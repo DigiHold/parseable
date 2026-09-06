@@ -8,6 +8,11 @@
 import type { Resume, Role, SkillRow } from './types';
 import { emptyResume } from './types';
 
+/** Marks a line that ran into the right margin, so a wrap can be told from a real break. */
+export const FULL_WIDTH = '\u0001';
+/** Marks a wide horizontal gap, which is how a right aligned column reads in a text layer. */
+export const GAP = '\u0002';
+
 export async function extractPdfText(file: File): Promise<string> {
   const pdfjs = await import('pdfjs-dist');
   const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
@@ -23,6 +28,7 @@ export async function extractPdfText(file: File): Promise<string> {
     let line = '';
     let lastY: number | null = null;
     const lines: string[] = [];
+    const ends: number[] = [];
 
     let lastEndX: number | null = null;
     for (const raw of content.items as any[]) {
@@ -32,19 +38,35 @@ export async function extractPdfText(file: File): Promise<string> {
 
       if (lastY !== null && Math.abs(y - lastY) > 2) {
         lines.push(line.trim());
+        ends.push(lastEndX ?? 0);
         line = '';
         lastEndX = null;
       }
       // Runs carry no spaces of their own, so a horizontal gap is the only signal.
-      if (lastEndX !== null && x - lastEndX > 1 && !/\s$/.test(line) && !/^\s/.test(raw.str)) line += ' ';
+      if (lastEndX !== null) {
+        const gap = x - lastEndX;
+        // Some producers report item widths accurately and some do not. Where they do,
+        // a wide gap is a right aligned column and marking it makes the split exact.
+        if (gap > 14) line += GAP;
+        else if (gap > 1 && !/\s$/.test(line) && !/^\s/.test(raw.str)) line += ' ';
+      }
       line += raw.str;
 
       lastEndX = x + (typeof raw.width === 'number' ? raw.width : 0);
-      if (raw.hasEOL) { lines.push(line.trim()); line = ''; lastEndX = null; }
+      if (raw.hasEOL) { lines.push(line.trim()); ends.push(lastEndX ?? 0); line = ''; lastEndX = null; }
       lastY = y;
     }
-    if (line.trim()) lines.push(line.trim());
-    pages.push(lines.filter(Boolean).join('\n'));
+    if (line.trim()) { lines.push(line.trim()); ends.push(lastEndX ?? 0); }
+
+    // A line that reaches the right margin was cut by the margin, not by the writer.
+    // FULL_WIDTH marks it so the wrap can be undone once the lines are back together.
+    const rightEdge = Math.max(...ends, 0) * 0.94;
+    pages.push(
+      lines
+        .map((l, i) => (l && ends[i] >= rightEdge ? l + FULL_WIDTH : l))
+        .filter((l) => l.replace(FULL_WIDTH, '').length > 0)
+        .join('\n')
+    );
   }
   await task.destroy();
   return pages.join('\n\n');
@@ -63,16 +85,56 @@ const HEADINGS: Array<[keyof SectionMap, RegExp]> = [
 type SectionMap = Record<'summary' | 'skills' | 'experience' | 'projects' | 'education' | 'languages' | 'certifications' | 'head', string[]>;
 
 const DATE_RANGE =
-  /((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc)[a-zé.]*\s*)?(19|20)\d{2}\s*(?:[-–—]|to|à|jusqu|until)\s*((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zé.]*\s*)?((19|20)\d{2}|present|current|today|now|aujourd|présent|actuel)/i;
+  /((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc)[a-zé.]*\s*)?(19|20)\d{2}\s*(?:[-–—]|to|à|jusqu|until)\s*((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zé.]*\s*)?((19|20)\d{2}|present|current|today|now|aujourd'hui|aujourd|présent|actuel)/i;
 const BULLET = /^\s*[•▪◦●·*\-–—]\s+/;
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]{2,}/;
 const PHONE = /(\+\d{1,3}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,6}\d{2,4}/;
 const URL = /\b((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.(?:com|net|org|io|dev|ai|co|me|fr|ch|app|xyz)(?:\/[\w./-]*)?)\b/i;
 
+/**
+ * A PDF stores one visual line at a time, so a sentence that wraps arrives as
+ * two or three lines. Left alone, every wrapped bullet becomes several bullets.
+ * A line continues the one above it when it opens lowercase, or when the line
+ * above ends on a comma or a word that cannot end a sentence.
+ */
+const OPEN_TAIL = /(,|\b(and|or|the|a|an|to|in|of|for|with|on|at|by|from|as|that|which|into|across|through|including|such as)\b)\s*$/i;
+
+function joinWrapped(lines: string[]): string[] {
+  const out: string[] = [];
+  for (const raw of lines) {
+    const line = raw;
+    const prev = out[out.length - 1];
+    const bare = line.replace(FULL_WIDTH, '');
+    const isHeading = bare.length < 46 && HEADINGS.some(([, re]) => re.test(bare));
+    // "Backend: Node.js, ..." opens a new row even when the line above ran to the margin.
+    const LABEL_ROW = /^[A-Za-zÀ-ÿ&/ ]{2,28}\s?:\s\S/;
+    const starts =
+      BULLET.test(bare) || isHeading || DATE_RANGE.test(bare) || EMAIL.test(bare) ||
+      LABEL_ROW.test(bare) || bare.includes(GAP);
+    // A role header reaches the right margin because its dates are set there, not
+    // because it wrapped, so it must never swallow the company line beneath it.
+    const prevBare = prev === undefined ? '' : prev.replace(FULL_WIDTH, '');
+    const prevIsHeader =
+      prev !== undefined && (prevBare.includes(GAP) || DATE_RANGE.test(prevBare) || /\s((?:19|20)\d{2})\s*$/.test(prevBare));
+    // Reaching the right margin on a short line means something was aligned there,
+    // a date or a link, not that the sentence ran out of room. Only a long line wraps.
+    const wrapped = prev !== undefined && prev.endsWith(FULL_WIDTH) && !prevIsHeader && prevBare.length > 45;
+    const continues =
+      prev !== undefined &&
+      !starts &&
+      !prevIsHeader &&
+      (wrapped || (prevBare.length > 45 && !/[.!?:]$/.test(prevBare) && (/^[a-z(]/.test(line) || OPEN_TAIL.test(prevBare))));
+    if (continues) out[out.length - 1] = `${prev.replace(FULL_WIDTH, '')} ${line}`;
+    else out.push(line);
+  }
+  return out.map((l) => l.replace(new RegExp(FULL_WIDTH, 'g'), '').trim());
+}
+
 /** Turns extracted text into a resume the person then corrects. */
 export function textToResume(text: string): Resume {
   const r = emptyResume();
-  const lines = text.split(/\r?\n/).map((l) => l.replace(/\s+/g, ' ').trim());
+  const lines = joinWrapped(text.split(/\r?\n/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean));
+
 
   const sections: SectionMap = { head: [], summary: [], skills: [], experience: [], projects: [], education: [], languages: [], certifications: [] };
   let current: keyof SectionMap = 'head';
@@ -141,16 +203,41 @@ export function textToResume(text: string): Resume {
   r.education = blockToRoles(sections.education).map((e) => ({ degree: e.title, school: e.org, dates: e.dates, detail: e.bullets.join(' ') }));
   r.languages = sections.languages.join(', ').replace(/\s*,\s*/g, ', ').trim();
 
-  return r;
+  return stripMarkers(r);
+}
+
+/** The layout markers are internal, so nothing carrying them ever reaches a form field. */
+function stripMarkers<T>(value: T): T {
+  const MARKERS = new RegExp(`[${FULL_WIDTH}${GAP}]`, 'g');
+  if (typeof value === 'string') return value.replace(MARKERS, ' ').replace(/\s+/g, ' ').trim() as unknown as T;
+  if (Array.isArray(value)) return value.map(stripMarkers) as unknown as T;
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) out[k] = stripMarkers(v);
+    return out as T;
+  }
+  return value;
 }
 
 /** A line carrying a date range opens a new entry. Everything under it belongs to that entry. */
 function blockToRoles(block: string[]): Role[] {
   const roles: Role[] = [];
   let cur: Role | null = null;
+  // Bullet glyphs are drawn by CSS in many PDFs and never reach the text layer, so
+  // "a plain line after bullets starts a new entry" is only safe where dates are
+  // absent entirely. That is the projects block. Experience always has dates.
+  const datelessBlock = !block.some((l) => DATE_RANGE.test(l) || /\s((?:19|20)\d{2})\s*$/.test(l));
 
   for (const line of block) {
-    // "Full Stack Developer      2023" is a role too, not only "2021 - 2024".
+    // A gap means a right aligned column, so the left is the entry and the right is
+    // its dates or its link. That covers "Founder            2016 - 2019" and
+    // "LinkedGrow                    linkedgrow.ai" with the same rule.
+    const parts = line.split(GAP).map((x) => x.trim()).filter(Boolean);
+    if (parts.length > 1 && !BULLET.test(line)) {
+      if (cur) roles.push(cur);
+      cur = { title: parts[0], org: '', dates: parts[parts.length - 1], bullets: [], env: '' };
+      continue;
+    }
     const single = line.match(/^(?![•▪◦●·*\-–—\s]*[•▪◦●·*])(?=.{4,70}$).*?\s((?:19|20)\d{2})\s*$/);
     const dates = line.match(DATE_RANGE)?.[0] ?? (single ? single[1] : /^\s*((19|20)\d{2})\s*$/.test(line) ? line.trim() : '');
     const isBullet = BULLET.test(line);
@@ -162,6 +249,14 @@ function blockToRoles(block: string[]): Role[] {
       continue;
     }
     if (!cur) { cur = { title: line, org: '', dates: '', bullets: [], env: '' }; continue; }
+
+    // Projects rarely carry dates, so the shape is the signal: a plain line
+    // arriving after a run of bullets is the next project's name.
+    if (datelessBlock && !isBullet && cur.bullets.length > 0 && line.length < 70 && !/^(environment|stack|tech|technologies|environnement)\s*:/i.test(line)) {
+      roles.push(cur);
+      cur = { title: line, org: '', dates: '', bullets: [], env: '' };
+      continue;
+    }
 
     if (isBullet) cur.bullets.push(line.replace(BULLET, '').trim());
     else if (!cur.title) cur.title = line;
