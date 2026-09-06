@@ -232,15 +232,15 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   const place = () => {
     const narrow = host.clientWidth < 760;
     group.rotation.set(narrow ? 0.06 : 0.14, narrow ? -0.16 : -0.5, narrow ? 0.02 : 0.05);
-    group.position.set(narrow ? 0.4 : 1.32, narrow ? -1.55 : -0.42, 0);
-    group.scale.setScalar(narrow ? 1.0 : 1.12);
+    group.position.set(narrow ? 0.4 : 1.32, narrow ? -1.55 : -0.22, 0);
+    group.scale.setScalar(narrow ? 1.0 : 1.02);
   };
   place();
 
   host.replaceChildren(renderer.domElement);
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 1.0, 1.02);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 0.65, 1.02);
   composer.addPass(bloom);
   const grain = new ShaderPass(GRAIN_SHADER);
   composer.addPass(grain);
@@ -283,7 +283,7 @@ export async function mountHero(host: HTMLElement): Promise<void> {
     grain.uniforms.uTime.value = t;
     cur.x += (target.x - cur.x) * 0.045; cur.y += (target.y - cur.y) * 0.045;
     if (host.clientWidth >= 760) group.rotation.set(cur.x, cur.y, 0.04 + Math.sin(t * 0.5) * 0.012);
-    group.position.y = (host.clientWidth < 760 ? -1.55 : -0.42) + Math.sin(t * 0.7) * 0.04;
+    group.position.y = (host.clientWidth < 760 ? -1.55 : -0.22) + Math.sin(t * 0.7) * 0.04;
     composer.render();
   };
   new IntersectionObserver(([e]) => {
