@@ -9,8 +9,8 @@
    ============================================================ */
 @theme {
   --color-paper: #ffffff;
-  --color-page: #fbfaf8;
-  --color-canvas: #f4f4f2;
+  --color-page: #f3f3f1;
+  --color-canvas: #ebebe8;
   --color-ink: #0f172a;
   --color-ink-2: #475569;
   --color-ink-3: #8b95a5;
@@ -32,7 +32,8 @@
   --color-line-2: #e7eaef;
   --ease-soft: cubic-bezier(.22, 1, .36, 1);
 
-  --font-display: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-ui: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
@@ -40,6 +41,13 @@
   --shadow-float: 0 2px 6px rgba(15, 23, 42, .05), 0 24px 60px rgba(15, 23, 42, .10);
 }
 
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/fonts/newsreader.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+  font-style: normal;
+}
 @font-face {
   font-family: 'Archivo';
   src: url('/fonts/archivo.woff2') format('woff2');
@@ -51,7 +59,8 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body { @apply m-0 bg-page text-ink font-sans text-[17px] leading-relaxed antialiased; }
-  h1, h2, h3, h4 { @apply font-display font-bold leading-[1.08] tracking-[-0.028em] m-0; }
+  h1, h2 { @apply font-display font-normal leading-[1.02] tracking-[-0.02em] m-0; font-variation-settings: 'opsz' 72; }
+  h3, h4 { @apply font-ui font-semibold leading-tight tracking-[-0.015em] m-0; }
   :focus-visible { @apply outline-[3px] outline-primary/60 outline-offset-2 rounded-lg; }
   img { @apply max-w-full; }
   ::selection { background: #dbe6ff; }
@@ -67,11 +76,11 @@
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-full border border-transparent
-           px-6 py-3.5 font-display text-[16px] font-semibold leading-none cursor-pointer
+           px-6 py-3.5 font-ui text-[16px] font-semibold leading-none cursor-pointer
            no-underline transition-[background-color,border-color,color,transform,box-shadow] duration-200 select-none;
   }
   .btn:active { transform: translateY(1px); }
-  .btn-primary { @apply bg-primary text-white shadow-[0_8px_24px_rgba(37,99,235,.28)] hover:bg-primary-hover; }
+  .btn-primary { @apply bg-ink text-white hover:bg-black; }
   .btn-xl { @apply px-9 py-[19px] text-[18px]; }
   .btn-ghost { @apply bg-paper text-ink border-edge hover:border-ink-3 hover:bg-canvas; }
   .btn-quiet { @apply bg-transparent text-ink-2 border-rule px-4 py-2.5 text-[14px] hover:text-ink hover:border-edge; }
@@ -79,7 +88,7 @@
   .btn:disabled { @apply opacity-40 cursor-not-allowed; }
 
   .field { @apply mb-4; }
-  .field label { @apply block font-display text-[13.5px] font-semibold text-ink-2 mb-2; }
+  .field label { @apply block font-ui text-[13.5px] font-semibold text-ink-2 mb-2; }
   .field input, .field textarea, .field select {
     @apply w-full rounded-xl border border-edge bg-paper px-4 py-3 text-[16px] leading-normal text-ink
            transition-[border-color,box-shadow] duration-150 placeholder:text-ink-3;
@@ -107,7 +116,7 @@
 
   .step-btn {
     @apply inline-flex items-center gap-2.5 rounded-full border border-rule bg-paper px-4 py-2.5
-           font-display text-[14.5px] font-semibold text-ink-2 cursor-pointer transition-colors
+           font-ui text-[14.5px] font-semibold text-ink-2 cursor-pointer transition-colors
            hover:border-edge hover:text-ink;
   }
   .step-btn[aria-current='step'] { @apply bg-ink border-ink text-white hover:text-white; }
@@ -125,7 +134,7 @@
   .tpl-thumb i { @apply block mb-[3px] rounded-[1px] bg-rule; }
 
   .notice { @apply mb-4 rounded-2xl bg-primary-soft px-4 py-3.5 text-[14.5px] text-ink-2; }
-  .notice strong { @apply mb-1 block font-display text-[14.5px] text-ink; }
+  .notice strong { @apply mb-1 block font-ui font-semibold text-[14.5px] text-ink; }
 
   .dropzone { @apply transition-[border-color,background-color,box-shadow] duration-200; }
   .dropzone.over { @apply border-primary bg-primary-soft; }
@@ -142,17 +151,28 @@ body[data-view='parser'] .zoomctl { display: none; }
 .js [data-reveal].is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .js [data-reveal] { opacity: 1; transform: none; transition: none; } }
 
-/* ---------- hero fallback, painted before three arrives ---------- */
-.hero-fallback .fb { display: block; height: 4%; margin-bottom: 3.2%; border-radius: 2px; background: #dde1e7; }
-.hero-fallback .fb.name { height: 7%; width: 58%; background: #16181c; margin-bottom: 3%; }
-.hero-fallback .fb.role { height: 3.5%; width: 38%; background: #b8c0cc; }
-.hero-fallback .fb.rule { height: 1.2%; width: 100%; background: #c9a961; margin: 2% 0 5%; }
-.hero-fallback .fb.head { height: 4.5%; width: 30%; background: #16181c; margin-top: 6%; }
-.hero-fallback .fb-beam { position: absolute; left: -4%; right: -4%; top: 58%; height: 2px; background: #60a5fa; box-shadow: 0 0 18px 4px rgba(96,165,250,.55); }
-.hero-fallback .fb-machine { position: absolute; left: 0; right: 0; bottom: 0; top: 58%; background: #0b1220; border-radius: 0 0 6px 6px; padding: 8%; }
-.hero-fallback .fb-machine i { display: block; height: 4%; margin-bottom: 6%; border-radius: 2px; background: #3f4756; width: 70%; }
-.hero-fallback .fb-machine i.g { background: #34d399; width: 52%; }
-[data-hero-3d] canvas { display: block; width: 100% !important; height: 100% !important; }
+
+/* ---------- the photographed sheet ---------- */
+.hero { position: relative; overflow: hidden; background: var(--color-page); }
+.site-head.is-scrolled { background: rgba(243,243,241,.82); backdrop-filter: blur(10px); }
+.hero-photo {
+  position: absolute; top: 0; bottom: 0; right: 0; width: 66%;
+  background: url('/img/sheet-hero.avif') 62% 50% / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+}
+@media (max-width: 1023px) {
+  .hero-photo { position: relative; width: auto; height: 360px; margin: 8px 0 0; mask-image: none; -webkit-mask-image: none;
+    background-position: 50% 42%; }
+}
+/* one hand drawn mark on the page: the underline in the headline */
+.ink { position: relative; white-space: nowrap; }
+.ink svg { position: absolute; left: -2%; right: -2%; bottom: -0.08em; width: 104%; height: .22em; overflow: visible; }
+.ink path { fill: none; stroke: var(--color-ink); stroke-width: 6; stroke-linecap: round; opacity: .9; }
+
+/* a torn strip of real paper between sections */
+.torn { position: relative; height: 120px; overflow: hidden; pointer-events: none; }
+.torn img { position: absolute; left: 50%; top: 50%; width: 1600px; max-width: none; transform: translate(-50%, -50%); mix-blend-mode: multiply; opacity: .9; }
 
 /* ---------- the pipeline ---------- */
 .pipe { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 0 48px; padding: 36px 0 0; list-style: none; }
@@ -160,7 +180,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .pipe li { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .pipe-dot { position: relative; z-index: 1; width: 22px; height: 22px; border-radius: 50%; background: var(--color-paper); border: 2px solid var(--color-ink); box-sizing: border-box; }
 .pipe li.fails .pipe-dot { background: var(--color-miss); border-color: var(--color-miss); box-shadow: 0 0 0 6px var(--color-miss-bg); }
-.pipe-label { margin-top: 14px; font-family: var(--font-display); font-weight: 600; font-size: 14px; line-height: 1.25; color: var(--color-ink-2); max-width: 11ch; }
+.pipe-label { margin-top: 14px; font-family: var(--font-ui); font-weight: 600; font-size: 14px; line-height: 1.25; color: var(--color-ink-2); max-width: 11ch; }
 .pipe li.fails .pipe-label { color: var(--color-ink); }
 .pipe-tag { position: absolute; top: -34px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--color-miss); letter-spacing: .06em; }
 @media (max-width: 640px) {
@@ -175,7 +195,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .notes li { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 26px 0; border-top: 1px solid var(--color-rule); }
 .notes li:last-child { border-bottom: 1px solid var(--color-rule); }
 .note-num { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--color-miss); padding-top: 6px; letter-spacing: .06em; }
-.notes h3 { font-size: 21px; margin: 0 0 8px; }
+.notes h3 { font-size: 19px; margin: 0 0 8px; }
 .notes p { margin: 0; font-size: 16px; color: var(--color-ink-2); }
 
 /* ---------- how it works ---------- */
@@ -183,12 +203,13 @@ body[data-view='parser'] .zoomctl { display: none; }
 .how li { counter-increment: how; position: relative; padding: 8px 0 64px 72px; opacity: .45; transition: opacity .35s var(--ease-soft); }
 .how li.is-active { opacity: 1; }
 .how li::before {
-  content: counter(how, decimal-leading-zero); position: absolute; left: 0; top: 4px;
-  font-family: var(--font-display); font-weight: 700; font-size: 34px; letter-spacing: -.03em; color: var(--color-ink);
+  content: counter(how, decimal-leading-zero); position: absolute; left: 0; top: 0;
+  font-family: var(--font-display); font-weight: 400; font-size: 40px; letter-spacing: -.02em; color: var(--color-ink);
+  font-variation-settings: 'opsz' 72;
 }
 .how li::after { content: ''; position: absolute; left: 22px; top: 54px; bottom: 6px; width: 2px; background: var(--color-rule); }
 .how li:last-child::after { display: none; }
-.how h3 { font-size: 24px; margin: 0 0 10px; }
+.how h3 { font-size: 22px; margin: 0 0 10px; }
 .how p { margin: 0; font-size: 16.5px; color: var(--color-ink-2); max-width: 46ch; }
 @media (max-width: 1023px) { .how li { opacity: 1; } }
 
@@ -204,7 +225,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .faq-index button {
   display: grid; grid-template-columns: 40px 1fr; gap: 12px; width: 100%; text-align: left;
   padding: 16px 12px 16px 0; border: 0; border-top: 1px solid var(--color-rule); background: none; cursor: pointer;
-  font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.35; color: var(--color-ink-2);
+  font-family: var(--font-ui); font-weight: 600; font-size: 16px; line-height: 1.35; color: var(--color-ink-2);
   transition: color .2s, padding-left .25s var(--ease-soft);
 }
 .faq-index li:last-child button { border-bottom: 1px solid var(--color-rule); }
@@ -213,7 +234,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .faq-num { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--color-ink-3); padding-top: 4px; letter-spacing: .06em; }
 .faq-index button[aria-selected='true'] .faq-num { color: var(--color-primary); }
 .faq-panel article { padding: 0 0 36px; }
-.faq-panel h3 { font-size: 24px; margin: 0 0 14px; }
+.faq-panel h3 { font-family: var(--font-display); font-weight: 400; font-size: 30px; letter-spacing: -.015em; margin: 0 0 16px; font-variation-settings: 'opsz' 48; }
 .faq-panel p { margin: 0; font-size: 18px; line-height: 1.7; color: var(--color-ink-2); }
 @media (max-width: 1023px) {
   .faq-panel article { border-top: 1px solid var(--color-rule); padding: 26px 0; }
@@ -228,7 +249,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 }
 
 /* ---------- footer wordmark ---------- */
-.ghost { margin: 0 0 -2vw -0.04em; font-family: var(--font-display); font-weight: 700; font-size: clamp(88px, 17.5vw, 250px); line-height: .9; letter-spacing: -.055em; color: rgba(15, 23, 42, .055); user-select: none; }
+.ghost { margin: 0 0 -2vw -0.02em; font-family: var(--font-display); font-weight: 400; font-size: clamp(88px, 17.5vw, 250px); line-height: .9; letter-spacing: -.03em; color: rgba(15, 23, 42, .06); user-select: none; font-variation-settings: 'opsz' 72; }
 
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary::after { content: '+'; }

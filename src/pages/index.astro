@@ -111,7 +111,7 @@ const schema = {
   <meta name="description" content={description} />
   <link rel="canonical" href={site + '/'} />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
-  <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={site + '/'} />
@@ -127,14 +127,9 @@ const schema = {
 </head>
 <body>
 
-<header class="sticky top-0 z-40 bg-page/80 backdrop-blur-md">
+<header class="site-head sticky top-0 z-40 transition-[background-color,backdrop-filter] duration-300" data-head>
   <div class="mx-auto flex h-[72px] max-w-[1240px] items-center gap-6 px-6">
-    <a href="/" class="flex items-center gap-2.5 font-display text-[20px] font-bold tracking-[-0.025em] no-underline">
-      <span class="grid h-8 w-8 place-items-center rounded-[9px] bg-ink" aria-hidden="true">
-        <svg width="14" height="17" viewBox="0 0 14 17" fill="none"><rect x="0.75" y="0.75" width="12.5" height="15.5" rx="2" stroke="#fff" stroke-width="1.5"/><rect x="3.5" y="5" width="7" height="1.6" fill="#fff"/><rect x="3.5" y="8.2" width="7" height="1.6" fill="#fff"/><rect x="3.5" y="11.4" width="4" height="1.6" fill="#60a5fa"/></svg>
-      </span>
-      Parseable
-    </a>
+    <a href="/" class="font-display text-[26px] tracking-[-0.02em] no-underline" style="font-variation-settings:'opsz' 32">Parseable</a>
     <nav class="ml-auto hidden items-center gap-8 text-[15px] font-medium sm:flex">
       <a href="#how" class="text-ink-2 no-underline transition-colors hover:text-ink">How it works</a>
       <a href="#faq" class="text-ink-2 no-underline transition-colors hover:text-ink">Questions</a>
@@ -144,29 +139,26 @@ const schema = {
 </header>
 
 <main>
-  <!-- hero: the sheet, and the software reading it -->
-  <section class="overflow-hidden">
-    <div class="mx-auto grid max-w-[1240px] items-center gap-10 px-6 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-6 lg:pb-24 lg:pt-14">
-      <div class="max-w-[600px]">
-        <p class="mb-6 font-mono text-[13px] font-medium uppercase tracking-[0.12em] text-ink-3">Free ATS friendly resume checker</p>
-        <h1 class="mb-6 text-[clamp(42px,6.2vw,74px)]">Get past the software and in front of a person</h1>
-        <p class="mb-9 max-w-[52ch] text-[19px] leading-relaxed text-ink-2">
+  <!-- hero: a real sheet of paper, and the beam that reads it -->
+  <section class="hero">
+    <div class="relative z-[1] mx-auto max-w-[1240px] px-6 pb-16 pt-12 lg:min-h-[720px] lg:pb-28 lg:pt-24">
+      <div class="max-w-[560px]">
+        <p class="mb-7 font-mono text-[12.5px] uppercase tracking-[0.14em] text-ink-3">Free ATS friendly resume checker</p>
+        <h1 class="mb-7 text-[clamp(44px,6.4vw,84px)]">Get past the software and in front of <span class="ink">a person<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C 60 6, 120 16, 180 10 S 270 8, 296 12"/></svg></span></h1>
+        <p class="mb-9 max-w-[46ch] text-[18px] leading-relaxed text-ink-2">
           Software reads your resume before a human does. Drop yours in, paste the job posting, and
           download a PDF the screening system reads correctly. Nothing leaves your browser.
         </p>
 
-        <div class="dropzone relative max-w-[540px] rounded-[26px] border border-rule bg-paper p-7 shadow-[var(--shadow-float)] sm:p-8" data-drop="pdf">
+        <div class="dropzone relative max-w-[520px] rounded-[22px] border border-rule bg-paper p-6 shadow-[var(--shadow-float)] sm:p-7" data-drop="pdf">
           <div class="flex flex-wrap items-center gap-4">
-            <button class="btn btn-primary btn-xl" data-action="pick-pdf">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0 4 4m-4-4-4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-              Upload your resume
-            </button>
-            <div class="min-w-[140px]">
-              <p class="m-0 font-display text-[16px] font-semibold text-ink">or drop a PDF here</p>
+            <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
+            <div class="min-w-[150px]">
+              <p class="m-0 font-ui text-[15.5px] font-semibold text-ink">or drop a PDF here</p>
               <p class="m-0 text-[13.5px] text-ink-3" data-role="pdf-status">Read in your browser, never uploaded.</p>
             </div>
           </div>
-          <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-rule pt-5 text-[14.5px]">
+          <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-rule pt-5 text-[14.5px]">
             <button class="cursor-pointer border-0 bg-transparent p-0 font-medium text-ink-2 underline decoration-edge underline-offset-4 transition-colors hover:text-ink hover:decoration-ink" data-action="blank">Start from scratch</button>
             <button class="cursor-pointer border-0 bg-transparent p-0 font-medium text-ink-2 underline decoration-edge underline-offset-4 transition-colors hover:text-ink hover:decoration-ink" data-action="import-json">Import a saved JSON</button>
           </div>
@@ -179,20 +171,8 @@ const schema = {
           <span><b class="font-semibold text-ink-2">Open source,</b> MIT licensed, host your own copy.</span>
         </p>
       </div>
-
-      <div class="relative h-[340px] sm:h-[440px] lg:-mr-10 lg:h-[600px]" data-hero-3d aria-hidden="true">
-        <!-- painted before three loads, and kept when WebGL is unavailable -->
-        <div class="hero-fallback absolute inset-0 grid place-items-center">
-          <div class="relative h-[86%] w-[62%] max-w-[300px] rotate-[-6deg] rounded-[6px] bg-paper p-[8%] shadow-[var(--shadow-float)]">
-            <i class="fb name"></i><i class="fb role"></i><i class="fb rule"></i>
-            <i class="fb head"></i><i class="fb" style="width:100%"></i><i class="fb" style="width:94%"></i><i class="fb" style="width:88%"></i>
-            <i class="fb head" style="width:24%"></i><i class="fb" style="width:80%"></i><i class="fb" style="width:72%"></i>
-            <div class="fb-beam"></div>
-            <div class="fb-machine"><i></i><i class="g"></i><i></i><i class="g"></i><i></i><i></i><i class="g"></i></div>
-          </div>
-        </div>
-      </div>
     </div>
+    <div class="hero-photo" aria-hidden="true"></div>
   </section>
 
   <!-- workspace: appears once a resume is loaded -->
@@ -366,8 +346,10 @@ Languages: Python, Go, SQL, TypeScript</pre>
     </div>
   </section>
 
+  <div class="torn" aria-hidden="true"><img src="/img/torn-strip.avif" alt="" loading="lazy" decoding="async" width="1376" height="768"></div>
+
   <!-- questions: an index, one answer at a time -->
-  <section id="faq" class="scroll-mt-[72px] border-t border-rule bg-paper">
+  <section id="faq" class="scroll-mt-[72px] bg-paper">
     <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
       <div class="mb-12 max-w-[640px]" data-reveal>
         <p class="mb-5 font-mono text-[13px] font-medium uppercase tracking-[0.12em] text-ink-3">Questions</p>
