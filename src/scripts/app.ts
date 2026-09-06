@@ -16,7 +16,7 @@ let step: StepId = 'details';
 let started = true;
 let posting = '';
 let lastAudit: Audit | null = null;
-let zoom = 0.6;
+let zoom = 0.66;
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector(sel) as T | null;
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -49,8 +49,7 @@ function panelDetails(): string {
       <p class="text-[13.5px] text-ink-2 mb-4">Check every field before you continue, because extraction from a PDF is never perfect, and a wrong date is worse than a missing one.</p>
 
       <div class="field"><label for="f-name">Full name</label><input id="f-name" data-bind="basics.name" value="${esc(b.name)}" autocomplete="name"></div>
-      <div class="field"><label for="f-title">Job title</label><input id="f-title" data-bind="basics.title" value="${esc(b.title)}" placeholder="Full Stack Developer">
-        <p class="sub">Match this to the posting's own title when it is honest.</p></div>
+      <div class="field"><label for="f-title">Job title</label><input id="f-title" data-bind="basics.title" value="${esc(b.title)}" placeholder="Full Stack Developer"></div>
       <div class="row2 grid grid-cols-2 gap-3">
         <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" data-bind="basics.email" value="${esc(b.email)}"></div>
         <div class="field"><label for="f-phone">Phone</label><input id="f-phone" data-bind="basics.phone" value="${esc(b.phone)}"></div>
@@ -58,8 +57,7 @@ function panelDetails(): string {
       <div class="field"><label for="f-loc">Location</label><input id="f-loc" data-bind="basics.location" value="${esc(b.location)}" placeholder="Berlin, Germany or Remote (CET)"></div>
 
       <div class="field"><label for="f-links">Links</label>
-        <input id="f-links" data-bind="links" value="${esc(b.links.map((l) => l.url).join(', '))}" placeholder="github.com/you, yoursite.com">
-        <p class="sub">Separated by commas, and they print as plain text so a parser can read them.</p></div>
+        <input id="f-links" data-bind="links" value="${esc(b.links.map((l) => l.url).join(', '))}" placeholder="github.com/you, yoursite.com, separated by commas"></div>
 
       <div class="field"><label for="f-sum">Professional summary</label>
         <textarea id="f-sum" data-bind="basics.summary" rows="5" placeholder="Three or four sentences. This is where the posting's most important terms belong.">${esc(b.summary)}</textarea>
@@ -118,18 +116,17 @@ function panelDetails(): string {
           </div>
           <div class="field mb-0"><label>Detail (optional)</label><input data-bind="education.${i}.detail" value="${esc(e.detail)}"></div>
         </div>`).join(''))}
-      <p class="mt-[-6px] mb-4 text-[12.5px] text-ink-3">No degree? Leave this empty, because an absent section reads better than one that announces the gap.</p>
 
       <div class="field"><label for="f-lang">Languages</label><input id="f-lang" data-bind="languages" value="${esc(data.languages)}" placeholder="English (native), German (B2)"></div>
     </div>`;
 }
 
 function repeatable(title: string, key: string, body: string): string {
-  return `<div class="mb-5">
-    <div class="mb-2.5 flex items-center gap-2 border-t border-rule pt-4">
-      <h3 class="flex-1 font-display text-[15px] font-bold">${title}</h3>
-      <button class="btn btn-quiet" data-add="${key}">Add</button>
-    </div>${body}</div>`;
+  const count = (data as unknown as Record<string, unknown[]>)[key].length;
+  return `<details class="acc" ${key === 'skills' || key === 'experience' ? 'open' : ''}>
+    <summary><span>${title}</span><span class="acc-count">${count}</span></summary>
+    <div class="acc-body">${body}<button class="btn btn-quiet" data-add="${key}">Add ${title.toLowerCase().replace(/s$/, '')}</button></div>
+  </details>`;
 }
 function moveButtons(key: string, i: number, len: number): string {
   return `<button class="icon-btn" data-move="${key}:${i}:-1" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>↑</button>
@@ -193,7 +190,7 @@ function panelPosting(): string {
         <label for="f-post">Job description</label>
         <textarea id="f-post" rows="7" data-role="posting" placeholder="Paste the whole posting, requirements included.">${esc(posting)}</textarea>
       </div>
-      <button class="btn btn-primary w-full" data-action="run-audit">Check my resume against it</button>
+      <button class="btn btn-ghost w-full" data-action="run-audit">Check my resume against it</button>
       ${a ? renderAudit(a) : `<p class="mt-4 text-[13px] text-ink-3">Nothing is sent anywhere. The comparison runs in this tab.</p>`}
     </div>`;
 }
@@ -229,7 +226,7 @@ function panelExport(): string {
     <div class="p-5">
       <h2 class="text-[19px] mb-1">Take it with you</h2>
       <p class="text-[13.5px] text-ink-2 mb-4">Download the PDF for this application, and the JSON so the next one takes a minute.</p>
-      <button class="btn btn-primary mb-2.5 w-full" data-action="print">Download PDF</button>
+      <button class="btn btn-ghost mb-2.5 w-full" data-action="print">Download PDF</button>
       <button class="btn btn-ghost mb-4 w-full" data-action="export-json">Export JSON</button>
       <div class="notice">
         <strong>In the print dialog</strong>
@@ -282,7 +279,7 @@ function renderPreview() {
   const parser = $('#parser');
   if (parser) parser.textContent = renderParserText(sheet) || 'Your resume is empty, so a parser would read nothing.';
   const scale = $('#scale');
-  if (scale) scale.style.transform = `scale(${zoom})`;
+  if (scale) { scale.style.transform = `scale(${zoom})`; scale.style.height = `${Math.round(297 * 3.78 * zoom)}px`; scale.style.width = `${Math.round(210 * 3.78 * zoom)}px`; }
   const z = $('#zoomval');
   if (z) z.textContent = `${Math.round(zoom * 100)}%`;
 }

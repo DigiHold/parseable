@@ -139,68 +139,59 @@ const schema = {
 </header>
 
 <main class="dropzone" data-drop="pdf">
-  <section class="mx-auto max-w-[1120px] px-6 pb-12 pt-16 sm:pt-24 sm:pb-16">
-    <h1 class="mb-6 max-w-[13ch] text-[clamp(44px,7vw,92px)]">Get past the software and in front of a person</h1>
-    <p class="mb-8 max-w-[44ch] text-[18px] leading-[1.55] text-ink-2 sm:text-[20px]">Software reads your resume before a human does. Check yours against the job posting and download a PDF the screening system reads correctly. Nothing leaves your browser.</p>
-    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
-      <button class="btn btn-primary btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
-      <p class="m-0 text-[15px] text-ink-2"><span class="hidden [@media(hover:hover)]:inline">or drop a PDF anywhere on this page, or </span><button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="import-json">import a saved JSON</button>.</p>
-    </div>
-    <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
-    <input type="file" accept="application/json,.json" class="hidden" data-file="json">
-    <p class="mt-4 text-[14px] text-ink-3" data-role="pdf-status"></p>
+  <section class="mx-auto max-w-[1120px] px-6 pt-14 sm:pt-20">
+    <h1 class="mb-10 max-w-[22ch] text-[clamp(42px,6.2vw,88px)]">Get past the software and in front of a person</h1>
   </section>
 
-  <!-- the tool, open on arrival -->
-  <section id="workspace" class="scroll-mt-[80px]">
-    <div class="mx-auto max-w-[1120px] px-6 pb-20">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-5">
-        <ol class="m-0 flex list-none flex-wrap gap-2 p-0" id="steps">
-          {steps.map((s, i) => (
-            <li>
-              <button class="step-btn" data-step={s.id} aria-current={i === 0 ? 'step' : undefined}>
-                <span class="step-num"><span>{i + 1}</span></span>
-                <span class="step-label">{s.label}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-        <div class="flex items-center gap-4">
-          <p class="m-0 text-[13.5px] text-ink-3" data-role="demo-note">A sample resume is loaded. Upload yours to replace it, or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] underline hover:text-ink" data-action="blank">start from scratch</button>.</p>
-          <button class="btn btn-primary btn-sm" data-action="print">Download PDF</button>
-        </div>
+  <section id="workspace" class="mx-auto grid max-w-[1120px] grid-cols-1 items-start gap-10 px-6 pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
+    <div>
+      <p class="mb-7 max-w-[40ch] text-[18px] leading-[1.55] text-ink-2">Software reads your resume before a human does. Check yours against the job posting and download a PDF the screening system reads correctly. Nothing leaves your browser.</p>
+      <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+        <button class="btn btn-primary btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
+        <p class="m-0 text-[15px] text-ink-2"><span class="hidden [@media(hover:hover)]:inline">or drop a PDF anywhere, or </span><button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="import-json">import a saved JSON</button>.</p>
       </div>
+      <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
+      <input type="file" accept="application/json,.json" class="hidden" data-file="json">
+      <p class="mb-8 text-[13px] text-ink-3" data-role="pdf-status"></p>
+      <p class="mb-5 text-[13px] text-ink-3" data-role="demo-note">A sample resume is loaded. Upload yours to replace it, or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] underline hover:text-ink" data-action="blank">start from scratch</button>.</p>
 
-      <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <div class="overflow-hidden rounded-[4px] border border-rule bg-paper">
-          <div id="panels"></div>
-          <div class="flex gap-3 border-t border-rule px-6 py-5">
-            <button class="btn btn-ghost flex-1" data-nav="prev">Back</button>
-            <button class="btn btn-primary flex-1" data-nav="next">Continue</button>
-          </div>
+      <ol class="m-0 mb-4 flex list-none flex-wrap gap-x-6 gap-y-1 border-b border-rule p-0" id="steps">
+        {steps.map((s, i) => (
+          <li>
+            <button class="step-btn" data-step={s.id} aria-current={i === 0 ? 'step' : undefined}>
+              <span class="step-num"><span>{i + 1}</span></span>
+              <span class="step-label">{s.label}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div id="panels"></div>
+      <div class="flex gap-3 border-t border-rule pt-5">
+        <button class="btn btn-ghost" data-nav="prev">Back</button>
+        <button class="btn btn-ghost" data-nav="next">Continue</button>
+      </div>
+    </div>
+
+    <div class="lg:sticky lg:top-[80px]">
+      <div class="mb-3 flex flex-wrap items-center gap-3">
+        <div class="flex gap-5" role="tablist" aria-label="Preview mode">
+          <button class="step-btn" role="tab" aria-selected="true" data-view="human">What a person sees</button>
+          <button class="step-btn" role="tab" aria-selected="false" data-view="parser">What the software reads</button>
         </div>
-
-        <div class="lg:sticky lg:top-[84px]">
-          <div class="mb-3 flex flex-wrap items-center gap-2">
-            <div class="inline-flex rounded-[4px] border border-rule bg-paper p-0.5" role="tablist" aria-label="Preview mode">
-              <button class="rounded-[3px] border-0 bg-transparent px-3.5 py-1.5 font-ui text-[13.5px] font-medium text-ink-2 cursor-pointer transition-colors aria-selected:bg-ink aria-selected:text-white" role="tab" aria-selected="true" data-view="human">What a person sees</button>
-              <button class="rounded-[3px] border-0 bg-transparent px-3.5 py-1.5 font-ui text-[13.5px] font-medium text-ink-2 cursor-pointer transition-colors aria-selected:bg-ink aria-selected:text-white" role="tab" aria-selected="false" data-view="parser">What the software reads</button>
-            </div>
-            <div class="zoomctl ml-auto flex items-center gap-1.5">
-              <button class="icon-btn" data-zoom="-1" aria-label="Zoom out">−</button>
-              <span class="min-w-[40px] text-center font-mono text-[12px] text-ink-3" id="zoomval">60%</span>
-              <button class="icon-btn" data-zoom="1" aria-label="Zoom in">+</button>
-            </div>
-          </div>
-          <div class="stage max-h-[calc(100vh-150px)] overflow-auto rounded-[4px] border border-rule bg-canvas p-6">
-            <div class="sheet-scale flex origin-top justify-center transition-transform duration-200" id="scale">
-              <article class="sheet" id="sheet" data-tpl="classic"></article>
-            </div>
-            <div class="parser-out">
-              <p class="mb-3 text-[14px] text-ink-2">This is the plain text a parser pulls out of your PDF. If a heading or a date looks wrong here, it is wrong in the employer's system too.</p>
-              <pre class="m-0 max-h-[calc(100vh-220px)] overflow-auto whitespace-pre-wrap break-words rounded-[4px] border border-rule bg-paper p-6 font-mono text-[12.5px] leading-[1.7] text-ink" id="parser"></pre>
-            </div>
-          </div>
+        <div class="zoomctl ml-auto flex items-center gap-1.5">
+          <button class="icon-btn" data-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="min-w-[40px] text-center font-mono text-[12px] text-ink-3" id="zoomval">66%</span>
+          <button class="icon-btn" data-zoom="1" aria-label="Zoom in">+</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-action="print">Download PDF</button>
+      </div>
+      <div class="stage max-h-[calc(100vh-140px)] overflow-auto border border-rule">
+        <div class="sheet-scale flex origin-top justify-start transition-transform duration-200" id="scale">
+          <article class="sheet" id="sheet" data-tpl="classic"></article>
+        </div>
+        <div class="parser-out">
+          <p class="m-0 border-b border-rule px-6 py-3 text-[13px] text-ink-2">The plain text a parser pulls out of your PDF. If a heading or a date looks wrong here, it is wrong in the employer's system too.</p>
+          <pre class="m-0 max-h-[calc(100vh-220px)] overflow-auto whitespace-pre-wrap break-words bg-paper p-6 font-mono text-[12.5px] leading-[1.7] text-ink" id="parser"></pre>
         </div>
       </div>
     </div>
@@ -209,7 +200,7 @@ const schema = {
   <!-- why resumes fail, in the extractor's own output -->
   <section id="read" class="scroll-mt-[80px] border-t border-rule">
     <div class="mx-auto max-w-[1120px] px-6 py-20">
-      <h2 class="mb-4 max-w-[18ch] text-[clamp(30px,4vw,48px)]">What the software read from a two column resume</h2>
+      <h2 class="mb-4 max-w-[24ch] text-[clamp(28px,3.4vw,40px)]">What the software read from a two column resume</h2>
       <p class="mb-10 max-w-[56ch] text-[18px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, with the three places where the application dies marked.</p>
       <div class="read">
         <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
@@ -240,7 +231,7 @@ English</pre>
 
   <section id="faq" class="scroll-mt-[80px] border-t border-rule">
     <div class="mx-auto max-w-[1120px] px-6 py-20">
-      <h2 class="mb-8 max-w-[20ch] text-[clamp(30px,4vw,48px)]">What people ask before they trust a resume checker</h2>
+      <h2 class="mb-8 max-w-[24ch] text-[clamp(28px,3.4vw,40px)]">What people ask before they trust a resume checker</h2>
       <div class="faq-panel max-w-[720px]">
         {faq.map((f) => (
           <article data-faq-a>

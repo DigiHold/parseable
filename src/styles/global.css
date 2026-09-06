@@ -89,9 +89,9 @@
   .field input:focus, .field textarea:focus, .field select:focus {
     @apply outline-none border-ink shadow-[0_0_0_3px_rgba(20,21,23,.10)];
   }
-  .field .sub { @apply text-[13px] text-ink-3 mt-2 mb-0 leading-snug; }
+  .field .sub { @apply text-[13px] text-ink-3 mt-1.5 mb-0 leading-snug; }
 
-  .card { @apply rounded-[4px] border border-rule bg-canvas p-4 mb-3; }
+  .card { @apply rounded-[4px] border border-rule bg-paper p-4 mb-3; }
   .icon-btn {
     @apply grid h-8 w-8 place-items-center rounded-lg border border-edge bg-paper p-0 text-[14px]
            leading-none text-ink-2 cursor-pointer transition-colors hover:text-ink hover:border-ink-3;
@@ -102,30 +102,24 @@
     @apply inline-flex items-center gap-1.5 rounded-full border border-transparent
            px-3 py-2 text-[13.5px] font-medium leading-none;
   }
-  .chip-hit { @apply bg-[#f0f0f0] text-ink; }
-  .chip-miss { @apply bg-paper text-ink-2 border-edge cursor-pointer transition-colors hover:border-ink; }
+  .chip-hit { @apply bg-[#efefef] text-ink; }
+  .chip-miss { @apply bg-paper text-ink border-edge cursor-pointer transition-colors hover:border-ink; }
   .chip-miss::after { content: '+'; @apply font-bold opacity-70; }
 
   .step-btn {
-    @apply inline-flex items-center gap-2.5 rounded-[4px] border border-rule bg-paper px-4 py-2.5
-           font-ui text-[14.5px] font-semibold text-ink-2 cursor-pointer transition-colors
-           hover:border-edge hover:text-ink;
+    @apply inline-flex items-center border-0 border-b-2 border-transparent bg-transparent px-0 pb-2 pt-1
+           font-ui text-[15px] font-medium text-ink-2 cursor-pointer transition-colors hover:text-ink;
   }
-  .step-btn[aria-current='step'] { @apply bg-ink border-ink text-white hover:text-white; }
-  .step-num {
-    @apply grid h-6 w-6 flex-none place-items-center rounded-full border-[1.5px] border-current
-           font-mono text-[12px] font-semibold leading-none;
-  }
-  .step-btn.done .step-num { @apply bg-match border-match text-white; }
-  .step-btn.done .step-num > span { @apply hidden; }
-  .step-btn.done .step-num::before { content: '✓'; @apply text-[12px]; }
+  .step-btn[aria-current='step'], .step-btn[aria-selected='true'] { @apply border-ink text-ink; }
+  .step-btn.done { @apply text-ink; }
+  .step-num { @apply hidden; }
 
   .tpl { @apply block w-full cursor-pointer rounded-[4px] border-2 border-rule bg-paper p-2.5 text-left transition-colors hover:border-edge; }
   .tpl[aria-pressed='true'] { @apply border-ink; }
   .tpl-thumb { @apply mb-2 overflow-hidden rounded-lg border border-rule bg-white p-2; aspect-ratio: 1 / 1.3; }
   .tpl-thumb i { @apply block mb-[3px] rounded-[1px] bg-rule; }
 
-  .notice { @apply mb-4 rounded-[4px] bg-primary-soft px-4 py-3.5 text-[14.5px] text-ink-2; }
+  .notice { @apply mb-4 rounded-[4px] border border-rule px-4 py-3.5 text-[14.5px] text-ink-2; }
   .notice strong { @apply mb-1 block font-ui font-semibold text-[14.5px] text-ink; }
 
   .dropzone { @apply transition-[border-color,background-color,box-shadow] duration-200; }
@@ -182,12 +176,20 @@ body[data-view='parser'] .zoomctl { display: none; }
 .read pre b { font-weight: 500; color: #0a0a0a; background: #efefef; box-shadow: 0 0 0 3px #efefef; border-radius: 2px; }
 .read pre s { text-decoration: none; color: #9a9a9a; }
 .read pre i { font-style: normal; color: #0a0a0a; background: #efefef; box-shadow: 0 0 0 3px #efefef; border-radius: 2px; }
-.read ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 32px; }
-@media (min-width: 768px) { .read ol { grid-template-columns: repeat(3, 1fr); gap: 40px; } }
+.read ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; max-width: 720px; }
 .read li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; }
 .read .num { font: 500 13px/1.6 var(--font-ui); color: var(--color-ink-3); }
 .read h3 { font-size: 17px; margin: 0 0 6px; }
 .read p { margin: 0; font-size: 15.5px; color: var(--color-ink-2); }
+
+/* ---------- collapsible groups in the form ---------- */
+.acc { border-top: 1px solid var(--color-rule); }
+.acc summary { display: flex; align-items: center; gap: 10px; padding: 14px 0; cursor: pointer; list-style: none; font: 600 15px/1.3 var(--font-ui); }
+.acc summary::-webkit-details-marker { display: none; }
+.acc summary::before { content: '+'; width: 14px; color: var(--color-ink-3); font-weight: 400; }
+.acc[open] summary::before { content: '−'; }
+.acc-count { margin-left: auto; font-weight: 400; color: var(--color-ink-3); font-size: 13px; }
+.acc-body { padding: 2px 0 16px; }
 
 /* ---------- questions ---------- */
 .faq-index { display: none !important; }

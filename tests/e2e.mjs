@@ -36,8 +36,9 @@ const scaleOf = async () => page.locator('#scale').evaluate((el) => el.style.tra
 const z0 = await zoomText();
 await page.click('[data-zoom="1"]'); await page.waitForTimeout(100);
 check('zoom in changes the value', (await zoomText()) !== z0, `${z0} -> ${await zoomText()}`);
+const before = await scaleOf();
 await page.click('[data-zoom="-1"]'); await page.click('[data-zoom="-1"]'); await page.waitForTimeout(100);
-check('zoom out changes the transform', (await scaleOf()).includes('scale(0.5)'), await scaleOf());
+check('zoom out changes the transform', (await scaleOf()) !== before && /scale\(0\.\d+\)/.test(await scaleOf()), `${before} -> ${await scaleOf()}`);
 
 await page.click('button[role="tab"][data-view="parser"]'); await page.waitForTimeout(150);
 check('parser view shows extracted text', (await page.locator('#parser').innerText()).length > 400);
