@@ -6,6 +6,49 @@ const title = 'Free ATS Friendly Resume Checker · Parseable';
 const description =
   'Free ATS friendly resume checker. Paste a job posting, see which required keywords you match, and export a PDF screening software reads correctly.';
 
+// The demo resume, real text at real size, drawn with the same sheet the tool prints.
+const demoSheet = `
+<header class="s-head"><div class="s-head-txt"><h1 class="s-name">Marie Dubois</h1><p class="s-role">Senior Backend Engineer</p><p class="s-contact"><span>marie.dubois@example.com</span><span class="sep">|</span><span>+33 6 12 34 56 78</span><span class="sep">|</span><span>Lyon, France, remote across CET</span></p></div></header>
+<section><h2>Professional Summary</h2><p class="s-summary">Backend engineer with nine years building payment systems in Python and Go. Led the migration of a monolith to services handling four thousand requests per second, and mentored the team through it. Works remotely across CET.</p></section>
+<section><h2>Skills</h2><p class="s-skill"><b>Languages:</b> Python, Go, SQL, TypeScript</p><p class="s-skill"><b>Infrastructure:</b> Kubernetes, Docker, PostgreSQL, Terraform, AWS</p><p class="s-skill"><b>Practices:</b> CI/CD, on call, incident reviews, technical writing</p></section>
+<section><h2>Experience</h2>
+<div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in Go and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li><li>Wrote the incident review process the whole platform team now follows.</li></ul></div>
+<div class="s-item"><div class="s-item-head"><p class="s-item-title">Backend Engineer</p><span class="s-item-dates">2017 - 2021</span></div><p class="s-item-org">Doctolib, Paris</p><ul><li>Shipped the appointment reminder pipeline, sending two million messages a day.</li><li>Moved the search index to a managed cluster with zero downtime.</li></ul></div>
+</section>
+<section><h2>Education</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">MSc Computer Science</p><span class="s-item-dates">2015 - 2017</span></div><p class="s-item-org">INSA Lyon</p></div></section>
+<section><h2>Languages</h2><p>French (native) &nbsp;&nbsp; English (professional)</p></section>`;
+
+// The same document as the extractor returns it, with the terms a posting asked for marked.
+const demoRead = `EXPERIENCE
+Senior Backend Engineer                                   2021 - 2026
+Payfit, Paris
+Rebuilt the billing service in <b>Go</b> and cut p99 latency from 800ms to 90ms.
+Mentored four engineers through the migration and ran the on call rotation.
+Wrote the incident review process the whole platform team now follows.
+Backend Engineer                                          2017 - 2021
+Doctolib, Paris
+Shipped the appointment reminder pipeline, sending two million messages a day.
+Moved the search index to a managed cluster with zero downtime.
+
+EDUCATION
+MSc Computer Science                                      2015 - 2017
+INSA Lyon`;
+
+// The same text from the top, for the step that shows the whole extraction.
+const demoReadFull = `Marie Dubois
+Senior Backend Engineer
+marie.dubois@example.com | +33 6 12 34 56 78 | Lyon, France, remote across CET
+
+PROFESSIONAL SUMMARY
+Backend engineer with nine years building payment systems in <b>Python</b> and <b>Go</b>. Led the migration of a monolith to services handling four thousand requests per second, and mentored the team through it.
+
+SKILLS
+Languages: <b>Python</b>, <b>Go</b>, SQL, TypeScript
+Infrastructure: <b>Kubernetes</b>, <b>Docker</b>, <b>PostgreSQL</b>, Terraform, AWS
+Practices: <b>CI/CD</b>, on call, incident reviews, technical writing
+
+` + demoRead;
+
 const steps = [
   { id: 'details', label: 'Details' },
   { id: 'template', label: 'Template' },
@@ -112,7 +155,6 @@ const schema = {
   <link rel="canonical" href={site + '/'} />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
   <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="/img/sheet-hero.avif" as="image" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={site + '/'} />
@@ -145,13 +187,13 @@ const schema = {
     <div class="dropzone mx-auto grid max-w-[1240px] items-start gap-12 px-6 pb-14 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:pb-20 lg:pt-10" data-drop="pdf">
       <div class="max-w-[560px] lg:pt-6">
         <h1 class="mb-6 max-w-[12ch] text-[clamp(42px,5.5vw,72px)]" style="text-wrap:balance">Get past the software and in front of a person</h1>
-        <p class="mb-9 max-w-[44ch] text-[17px] leading-relaxed text-ink-2 sm:text-[18px]">
-          Software reads your resume before a human does. Drop yours in, paste the job posting, and
-          download a PDF the screening system reads correctly. Nothing leaves your browser.
+        <p class="mb-9 max-w-[44ch] text-[17px] leading-[1.6] text-ink-2 sm:text-[18px]">
+          Software reads your resume before a human does. <span class="hidden sm:inline">Drop yours in, paste the job posting, and
+          download a PDF the screening system reads correctly.</span> Nothing leaves your browser.
         </p>
         <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
           <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
-          <p class="m-0 text-[15px] text-ink-2">or drop a PDF anywhere on this page.</p>
+          <p class="m-0 hidden text-[15px] text-ink-2 [@media(hover:hover)]:block">or drop a PDF anywhere on this page.</p>
         </div>
         <p class="mt-5 text-[14px] text-ink-3" data-role="pdf-status">Read in your browser, never uploaded. No account, nothing stored, MIT licensed.</p>
         <p class="mt-8 border-t border-rule pt-5 text-[14px] text-ink-3">
@@ -163,8 +205,10 @@ const schema = {
         <input type="file" accept="application/json,.json" class="hidden" data-file="json">
       </div>
 
-      <div class="hero-photo" aria-hidden="true">
-        <img src="/img/sheet-hero.avif" alt="" width="640" height="720" decoding="async" fetchpriority="high">
+      <div class="demo" aria-label="A resume, and below the blue line the text a parser extracts from it">
+        <div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
+        <div class="demo-read"><pre set:html={demoRead}></pre></div>
+        <div class="demo-line" aria-hidden="true"></div>
       </div>
     </div>
   </section>
@@ -298,40 +342,22 @@ English</pre>
         <div class="lg:sticky lg:top-[96px]">
           <div class="frag-frame" aria-hidden="true">
             <div class="frag" data-how-frag="0">
-              <div class="rounded-xl border border-rule bg-paper p-6">
-                <div class="field"><label>Full name</label><input value="Marie Dubois" readonly tabindex="-1"></div>
-                <div class="field"><label>Job title</label><input value="Senior Backend Engineer" readonly tabindex="-1"></div>
-                <div class="field mb-0"><label>Professional summary</label><textarea readonly tabindex="-1" rows="3">Backend engineer with nine years building payment systems in Python and Go.</textarea></div>
-              </div>
+              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div></div>
             </div>
             <div class="frag" data-how-frag="1">
-              <pre class="m-0 rounded-xl bg-[#0f1520] p-6 font-mono text-[12.5px] leading-[1.75] text-[#c7ccd4]">Marie Dubois
-Senior Backend Engineer
-marie@example.com | Lyon, France
-
-PROFESSIONAL SUMMARY
-Backend engineer with nine years building
-payment systems in Python and Go.
-
-SKILLS
-Languages: Python, Go, SQL, TypeScript</pre>
+              <div class="demo" style="--scan:0%"><div class="demo-read demo-read-full"><pre set:html={demoReadFull}></pre></div></div>
             </div>
             <div class="frag" data-how-frag="2">
-              <div class="rounded-xl border border-rule bg-paper p-6">
+              <div class="rounded-xl bg-paper p-6 shadow-[1px_2px_0_#d8d5cf,0_18px_40px_-18px_rgba(15,23,42,.22)]">
                 <div class="flex items-baseline gap-2.5"><b class="font-display text-[40px] font-normal leading-none tracking-[-0.02em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
-                <div class="my-3 mb-5 h-1.5 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-primary"></i></div>
+                <div class="my-3 mb-5 h-1 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-primary"></i></div>
                 <div class="flex flex-wrap gap-1.5">
-                  <span class="chip chip-miss">WCAG</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Accessibility</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">JavaScript</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Next.js</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">React</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">TypeScript</span>
+                  <span class="chip chip-miss">Terraform</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Python</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Go</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Kubernetes</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Docker</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">PostgreSQL</span>
                 </div>
               </div>
             </div>
             <div class="frag" data-how-frag="3">
-              <article class="sheet" data-tpl="classic">
-                <header class="s-head"><div class="s-head-txt"><h1 class="s-name">Marie Dubois</h1><p class="s-role">Senior Backend Engineer</p><p class="s-contact"><span>marie@example.com</span><span class="sep">|</span><span>Lyon, France</span></p></div></header>
-                <section><h2>Professional Summary</h2><p class="s-summary">Backend engineer with nine years building payment systems in Python and Go. Led the migration of a monolith to services handling four thousand requests per second.</p></section>
-                <section><h2>Skills</h2><p class="s-skill"><b>Languages:</b> Python, Go, SQL, TypeScript</p><p class="s-skill"><b>Infrastructure:</b> Kubernetes, Docker, PostgreSQL, AWS</p></section>
-                <section><h2>Experience</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in Go and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li></ul></div></section>
-              </article>
+              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div></div>
             </div>
           </div>
         </div>
@@ -348,7 +374,7 @@ Languages: Python, Go, SQL, TypeScript</pre>
       <div class="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-16">
         <ol class="faq-index">
           {faq.map((f, i) => (
-            <li><button type="button" data-faq-q aria-selected={i === 0 ? 'true' : 'false'}><span class="faq-num">{String(i + 1).padStart(2, '0')}</span><span>{f.q}</span></button></li>
+            <li><button type="button" data-faq-q aria-selected={i === 0 ? 'true' : 'false'}>{f.q}</button></li>
           ))}
         </ol>
         <div class="faq-panel">

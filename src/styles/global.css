@@ -13,7 +13,7 @@
   --color-canvas: #f4f3f0;
   --color-ink: #0f172a;
   --color-ink-2: #475569;
-  --color-ink-3: #8b95a5;
+  --color-ink-3: #778090;
   --color-rule: #e7eaef;
   --color-edge: #d3d9e2;
 
@@ -140,74 +140,80 @@ body[data-view='parser'] .zoomctl { display: none; }
 .parser-out { display: none; }
 
 
-/* ---------- the photographed sheet ---------- */
-.hero-photo { position: relative; max-width: 600px; margin: 0 0 0 auto; transform: translateX(6%); }
-.hero-photo img {
-  display: block; width: 100%; height: auto;
-  /* the photographed ground is a shade uneven at its edges, so the outer 8% fades into the page */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
-  mask-composite: intersect;
+/* ---------- the demo sheet: the product itself, on paper ---------- */
+.demo { position: relative; width: 100%; max-width: 560px; aspect-ratio: 210 / 262; margin-left: auto; }
+.demo-sheet, .demo-read {
+  position: absolute; inset: 0; background: #fff; overflow: hidden;
+  box-shadow: 1px 2px 0 #d8d5cf, 0 18px 40px -18px rgba(15, 23, 42, .28);
 }
+.demo-sheet .sheet { transform: scale(var(--k, .705)); transform-origin: top left; width: 210mm; min-height: 0; box-shadow: none; }
+.demo-sheet { clip-path: inset(0 0 calc(100% - var(--scan)) 0); z-index: 2; }
+.demo-read { clip-path: inset(var(--scan) 0 0 0); z-index: 1; }
+/* top as a percentage resolves against the box height, which is what the line uses too */
+.demo-read pre {
+  position: absolute; left: 0; right: 0; top: calc(var(--scan) + 30px); margin: 0; padding: 0 36px 34px;
+  font: 400 11px/1.7 var(--font-mono); color: #1f2937; white-space: pre-wrap; word-break: break-word;
+}
+.demo-read-full pre { top: 34px; }
+.demo-read pre b { font-weight: 400; color: #1d4ed8; background: #e8eefc; border-radius: 2px; }
+.demo-line { position: absolute; left: 0; right: 0; top: var(--scan); height: 1px; background: #2563eb; z-index: 3; }
+.demo-line::after { content: 'what the software reads'; position: absolute; left: 36px; top: 9px; font: 500 11px/1 var(--font-ui); color: #1d4ed8; letter-spacing: .01em; }
+/* the line sits exactly on the Experience heading of the sheet above it */
+.demo { --scan: 46.4%; }
+@media (max-width: 1023px) { .demo { max-width: 520px; margin: 8px auto 0; } .demo-sheet .sheet { --k: .62; } }
+@media (max-width: 560px) { .demo-sheet .sheet { --k: .44; } .demo-read pre { padding: 22px 24px; font-size: 10px; } }
 
-/* ---------- what the machine read, full width ---------- */
+/* ---------- what the machine read, full width, ink on paper ---------- */
 .read { display: grid; gap: 40px; }
 @media (min-width: 1024px) { .read { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 64px; align-items: start; } }
 .read pre {
-  margin: 0; padding: 36px 40px; border-radius: 12px; background: #0f1520; color: #c7ccd4;
+  margin: 0; padding: 36px 40px; background: #fff; color: #1f2937;
+  box-shadow: 1px 2px 0 #d8d5cf, 0 18px 40px -18px rgba(15, 23, 42, .22);
   font: 400 13.5px/1.9 var(--font-mono); white-space: pre; overflow-x: auto;
 }
-.read pre b { font-weight: 400; color: #fff; background: rgba(96,165,250,.22); box-shadow: 0 0 0 3px rgba(96,165,250,.22); border-radius: 2px; }
-.read pre s { text-decoration: none; color: #6b7280; }
-.read pre i { font-style: normal; color: #93c5fd; }
+.read pre b { font-weight: 400; color: #1d4ed8; background: #e8eefc; box-shadow: 0 0 0 3px #e8eefc; border-radius: 2px; }
+.read pre s { text-decoration: none; color: #9aa3b2; }
+.read pre i { font-style: normal; color: #1d4ed8; }
 .read ol { list-style: none; margin: 0; padding: 0; }
 .read li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 22px 0; border-top: 1px solid var(--color-rule); }
 .read li:last-child { border-bottom: 1px solid var(--color-rule); }
-.read .num { font-family: var(--font-display); font-size: 22px; color: var(--color-ink-3); font-variation-settings: 'opsz' 72; line-height: 1.2; }
+.read .num { font-family: var(--font-display); font-size: 22px; color: var(--color-ink-2); font-variation-settings: 'opsz' 72; line-height: 1.2; }
 .read h3 { font-size: 18px; margin: 0 0 6px; }
 .read p { margin: 0; font-size: 15.5px; color: var(--color-ink-2); }
 
 /* ---------- how it works ---------- */
 .how { list-style: none; margin: 0; padding: 0; counter-reset: how; }
-.how li { counter-increment: how; position: relative; padding: 8px 0 56px 72px; }
+.how li { counter-increment: how; position: relative; padding: 0 0 44px 36px; }
 .how li::marker { content: ''; }
-.how li.is-active::before { color: var(--color-ink); }
+.how li.is-active::before { background: var(--color-ink); }
 
-.how li::before {
-  content: counter(how, decimal-leading-zero); position: absolute; left: 0; top: 0;
-  font-family: var(--font-display); font-weight: 400; font-size: 40px; letter-spacing: -.02em; color: var(--color-ink-3);
-  font-variation-settings: 'opsz' 72;
-}
-.how li::after { content: ''; position: absolute; left: 22px; top: 54px; bottom: 6px; width: 2px; background: var(--color-rule); }
+.how li::before { content: ''; position: absolute; left: 0; top: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--color-edge); transition: background .3s; }
+.how li::after { content: ''; position: absolute; left: 4px; top: 26px; bottom: 6px; width: 2px; background: var(--color-rule); }
 .how li:last-child::after { display: none; }
 .how h3 { font-size: 22px; margin: 0 0 10px; }
 .how p { margin: 0; font-size: 16.5px; color: var(--color-ink-2); max-width: 46ch; }
 
-.frag-frame { position: relative; height: 460px; overflow: hidden; }
+.frag-frame { position: relative; height: 520px; overflow: hidden; }
 .frag { position: absolute; inset: 0; display: grid; place-items: center; padding: 0; opacity: 0; transform: translateY(10px) scale(.985); transition: opacity .45s var(--ease-soft), transform .45s var(--ease-soft); pointer-events: none; }
 .frag.is-active { opacity: 1; transform: none; }
-.frag > * { width: 100%; max-width: 520px; }
-.frag .sheet { transform: scale(.52); transform-origin: top center; margin-bottom: -140%; }
+.frag > * { width: 100%; max-width: 560px; }
 @media (max-width: 1023px) { .frag-frame { height: 380px; } }
 @media (prefers-reduced-motion: reduce) { .frag { transition: none; } }
 
 /* ---------- questions ---------- */
 .faq-index { list-style: none; margin: 0; padding: 0; display: none; }
 .faq-index button {
-  display: grid; grid-template-columns: 44px 1fr; gap: 12px; width: 100%; text-align: left;
-  padding: 16px 12px 16px 0; border: 0; border-top: 1px solid var(--color-rule); background: none; cursor: pointer;
-  font-family: var(--font-ui); font-weight: 600; font-size: 16px; line-height: 1.35; color: var(--color-ink-2);
+  display: block; width: 100%; text-align: left;
+  padding: 13px 12px 13px 0; border: 0; border-top: 1px solid var(--color-rule); background: none; cursor: pointer;
+  font-family: var(--font-ui); font-weight: 500; font-size: 15.5px; line-height: 1.35; color: var(--color-ink-2);
   transition: color .2s, padding-left .25s var(--ease-soft);
 }
 .faq-index li:last-child button { border-bottom: 1px solid var(--color-rule); }
 .faq-index button:hover { color: var(--color-ink); }
-.faq-index button[aria-selected='true'] { color: var(--color-ink); padding-left: 10px; }
-.faq-num { font-family: var(--font-display); font-size: 22px; line-height: 1.1; color: var(--color-ink-3); font-variation-settings: 'opsz' 72; }
-.faq-index button[aria-selected='true'] .faq-num { color: var(--color-ink); }
-.faq-panel article { padding: 0 0 36px; }
-.faq-panel h3 { font-family: var(--font-display); font-weight: 400; font-size: 30px; letter-spacing: -.015em; margin: 0 0 16px; font-variation-settings: 'opsz' 48; }
-.faq-panel p { margin: 0; font-size: 18px; line-height: 1.7; color: var(--color-ink-2); }
+.faq-index button[aria-selected='true'] { color: var(--color-ink); padding-left: 14px; box-shadow: inset 2px 0 0 var(--color-ink); }
+.faq-index button[aria-selected='true'] .faq-panel article { padding: 0 0 36px; }
+.faq-panel h3 { font-size: 22px; margin: 0 0 14px; }
+.faq-panel p { margin: 0; font-size: 17px; line-height: 1.7; color: var(--color-ink-2); max-width: 62ch; }
 @media (max-width: 1023px) {
   .faq-panel article { border-top: 1px solid var(--color-rule); padding: 26px 0; }
   .faq-panel h3 { font-size: 20px; }
