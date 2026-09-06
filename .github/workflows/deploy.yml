@@ -16,7 +16,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: cloudflare/wrangler-action@v3
+
+      # The deploy only runs once the repository holds the Cloudflare secrets.
+      # Until then the build still verifies every push, and nothing fails.
+      - id: secrets
+        run: echo "present=${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.secrets.outputs.present == 'true'
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - if: steps.secrets.outputs.present != 'true'
+        run: echo "Cloudflare secrets not set, build verified, deploy skipped."
