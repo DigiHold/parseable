@@ -3,12 +3,13 @@ import { emptyResume, normalise } from './types';
 import { renderSheet, renderParserText } from './render';
 import { audit, type Audit } from './keywords';
 
-type StepId = 'import' | 'details' | 'template' | 'posting' | 'export';
-const STEPS: StepId[] = ['import', 'details', 'template', 'posting', 'export'];
+type StepId = 'details' | 'template' | 'posting' | 'export';
+const STEPS: StepId[] = ['details', 'template', 'posting', 'export'];
 const KEY = 'parseable/draft';
 
 let data: Resume = emptyResume();
-let step: StepId = 'import';
+let step: StepId = 'details';
+let started = false;
 let posting = '';
 let lastAudit: Audit | null = null;
 let zoom = 0.6;
@@ -19,45 +20,21 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 /* The draft lives in sessionStorage, so it survives a reload and is gone when
    the tab closes. It never reaches a server, because there is no server. */
 function save() {
-  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, step })); } catch { /* private mode */ }
+  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, step, started })); } catch { /* private mode */ }
 }
 function restore() {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return;
-    const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId };
+    const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId; started?: boolean };
     data = normalise(p.data);
+    started = p.started === true;
     posting = typeof p.posting === 'string' ? p.posting : '';
     if (p.step && STEPS.includes(p.step)) step = p.step;
   } catch { /* corrupt draft, start clean */ }
 }
 
 /* ------------------------------------------------------------------ panels */
-
-function panelImport(): string {
-  return `
-    <div class="p-5">
-      <h2 class="text-[19px] mb-1">Start from what you have</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">Nothing is uploaded. The file is read inside this tab and never sent anywhere.</p>
-      <div class="mb-3 cursor-pointer rounded-lg border-[1.5px] border-dashed border-edge bg-panel px-5 py-7 text-center transition-colors hover:border-match hover:bg-match-bg" data-drop="pdf">
-        <strong class="mb-1 block font-display text-[15px]">Drop your current resume here</strong>
-        <span class="text-[13px] text-ink-2">PDF, read in your browser. Or click to choose a file.</span>
-        <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
-      </div>
-      <p class="mb-4 text-center text-[13px] text-ink-3" data-role="pdf-status"></p>
-      <div class="mb-4 flex items-center gap-3 text-[12.5px] text-ink-3"><span class="h-px flex-1 bg-rule"></span>or<span class="h-px flex-1 bg-rule"></span></div>
-      <div class="grid grid-cols-2 gap-2.5">
-        <button class="btn btn-ghost btn-sm" data-action="import-json">Import JSON</button>
-        <button class="btn btn-ghost btn-sm" data-action="blank">Start blank</button>
-      </div>
-      <input type="file" accept="application/json,.json" class="hidden" data-file="json">
-      <div class="notice mt-5">
-        <strong>Been here before?</strong>
-        Import the JSON you exported last time. Everything comes back, including your photo, so a new
-        application only costs you the job posting step.
-      </div>
-    </div>`;
-}
 
 function panelDetails(): string {
   const b = data.basics;
@@ -267,8 +244,7 @@ function render() {
   const panels = $('#panels');
   if (panels) {
     panels.innerHTML =
-      step === 'import' ? panelImport()
-      : step === 'details' ? panelDetails()
+      step === 'details' ? panelDetails()
       : step === 'template' ? panelTemplate()
       : step === 'posting' ? panelPosting()
       : panelExport();
@@ -284,8 +260,10 @@ function render() {
 
   const prev = $<HTMLButtonElement>('[data-nav="prev"]');
   const next = $<HTMLButtonElement>('[data-nav="next"]');
-  if (prev) prev.disabled = step === 'import';
-  if (next) { next.disabled = step === 'export'; next.textContent = step === 'posting' ? 'Continue to download' : 'Continue'; }
+  if (prev) prev.disabled = step === 'details';
+  const ws = $('#workspace');
+  if (ws) ws.hidden = !started;
+  if (next) { next.disabled = step === 'export'; next.textContent = 'Continue'; }
 
   renderPreview();
   save();
@@ -348,7 +326,7 @@ function print() {
   window.print();
 }
 
-function goto(id: StepId) { step = id; render(); $('#app')?.scrollIntoView({ block: 'start' }); }
+function goto(id: StepId) { step = id; started = true; render(); $('#workspace')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
 /**
  * Puts the skill groups this posting cares about at the top, ordered by how many
@@ -413,12 +391,6 @@ function bootstrap() {
       return;
     }
 
-    const start = hit('[data-start]')?.dataset.start;
-    if (start) {
-      goto('import');
-      if (start === 'blank') { data = emptyResume(); goto('details'); }
-      return;
-    }
 
     const view = hit('[data-view]')?.dataset.view;
     if (view) {
@@ -467,6 +439,7 @@ function bootstrap() {
       return;
     }
     if (action === 'blank') { data = emptyResume(); goto('details'); }
+    if (action === 'pick-pdf') $<HTMLInputElement>('[data-file="pdf"]')?.click();
     if (action === 'import-json') $<HTMLInputElement>('[data-file="json"]')?.click();
     if (action === 'pick-photo') $<HTMLInputElement>('[data-file="photo"]')?.click();
     if (action === 'drop-photo') { data.basics.photo = null; render(); }
@@ -506,7 +479,7 @@ function bootstrap() {
       const zone = (ev.target as HTMLElement).closest('[data-drop="pdf"]');
       if (!zone) return;
       ev.preventDefault();
-      zone.classList.toggle('border-match', type === 'dragover');
+      zone.classList.toggle('over', type === 'dragover');
       if (type === 'drop') {
         const file = (ev as DragEvent).dataTransfer?.files?.[0];
         if (file?.type === 'application/pdf') void loadPdf(file);
@@ -521,7 +494,7 @@ function status(msg: string) {
 }
 
 async function loadPdf(file: File) {
-  status('Reading the file in your browser…');
+  status('Reading the file in your browser, one moment.');
   try {
     const { extractPdfText, textToResume } = await import('./parse');
     const text = await extractPdfText(file);
