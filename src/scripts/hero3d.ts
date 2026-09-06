@@ -44,7 +44,7 @@ const PAPER_FRAG = /* glsl */ `
   void main() {
     // cotton paper: layered noise, faint fibres
     float fibre = noise(vUv * 900.0) * 0.5 + noise(vUv * 220.0) * 0.35 + noise(vUv * 40.0) * 0.15;
-    vec3 paper = vec3(0.985, 0.982, 0.975) - fibre * 0.05;
+    vec3 paper = vec3(0.86, 0.855, 0.845) - fibre * 0.05;
 
     vec3 human = texture2D(uHuman, vUv).rgb;
     vec3 machine = texture2D(uMachine, vUv).rgb;
@@ -60,10 +60,12 @@ const PAPER_FRAG = /* glsl */ `
     vec3 ink = mix(machineJ, human, edge);
     vec3 col = paper * ink;
 
-    // light from the blade, falling onto the paper both ways
+    // the blade on the paper: a thin tinted core, a broad falloff that lifts the paper to white
     float d = abs(vUv.y - uScan);
-    float glow = exp(-d * 60.0) * 0.9 + exp(-d * 14.0) * 0.25;
-    col += vec3(0.30, 0.48, 0.90) * glow * 0.6;
+    float core = exp(-d * 420.0);
+    float fall = exp(-d * 18.0);
+    col += vec3(0.14, 0.14, 0.15) * fall;
+    col += vec3(0.45, 0.62, 1.0) * core * 0.9;
 
     // shading from the bend, a hair darker where the paper turns away
     col *= 0.94 + vBend * 1.2;
@@ -107,7 +109,7 @@ function canvas(w: number, h: number) {
 
 /* The typeset page, drawn with the page's own faces at print size. */
 function humanFace(THREE: T) {
-  const [c, g] = canvas(1240, 1754);
+  const [c, g] = canvas(1240, 1506);
   const X = 118; let y = 170;
   g.fillStyle = '#111'; g.font = '600 56px "IBM Plex Sans"'; g.fillText(RESUME.name, X, y); y += 48;
   g.fillStyle = '#555'; g.font = '400 26px "IBM Plex Sans"'; g.fillText(RESUME.role, X, y); y += 40;
@@ -135,7 +137,7 @@ function humanFace(THREE: T) {
 
 /* The same page as the extractor returns it: one weight, one face, the posting's terms lit. */
 function machineFace(THREE: T) {
-  const [c, g] = canvas(1240, 1754);
+  const [c, g] = canvas(1240, 1506);
   const X = 118; let y = 170; const line = 34;
   g.font = '400 19px "IBM Plex Mono"';
   const put = (s: string) => {
@@ -175,7 +177,7 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 40);
   camera.position.set(0, 0, 8.2);
 
-  const geo = new THREE.PlaneGeometry(2.1, 2.97, 48, 64);
+  const geo = new THREE.PlaneGeometry(2.1, 2.55, 48, 64);
   const paper = new THREE.ShaderMaterial({
     uniforms: { uHuman: { value: humanFace(THREE) }, uMachine: { value: machineFace(THREE) }, uScan: { value: 1.1 }, uTime: { value: 0 } },
     vertexShader: PAPER_VERT, fragmentShader: PAPER_FRAG,
@@ -183,37 +185,35 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   const sheet = new THREE.Mesh(geo, paper);
 
   // a second, unlit sheet behind for depth, and a soft floor shadow
-  const back = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.97), new THREE.MeshBasicMaterial({ color: 0x1b1d23 }));
-  back.position.set(0.32, -0.26, -0.22); back.rotation.z = -0.06;
   const shadowTex = (() => {
     const [c, g] = canvas(512, 512); g.clearRect(0, 0, 512, 512);
     const r = g.createRadialGradient(256, 256, 60, 256, 256, 256); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = r; g.fillRect(0, 0, 512, 512); return new THREE.CanvasTexture(c);
   })();
-  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 5.6), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
-  shadow.position.set(0.4, -0.6, -1.2);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 4.2), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 0.7 }));
+  shadow.position.set(0.12, -0.18, -0.35);
 
   // the blade of light, emissive, bloomed by the composer
   const bladeMat = new THREE.MeshBasicMaterial({ toneMapped: false });
   bladeMat.color.setRGB(2.2, 3.0, 5.0);
-  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.014), bladeMat);
+  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.16, 0.012), bladeMat);
   blade.position.z = 0.09;
 
   const group = new THREE.Group();
-  group.add(shadow, back, sheet, blade);
+  group.add(shadow, sheet, blade);
   group.rotation.set(0.12, -0.42, 0.04);
   scene.add(group);
   const place = () => {
     const narrow = host.clientWidth < 760;
-    group.position.set(narrow ? 0 : 1.25, narrow ? -1.15 : 0, 0);
-    group.scale.setScalar(narrow ? 0.62 : 1);
+    group.position.set(narrow ? 0 : 1.3, narrow ? -1.15 : 0.08, 0);
+    group.scale.setScalar(narrow ? 0.62 : 0.94);
   };
   place();
 
   host.replaceChildren(renderer.domElement);
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.75, 0.6, 1.05);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.45, 0.5, 1.05);
   composer.addPass(bloom);
   const grain = new ShaderPass(GRAIN_SHADER);
   composer.addPass(grain);
@@ -227,7 +227,7 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   resize();
   new ResizeObserver(resize).observe(host);
 
-  const setScan = (v: number) => { paper.uniforms.uScan.value = v; blade.position.y = (v - 0.5) * 2.97; blade.visible = v > 0 && v < 1; };
+  const setScan = (v: number) => { paper.uniforms.uScan.value = v; blade.position.y = (v - 0.5) * 2.55; blade.visible = v > 0 && v < 1; };
 
   const base = { x: 0.12, y: -0.42 };
   const target = { ...base }; const cur = { ...base };
@@ -243,19 +243,20 @@ export async function mountHero(host: HTMLElement): Promise<void> {
 
   const clock = new THREE.Clock();
   let running = false, raf = 0;
-  const CYCLE = 9;
+  const CYCLE = 12;
   const frame = () => {
     if (!running) return;
     raf = requestAnimationFrame(frame);
     const t = clock.getElapsedTime();
     const p = (t % CYCLE) / CYCLE;
-    const scan = p < 0.45 ? 1.1 - ease(p / 0.45) * 1.2 : p < 0.55 ? -0.1 : p < 0.95 ? -0.1 + ease((p - 0.55) / 0.4) * 1.2 : 1.1;
+    // sweep to the middle, rest there so one frame tells the story, finish, come back
+    const scan = p < 0.25 ? 1.1 - ease(p / 0.25) * 0.62 : p < 0.55 ? 0.48 : p < 0.72 ? 0.48 - ease((p - 0.55) / 0.17) * 0.58 : p < 0.8 ? -0.1 : p < 0.97 ? -0.1 + ease((p - 0.8) / 0.17) * 1.2 : 1.1;
     setScan(scan);
     paper.uniforms.uTime.value = t;
     grain.uniforms.uTime.value = t;
     cur.x += (target.x - cur.x) * 0.045; cur.y += (target.y - cur.y) * 0.045;
     group.rotation.set(cur.x, cur.y, 0.04 + Math.sin(t * 0.5) * 0.012);
-    group.position.y = (host.clientWidth < 760 ? -1.15 : 0) + Math.sin(t * 0.7) * 0.05;
+    group.position.y = (host.clientWidth < 760 ? -1.15 : 0.08) + Math.sin(t * 0.7) * 0.04;
     composer.render();
   };
   new IntersectionObserver(([e]) => {

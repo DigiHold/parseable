@@ -192,6 +192,8 @@ body[data-view='parser'] .zoomctl { display: none; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .hero-copy > * { animation: none; } }
 
+.hero-still { max-width: 420px; -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent); mask-image: linear-gradient(to bottom, #000 70%, transparent); }
+
 /* ---------- the tool, one framed panel at viewport height ---------- */
 .tool { border: 1px solid var(--color-rule); }
 @media (min-width: 1024px) {
