@@ -136,7 +136,7 @@ const schema = {
 <body>
 
 <header class="site-head sticky top-0 z-40 text-white transition-colors duration-300" data-head>
-  <div class="mx-auto flex h-16 max-w-[1120px] items-center gap-6 px-6">
+  <div class="mx-auto flex h-16 max-w-[1180px] items-center gap-6 px-6">
     <a href="/" class="font-ui text-[16px] font-semibold tracking-[-0.01em] text-current no-underline">Parseable</a>
     <nav class="ml-auto flex items-center gap-5 whitespace-nowrap text-[14px] opacity-80 sm:gap-7">
       <a href="#read" class="hidden text-current no-underline transition-opacity hover:opacity-100 sm:inline">Why resumes fail</a>
@@ -150,13 +150,13 @@ const schema = {
 <main class="dropzone" data-drop="pdf">
   <!-- the stage: the resume as a lit object, read by a blade of light -->
   <section class="stage-dark relative -mt-16 overflow-hidden bg-[#08090c] text-white">
-    <div class="relative mx-auto grid min-h-[100svh] max-w-[1180px] grid-cols-1 items-center gap-10 px-6 pb-16 pt-24 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-6 lg:pb-12 lg:pt-16">
+    <div class="relative mx-auto grid min-h-[100svh] max-w-[1180px] grid-cols-1 items-center gap-10 px-6 pb-16 pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6 lg:pb-12 lg:pt-16">
       <div class="hero-copy relative z-10">
-        <h1 class="mb-6 text-[clamp(38px,4.6vw,64px)] text-white"><span class="block whitespace-nowrap">Get past the</span><span class="block whitespace-nowrap">software and in</span><span class="block whitespace-nowrap">front of a person</span></h1>
-        <p class="mb-8 max-w-[34ch] text-[17px] leading-[1.55] text-white/60">Software reads your resume before a human does. Check yours against the posting and download a PDF it reads correctly.</p>
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
+        <h1 class="mb-6 text-[clamp(34px,3.8vw,54px)] text-white"><span class="block whitespace-nowrap">Get past the software</span><span class="block whitespace-nowrap">and in front of a person</span></h1>
+        <p class="mb-8 max-w-[40ch] text-[17px] leading-[1.55] text-white/60">A free ATS friendly resume checker that runs in your browser. Software reads your resume before a human does, so check yours against the posting and download a PDF it reads correctly.</p>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-3">
           <button class="btn btn-light btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
-          <p class="m-0 whitespace-nowrap text-center text-[15px] text-white/60 sm:text-left">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-white/75 underline decoration-white/30 underline-offset-4 hover:text-white" data-action="sample">try it with a sample</button></p>
+          <button class="btn btn-outline btn-xl w-full sm:w-auto" data-action="sample">Try it with a sample</button>
         </div>
         <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
         <input type="file" accept="application/json,.json" class="hidden" data-file="json">
@@ -177,14 +177,7 @@ const schema = {
     </div>
   </section>
 
-  <section class="bg-[#08090c] text-white/55" data-role="acts">
-    <div class="mx-auto max-w-[1180px] border-t border-white/10 px-6 py-7">
-      <h2 class="m-0 text-[15px] font-medium text-white/80">A free ATS friendly resume checker that runs in your browser</h2>
-      <p class="m-0 mt-1 text-[14px]">It shows the text a parser extracts, marks the terms a job posting asks for, and prints a PDF with a real text layer. Nothing is uploaded and nothing is stored.</p>
-    </div>
-  </section>
-
-  <section id="workspace" class="mx-auto max-w-[1120px] px-6 pb-20 pt-14" hidden>
+  <section id="workspace" class="mx-auto max-w-[1180px] px-6 pb-20 pt-14" hidden>
     <div class="tool">
       <div class="tool-form">
         <div class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-rule px-5 pt-3">
@@ -325,9 +318,9 @@ Languages: Python, Go, SQL, TypeScript</pre>
 
   <!-- questions -->
   <section id="faq" class="scroll-mt-[80px] border-t border-rule">
-    <div class="mx-auto max-w-[1180px] px-6 py-20 lg:py-24">
+    <div class="mx-auto max-w-[760px] px-6 py-20 lg:py-24">
       <h2 class="mb-10 max-w-[22ch] text-[clamp(30px,3.6vw,44px)]">What people ask before they trust a resume checker</h2>
-      <div class="faq-panel max-w-[760px]">
+      <div class="faq-panel">
         {faq.map((f) => (
           <article>
             <h3>{f.q}</h3>
@@ -340,7 +333,7 @@ Languages: Python, Go, SQL, TypeScript</pre>
 </main>
 
 <footer class="bg-[#0a0b0e] text-white/60" data-foot>
-  <div class="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 px-6 py-10 text-[14px]">
+  <div class="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 px-6 py-10 text-[14px]">
     <p class="inline-flex flex-wrap items-center gap-[.35rem] m-0">Made with love in <svg class="inline-block h-[15px] w-[15px] rounded-full align-middle" viewBox="0 0 512 512" role="img" aria-label="France"><circle cx="256" cy="256" fill="#fff" r="256"></circle><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"></path><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"></path></svg> by <a class="inline-flex items-center gap-[.4rem] text-white/80 transition-colors duration-200 ease-soft hover:text-white [&>img]:w-[1.35rem] [&>img]:h-[1.35rem] [&>img]:rounded-full [&>img]:object-cover [&>img]:border [&>img]:border-line-2" href="https://nicolaslecocq.com/" rel="noopener noreferrer" target="_blank"><img src="/nicolas.avif" width="24" height="24" alt="" loading="lazy" decoding="async">Nicolas Lecocq</a></p>
     <nav class="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
       <a href="#faq" class="text-white/60 no-underline hover:text-white">Questions</a>
