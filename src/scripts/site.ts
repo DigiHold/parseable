@@ -1,10 +1,18 @@
 /* Page behaviour outside the wizard: reveals, the FAQ index, the sticky how it works. */
 
 export function mountSite(): void {
+  // The lit sheet loads after first paint, and only where WebGL exists.
+  const host = document.querySelector<HTMLElement>('[data-hero-3d]');
+  if (host && 'WebGLRenderingContext' in window) {
+    const start = () => import('./hero3d').then((m) => m.mountHero(host)).catch(() => { /* the fallback stays */ });
+    if ('requestIdleCallback' in window) (window as Window & { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(start);
+    else setTimeout(start, 200);
+  }
+
   // The header is glass only once the page has moved under it.
   const head = document.querySelector<HTMLElement>('[data-head]');
   if (head) {
-    const onScroll = () => head.classList.toggle('is-scrolled', window.scrollY > 8);
+    const onScroll = () => head.classList.toggle('is-scrolled', window.scrollY > window.innerHeight * 0.85);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
   }

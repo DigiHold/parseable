@@ -73,6 +73,7 @@
   }
   .btn:active { transform: translateY(1px); }
   .btn-primary { @apply bg-ink text-white hover:bg-black; }
+  .btn-light { @apply bg-white text-ink hover:bg-[#f0f0f0]; }
   .btn-xl { @apply px-7 py-4 text-[16.5px]; }
   .btn-ghost { @apply bg-transparent text-ink border-transparent px-2 underline decoration-edge underline-offset-4 hover:decoration-ink; }
   .btn-quiet { @apply bg-transparent text-ink-2 border-transparent px-0 py-2 text-[14px] underline decoration-edge underline-offset-4 hover:text-ink hover:decoration-ink; }
@@ -181,6 +182,15 @@ body[data-view='parser'] .zoomctl { display: none; }
 .read .num { font: 500 13px/1.6 var(--font-ui); color: var(--color-ink-3); }
 .read h3 { font-size: 17px; margin: 0 0 6px; }
 .read p { margin: 0; font-size: 15.5px; color: var(--color-ink-2); }
+
+/* ---------- the dark stage and its fallback before three arrives ---------- */
+.hero-fallback { background: radial-gradient(60% 50% at 62% 50%, #1a1c22 0%, #0a0b0e 70%); }
+[data-hero-3d] canvas { display: block; width: 100% !important; height: 100% !important; }
+.hero-copy > * { animation: rise .9s var(--ease-soft) both; }
+.hero-copy > *:nth-child(2) { animation-delay: .08s; }
+.hero-copy > *:nth-child(3) { animation-delay: .16s; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-copy > * { animation: none; } }
 
 /* ---------- the tool, one framed panel at viewport height ---------- */
 .tool { border: 1px solid var(--color-rule); }

@@ -13,7 +13,7 @@ const DEMO: Resume = {"schema": "ats-resume-builder/v1", "basics": {"name": "Mar
 let data: Resume = DEMO;
 let demo = true;
 let step: StepId = 'details';
-let started = true;
+let started = false;
 let posting = '';
 let lastAudit: Audit | null = null;
 let zoom = 0.66;
@@ -33,7 +33,7 @@ function restore() {
     const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId; started?: boolean; demo?: boolean };
     data = normalise(p.data);
     demo = p.demo === true;
-    started = true;
+    started = p.started === true;
     posting = typeof p.posting === 'string' ? p.posting : '';
     if (p.step && STEPS.includes(p.step)) step = p.step;
   } catch { /* corrupt draft, start clean */ }
@@ -260,6 +260,10 @@ function render() {
   if (prev) prev.hidden = step === 'details';
   const note = $('[data-role="demo-note"]');
   if (note) note.hidden = !demo;
+  const ws = $('#workspace');
+  if (ws) ws.hidden = !started;
+  const shot = $('[data-role="shot"]');
+  if (shot) shot.hidden = started;
   if (next) { next.hidden = step === 'export'; next.textContent = 'Continue'; }
 
   renderPreview();
@@ -438,6 +442,7 @@ function bootstrap() {
       return;
     }
     if (action === 'blank') { data = emptyResume(); demo = false; goto('details'); }
+    if (action === 'sample') { data = DEMO; demo = true; goto('details'); }
     if (action === 'pick-pdf') $<HTMLInputElement>('[data-file="pdf"]')?.click();
     if (action === 'import-json') $<HTMLInputElement>('[data-file="json"]')?.click();
     if (action === 'pick-photo') $<HTMLInputElement>('[data-file="photo"]')?.click();

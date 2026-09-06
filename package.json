@@ -14,6 +14,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/three": "^0.185.4",
     "astro": "^5.13.0",
     "playwright": "^1.63.0",
     "tailwindcss": "^4.3.3",
@@ -21,6 +22,7 @@
     "wrangler": "^4.129.0"
   },
   "dependencies": {
-    "pdfjs-dist": "^6.3.289"
+    "pdfjs-dist": "^6.3.289",
+    "three": "^0.185.1"
   }
 }

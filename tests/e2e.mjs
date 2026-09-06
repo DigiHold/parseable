@@ -16,7 +16,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 
 await page.goto(base, { waitUntil: 'networkidle' });
-check('the tool is open on arrival with a sample', (await page.locator('#sheet').innerText()).includes('Marie Dubois'));
+check('the tool is hidden until a resume is given', !(await page.locator('#workspace').isVisible()));
 
 // import a real PDF
 // the sample is on screen already, so wait for the imported name to replace it

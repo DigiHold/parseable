@@ -1,0 +1,121 @@
+---
+import '../styles/global.css';
+const site = 'https://resume.nicolaslecocq.com';
+const faq = [
+  {
+    q: 'What is an ATS and why does it reject resumes?',
+    a: 'An applicant tracking system is the software an employer uses to receive applications. It extracts the text from your file, sorts it into fields such as employer, job title and dates, then scores those fields against the job requisition. Most resumes fail at the sorting step rather than the scoring step. A two column layout with a skills sidebar is the usual culprit, because the extractor reads the page in one pass and interleaves the columns, so your employer and your dates land in the wrong fields before anyone reads a word.',
+  },
+  {
+    q: 'Does this ATS friendly resume checker store my data?',
+    a: 'Nothing is stored, because there is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
+  },
+  {
+    q: 'Should I put white keywords on my resume to get past the AI?',
+    a: 'No, and this builder will not do it. Parsers strip styling and read the raw text layer, so a block of white on white keywords lands in the middle of the recruiter screen looking exactly like what it is. Screening platforms flag the pattern, and a flagged application can be rejected automatically with a fraud marker attached to your candidate record, which follows you across every future role at that company. The same applies to hidden instructions aimed at an AI reader. Putting the same words in visibly, inside your summary and your real bullets, scores identically and survives a human reading it.',
+  },
+  {
+    q: 'What resume format parses most reliably?',
+    a: 'A PDF with a real text layer, in one column, with standard headings such as Professional Summary, Experience, Skills and Education. Keep your contact details in the body of the document rather than in a page header, use one date format throughout, and avoid tables, text boxes and letter spacing on headings. Letter spacing is the quiet one: it survives into the text layer and your heading comes out as a string of separated capitals that no parser recognises.',
+  },
+  {
+    q: 'Should I put a photo on my resume?',
+    a: 'It depends where you are applying. A photo is normal in France, Germany, Switzerland, Spain and much of continental Europe. In the United Kingdom, Ireland and the United States it is usually left off, because employers avoid material that could support a discrimination claim. The photo toggle is off by default here, so turn it on only when you know the local convention.',
+  },
+  {
+    q: 'How long should a resume be?',
+    a: 'One page for under about eight years of work, two pages beyond that. Cutting a fifteen year career onto one page throws away keyword surface that the requisition is scoring you on, and no recruiter has ever rejected a strong second page. What does hurt is padding, so every line should either carry a keyword the job asked for or a result worth reading.',
+  },
+  {
+    q: 'Can I check a resume I already have against a job description?',
+    a: 'Yes, and that is what the posting step is for. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
+  },
+  {
+    q: 'Is it really free, and can I run it myself?',
+    a: 'It is free and you can run your own copy. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
+  },
+];
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'FAQPage', '@id': `${site}/questions#faq`, mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+    { '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Parseable', item: site + '/' }, { '@type': 'ListItem', position: 2, name: 'Questions', item: site + '/questions' } ] },
+  ],
+};
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Questions about ATS friendly resumes · Parseable</title>
+  <meta name="description" content="What an ATS is, why two column resumes fail, whether white keywords work, what format parses, and how Parseable checks a resume against a job posting in the browser." />
+  <link rel="canonical" href={site + '/questions'} />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/plex-2.woff2" as="font" type="font/woff2" crossorigin />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />
+</head>
+<body>
+<header class="site-head sticky top-0 z-40" data-head>
+  <div class="mx-auto flex h-16 max-w-[1120px] items-center gap-6 px-6">
+    <a href="/" class="font-ui text-[16px] font-semibold tracking-[-0.01em] no-underline">Parseable</a>
+    <nav class="ml-auto flex items-center gap-5 whitespace-nowrap text-[14px] text-ink-2 sm:gap-7">
+      <a href="/" class="no-underline transition-colors hover:text-ink">Check a resume</a>
+      <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="no-underline transition-colors hover:text-ink">Source</a>
+    </nav>
+  </div>
+</header>
+<main class="mx-auto max-w-[1120px] px-6 pb-24 pt-14 sm:pt-20">
+  <div class="max-w-[720px]">
+    <h1 class="mb-6 text-[clamp(34px,4.6vw,56px)]">What the software read from a two column resume</h1>
+    <p class="mb-8 text-[18px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, with the three places where the application dies marked.</p>
+    <div class="read">
+      <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
+Full Stack Developer
+
+<s>Skills</s>                    <s>Experience</s>
+<b>WordPress                 Founder &amp; Developer          2025 - 2026</b>
+HTML/CSS                  At Vayalis, my own company, I develop and
+Vercel                    launch my own products, handling the full
+Cloudflare                cycle from idea to release.
+React                     <b>Web Designer                   2023 - 2025</b>
+Next.js                   Trivial Mass SA, Lausanne
+Node.js                   Graphic integration, website development,
+PHP                       <i>client follow up management</i>, as well as
+SQL                       invoicing.
+
+<s>Language</s>                  <i>client relations to understand their</i>
+French                    <i>requirements</i>, and monitoring the specs.
+English</pre>
+      <ol>
+        <li><span class="num">1</span><div><h3>The layout breaks the extractor</h3><p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p></div></li>
+        <li><span class="num">2</span><div><h3>The words do not match the posting</h3><p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p></div></li>
+        <li><span class="num">3</span><div><h3>Nobody tells you which one it was</h3><p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p></div></li>
+      </ol>
+    </div>
+
+    <h2 class="mb-8 mt-20 text-[clamp(28px,3.4vw,40px)]">Questions</h2>
+    <div class="faq-panel">
+      {faq.map((f) => (
+        <article>
+          <h3>{f.q}</h3>
+          <p>{f.a}</p>
+        </article>
+      ))}
+    </div>
+    <p class="mt-12 text-[16px]"><a href="/" class="text-ink">Check your resume against a posting</a>, in your browser, nothing uploaded.</p>
+  </div>
+</main>
+<footer class="border-t border-rule">
+  <div class="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-8 gap-y-4 px-6 py-10 text-[14px] text-ink-2">
+    <p class="m-0">Parseable is free and open source, <a href="https://github.com/DigiHold/parseable/blob/main/LICENSE" rel="noopener" target="_blank" class="text-ink-2">MIT licensed</a>.</p>
+    <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="ml-auto text-ink-2 no-underline hover:text-ink">Source on GitHub</a>
+  </div>
+</footer>
+<script>
+  document.documentElement.classList.add('js');
+  import { mountSite } from '../scripts/site';
+  mountSite();
+</script>
+</body>
+</html>
