@@ -45,8 +45,6 @@ function panelDetails(): string {
   const b = data.basics;
   return `
     <div class="p-5">
-      <h2 class="text-[19px] mb-1">Your details</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">Check every field before you continue, because extraction from a PDF is never perfect, and a wrong date is worse than a missing one.</p>
 
       <div class="field"><label for="f-name">Full name</label><input id="f-name" data-bind="basics.name" value="${esc(b.name)}" autocomplete="name"></div>
       <div class="field"><label for="f-title">Job title</label><input id="f-title" data-bind="basics.title" value="${esc(b.title)}" placeholder="Full Stack Developer"></div>
@@ -123,7 +121,7 @@ function panelDetails(): string {
 
 function repeatable(title: string, key: string, body: string): string {
   const count = (data as unknown as Record<string, unknown[]>)[key].length;
-  return `<details class="acc" ${key === 'skills' || key === 'experience' ? 'open' : ''}>
+  return `<details class="acc">
     <summary><span>${title}</span><span class="acc-count">${count}</span></summary>
     <div class="acc-body">${body}<button class="btn btn-quiet" data-add="${key}">Add ${title.toLowerCase().replace(/s$/, '')}</button></div>
   </details>`;
@@ -143,8 +141,7 @@ function panelTemplate(): string {
   const b = data.basics;
   return `
     <div class="p-5">
-      <h2 class="text-[19px] mb-1">Pick a layout</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">All three are one column with standard headings, because that is what parses. They differ in density, not in structure.</p>
+      <p class="text-[13.5px] text-ink-2 mb-4">Three one column layouts. They differ in density, not in structure.</p>
       <div class="mb-5 grid grid-cols-3 gap-2.5">
         ${tpls.map((t) => `
           <button class="tpl" data-tpl="${t.id}" aria-pressed="${data.settings.template === t.id}">
@@ -184,8 +181,7 @@ function panelPosting(): string {
   const a = lastAudit;
   return `
     <div class="p-5">
-      <h2 class="text-[19px] mb-1">Paste the job posting</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">The checker pulls out the terms the requisition scores, then tells you which ones your resume already contains.</p>
+      <p class="text-[13.5px] text-ink-2 mb-4">Paste the posting. The checker lists the terms it scores and marks the ones your resume already contains.</p>
       <div class="field">
         <label for="f-post">Job description</label>
         <textarea id="f-post" rows="7" data-role="posting" placeholder="Paste the whole posting, requirements included.">${esc(posting)}</textarea>
@@ -224,8 +220,7 @@ function renderAudit(a: Audit): string {
 function panelExport(): string {
   return `
     <div class="p-5">
-      <h2 class="text-[19px] mb-1">Take it with you</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">Download the PDF for this application, and the JSON so the next one takes a minute.</p>
+      <p class="text-[13.5px] text-ink-2 mb-4">The PDF for this application, and the JSON so the next one takes a minute.</p>
       <button class="btn btn-ghost mb-2.5 w-full" data-action="print">Download PDF</button>
       <button class="btn btn-ghost mb-4 w-full" data-action="export-json">Export JSON</button>
       <div class="notice">
@@ -262,10 +257,10 @@ function render() {
 
   const prev = $<HTMLButtonElement>('[data-nav="prev"]');
   const next = $<HTMLButtonElement>('[data-nav="next"]');
-  if (prev) prev.disabled = step === 'details';
+  if (prev) prev.hidden = step === 'details';
   const note = $('[data-role="demo-note"]');
   if (note) note.hidden = !demo;
-  if (next) { next.disabled = step === 'export'; next.textContent = 'Continue'; }
+  if (next) { next.hidden = step === 'export'; next.textContent = 'Continue'; }
 
   renderPreview();
   save();

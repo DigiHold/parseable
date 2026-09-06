@@ -53,16 +53,19 @@ check('zoom still works after switching views', (await zoomText()) !== z1, `${z1
 await page.fill('#f-title', 'Staff Engineer (test)'); await page.waitForTimeout(150);
 check('editing a field updates the sheet', (await page.locator('#sheet').innerText()).includes('Staff Engineer (test)'));
 
-// repeatable rows: add, move, remove
+// repeatable rows: add, move, remove. The groups are collapsed by default, so open Skills first.
+await page.locator('details.acc summary').first().click(); await page.waitForTimeout(150);
 const skillsBefore = await page.locator('[data-bind^="skills."][data-bind$=".items"]').count();
 await page.click('[data-add="skills"]'); await page.waitForTimeout(150);
+await page.locator('details.acc summary').first().click(); await page.waitForTimeout(100);
 check('add a skills row', (await page.locator('[data-bind^="skills."][data-bind$=".items"]').count()) === skillsBefore + 1);
 const firstLabel = await page.locator('[data-bind="skills.0.label"]').inputValue();
 await page.click('[data-move="skills:0:1"]'); await page.waitForTimeout(150);
+await page.locator('details.acc summary').first().click(); await page.waitForTimeout(100);
 check('move a row down', (await page.locator('[data-bind="skills.1.label"]').inputValue()) === firstLabel);
-await page.click(`[data-del="skills:${skillsBefore}:0"]`.replace(':0', '')).catch(() => {});
-await page.click('[data-del]:last-of-type').catch(() => {});
+await page.locator('[data-del^="skills:"]').last().click().catch(() => {});
 await page.waitForTimeout(150);
+await page.locator('details.acc summary').first().click(); await page.waitForTimeout(100);
 check('remove a row', (await page.locator('[data-bind^="skills."][data-bind$=".items"]').count()) <= skillsBefore + 1);
 
 // templates and photo toggle

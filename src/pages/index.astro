@@ -139,59 +139,63 @@ const schema = {
 </header>
 
 <main class="dropzone" data-drop="pdf">
-  <section class="mx-auto max-w-[1120px] px-6 pt-14 sm:pt-20">
-    <h1 class="mb-10 max-w-[22ch] text-[clamp(42px,6.2vw,88px)]">Get past the software and in front of a person</h1>
-  </section>
-
-  <section id="workspace" class="mx-auto grid max-w-[1120px] grid-cols-1 items-start gap-10 px-6 pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
-    <div>
-      <p class="mb-7 max-w-[40ch] text-[18px] leading-[1.55] text-ink-2">Software reads your resume before a human does. Check yours against the job posting and download a PDF the screening system reads correctly. Nothing leaves your browser.</p>
-      <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+  <section class="mx-auto max-w-[1120px] px-6 pt-12 sm:pt-16">
+    <h1 class="mb-7 max-w-[20ch] text-[clamp(40px,5.6vw,80px)]">Get past the software and in front of a person</h1>
+    <div class="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <p class="m-0 max-w-[44ch] text-[18px] leading-[1.55] text-ink-2">Software reads your resume before a human does. Check yours against the job posting and download a PDF the screening system reads correctly. Nothing leaves your browser.</p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
         <button class="btn btn-primary btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
-        <p class="m-0 text-[15px] text-ink-2"><span class="hidden [@media(hover:hover)]:inline">or drop a PDF anywhere, or </span><button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="import-json">import a saved JSON</button>.</p>
-      </div>
-      <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
-      <input type="file" accept="application/json,.json" class="hidden" data-file="json">
-      <p class="mb-8 text-[13px] text-ink-3" data-role="pdf-status"></p>
-      <p class="mb-5 text-[13px] text-ink-3" data-role="demo-note">A sample resume is loaded. Upload yours to replace it, or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] underline hover:text-ink" data-action="blank">start from scratch</button>.</p>
-
-      <ol class="m-0 mb-4 flex list-none flex-wrap gap-x-6 gap-y-1 border-b border-rule p-0" id="steps">
-        {steps.map((s, i) => (
-          <li>
-            <button class="step-btn" data-step={s.id} aria-current={i === 0 ? 'step' : undefined}>
-              <span class="step-num"><span>{i + 1}</span></span>
-              <span class="step-label">{s.label}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
-      <div id="panels"></div>
-      <div class="flex gap-3 border-t border-rule pt-5">
-        <button class="btn btn-ghost" data-nav="prev">Back</button>
-        <button class="btn btn-ghost" data-nav="next">Continue</button>
+        <p class="m-0 whitespace-nowrap text-[15px] text-ink-2"><span class="hidden [@media(hover:hover)]:inline">or drop a PDF anywhere, or </span><button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="import-json">import a saved JSON</button></p>
       </div>
     </div>
+    <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
+    <input type="file" accept="application/json,.json" class="hidden" data-file="json">
+    <p class="mb-3 text-[13px] text-ink-3" data-role="pdf-status"></p>
+  </section>
 
-    <div class="lg:sticky lg:top-[80px]">
-      <div class="mb-3 flex flex-wrap items-center gap-3">
-        <div class="flex gap-5" role="tablist" aria-label="Preview mode">
-          <button class="step-btn" role="tab" aria-selected="true" data-view="human">What a person sees</button>
-          <button class="step-btn" role="tab" aria-selected="false" data-view="parser">What the software reads</button>
+  <section id="workspace" class="mx-auto max-w-[1120px] px-6 pb-20">
+    <div class="tool">
+      <div class="tool-form">
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-rule px-5 pt-3">
+          <ol class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0" id="steps">
+            {steps.map((s, i) => (
+              <li>
+                <button class="step-btn" data-step={s.id} aria-current={i === 0 ? 'step' : undefined}>
+                  <span class="step-num"><span>{i + 1}</span></span>
+                  <span class="step-label">{s.label}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div class="zoomctl ml-auto flex items-center gap-1.5">
-          <button class="icon-btn" data-zoom="-1" aria-label="Zoom out">−</button>
-          <span class="min-w-[40px] text-center font-mono text-[12px] text-ink-3" id="zoomval">66%</span>
-          <button class="icon-btn" data-zoom="1" aria-label="Zoom in">+</button>
+        <p class="m-0 border-b border-rule px-5 py-3 text-[13px] text-ink-3" data-role="demo-note">A sample resume is loaded. Upload yours to replace it, or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] underline hover:text-ink" data-action="blank">start from scratch</button>.</p>
+        <div id="panels"></div>
+        <div class="flex gap-3 border-t border-rule px-5 py-4">
+          <button class="btn btn-ghost" data-nav="prev">Back</button>
+          <button class="btn btn-primary" data-nav="next">Continue</button>
         </div>
-        <button class="btn btn-ghost btn-sm" data-action="print">Download PDF</button>
       </div>
-      <div class="stage max-h-[calc(100vh-140px)] overflow-auto border border-rule">
-        <div class="sheet-scale flex origin-top justify-start transition-transform duration-200" id="scale">
-          <article class="sheet" id="sheet" data-tpl="classic"></article>
+
+      <div class="tool-view">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-rule px-5 pt-3">
+          <div class="flex gap-5" role="tablist" aria-label="Preview mode">
+            <button class="step-btn" role="tab" aria-selected="true" data-view="human">What a person sees</button>
+            <button class="step-btn" role="tab" aria-selected="false" data-view="parser">What the software reads</button>
+          </div>
+          <div class="zoomctl ml-auto flex items-center gap-1 pb-2">
+            <button class="icon-btn" data-zoom="-1" aria-label="Zoom out">−</button>
+            <span class="min-w-[40px] text-center font-mono text-[12px] text-ink-3" id="zoomval">66%</span>
+            <button class="icon-btn" data-zoom="1" aria-label="Zoom in">+</button>
+          </div>
+          <button class="btn btn-ghost btn-sm pb-2" data-action="print">Download PDF</button>
         </div>
-        <div class="parser-out">
-          <p class="m-0 border-b border-rule px-6 py-3 text-[13px] text-ink-2">The plain text a parser pulls out of your PDF. If a heading or a date looks wrong here, it is wrong in the employer's system too.</p>
-          <pre class="m-0 max-h-[calc(100vh-220px)] overflow-auto whitespace-pre-wrap break-words bg-paper p-6 font-mono text-[12.5px] leading-[1.7] text-ink" id="parser"></pre>
+        <div class="stage max-h-[70vh] overflow-auto bg-canvas p-5">
+          <div class="sheet-scale flex origin-top-left justify-start transition-transform duration-200" id="scale">
+            <article class="sheet" id="sheet" data-tpl="classic"></article>
+          </div>
+          <div class="parser-out">
+            <pre class="m-0 whitespace-pre-wrap break-words border border-rule bg-paper p-6 font-mono text-[12.5px] leading-[1.7] text-ink" id="parser"></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -200,6 +204,7 @@ const schema = {
   <!-- why resumes fail, in the extractor's own output -->
   <section id="read" class="scroll-mt-[80px] border-t border-rule">
     <div class="mx-auto max-w-[1120px] px-6 py-20">
+      <div class="max-w-[760px]">
       <h2 class="mb-4 max-w-[24ch] text-[clamp(28px,3.4vw,40px)]">What the software read from a two column resume</h2>
       <p class="mb-10 max-w-[56ch] text-[18px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, with the three places where the application dies marked.</p>
       <div class="read">
@@ -226,19 +231,22 @@ English</pre>
           <li><span class="num">3</span><div><h3>Nobody tells you which one it was</h3><p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p></div></li>
         </ol>
       </div>
+      </div>
     </div>
   </section>
 
   <section id="faq" class="scroll-mt-[80px] border-t border-rule">
     <div class="mx-auto max-w-[1120px] px-6 py-20">
+      <div class="max-w-[760px]">
       <h2 class="mb-8 max-w-[24ch] text-[clamp(28px,3.4vw,40px)]">What people ask before they trust a resume checker</h2>
-      <div class="faq-panel max-w-[720px]">
+      <div class="faq-panel">
         {faq.map((f) => (
           <article data-faq-a>
             <h3>{f.q}</h3>
             <p>{f.a}</p>
           </article>
         ))}
+      </div>
       </div>
     </div>
   </section>
