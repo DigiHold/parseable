@@ -238,7 +238,7 @@ function renderAudit(a: Audit): string {
       ${a.requiredPct < 80 ? `<div class="notice"><strong>Below the usual 80% mark</strong>Place the missing terms where they are honestly true, in your summary, your skills or a real bullet. A term you cannot place honestly stays missing, and that is a genuine gap rather than a formatting problem.</div>` : ''}
       <div class="mb-4"><h3 class="mb-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-ink-2">Required</h3>${chips(req)}</div>
       <div class="mb-2"><h3 class="mb-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-ink-2">Preferred (${a.preferredHit}/${a.preferredTotal})</h3>${chips(pref)}</div>
-      <p class="text-[12.5px] text-ink-3">Click a missing term to add it to your skills. Only do that when it is genuinely true of you, because it will be the first thing an interviewer asks about.</p>
+      <p class="text-[12.5px] text-ink-3">Your skill groups have been reordered so the ones this posting asks about come first. Nothing was reworded and nothing was added. Click a missing term to put it in, and only do that when it is genuinely true of you, because it will be the first thing an interviewer asks about.</p>
     </div>`;
 }
 
@@ -350,6 +350,25 @@ function print() {
 
 function goto(id: StepId) { step = id; render(); $('#app')?.scrollIntoView({ block: 'start' }); }
 
+/**
+ * Puts the skill groups this posting cares about at the top, ordered by how many
+ * of its required terms each group carries. Placement is the second thing a
+ * requisition scores after presence, and reordering rows the person wrote
+ * themselves invents nothing: no wording changes, no skill is added or removed.
+ */
+function tailorSkillOrder(a: Audit) {
+  const wanted = a.keywords.filter((k) => k.required && k.found).map((k) => k.term.toLowerCase());
+  if (!wanted.length) return;
+  const weight = (row: { label: string; items: string }) => {
+    const hay = `${row.label} ${row.items}`.toLowerCase();
+    return wanted.filter((t) => hay.includes(t)).length;
+  };
+  data.skills = data.skills
+    .map((row, i) => ({ row, i, w: weight(row) }))
+    .sort((x, y) => y.w - x.w || x.i - y.i)
+    .map((x) => x.row);
+}
+
 /* ------------------------------------------------------------------ wiring */
 
 function bootstrap() {
@@ -460,6 +479,7 @@ function bootstrap() {
       const sheet = $('#sheet');
       if (!sheet || !posting.trim()) return;
       lastAudit = audit(posting, renderParserText(sheet));
+      tailorSkillOrder(lastAudit);
       render();
     }
   });
@@ -511,8 +531,10 @@ async function loadPdf(file: File) {
     }
     data = textToResume(text);
     goto('details');
-  } catch {
+  } catch (err) {
     status('That file could not be read. Try exporting it again as a PDF, or start blank.');
+    if (import.meta.env.DEV) throw err;
+    window.dispatchEvent(new CustomEvent('resume-parse-error', { detail: String(err) }));
   }
 }
 

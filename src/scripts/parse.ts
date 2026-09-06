@@ -13,7 +13,9 @@ export async function extractPdfText(file: File): Promise<string> {
   const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
   pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
-  const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+  // In pdf.js 6 the loading task owns destroy(), not the document proxy.
+  const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
+  const doc = await task.promise;
   const pages: string[] = [];
 
   for (let n = 1; n <= doc.numPages; n++) {
@@ -22,21 +24,29 @@ export async function extractPdfText(file: File): Promise<string> {
     let lastY: number | null = null;
     const lines: string[] = [];
 
+    let lastEndX: number | null = null;
     for (const raw of content.items as any[]) {
       if (typeof raw.str !== 'string') continue;
       const y = Math.round(raw.transform[5]);
+      const x = raw.transform[4] as number;
+
       if (lastY !== null && Math.abs(y - lastY) > 2) {
         lines.push(line.trim());
         line = '';
+        lastEndX = null;
       }
+      // Runs carry no spaces of their own, so a horizontal gap is the only signal.
+      if (lastEndX !== null && x - lastEndX > 1 && !/\s$/.test(line) && !/^\s/.test(raw.str)) line += ' ';
       line += raw.str;
-      if (raw.hasEOL) { lines.push(line.trim()); line = ''; }
+
+      lastEndX = x + (typeof raw.width === 'number' ? raw.width : 0);
+      if (raw.hasEOL) { lines.push(line.trim()); line = ''; lastEndX = null; }
       lastY = y;
     }
     if (line.trim()) lines.push(line.trim());
     pages.push(lines.filter(Boolean).join('\n'));
   }
-  await doc.destroy();
+  await task.destroy();
   return pages.join('\n\n');
 }
 
@@ -56,7 +66,7 @@ const DATE_RANGE =
   /((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc)[a-zé.]*\s*)?(19|20)\d{2}\s*(?:[-–—]|to|à|jusqu|until)\s*((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zé.]*\s*)?((19|20)\d{2}|present|current|today|now|aujourd|présent|actuel)/i;
 const BULLET = /^\s*[•▪◦●·*\-–—]\s+/;
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]{2,}/;
-const PHONE = /(\+\d{1,3}[\s.-]?)?(\(?\d{2,4}\)?[\s.-]?){2,5}\d{2,4}/;
+const PHONE = /(\+\d{1,3}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,6}\d{2,4}/;
 const URL = /\b((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.(?:com|net|org|io|dev|ai|co|me|fr|ch|app|xyz)(?:\/[\w./-]*)?)\b/i;
 
 /** Turns extracted text into a resume the person then corrects. */
@@ -77,8 +87,17 @@ export function textToResume(text: string): Resume {
   // ---- contact block, taken from the whole document because it can sit anywhere
   const all = lines.join('\n');
   r.basics.email = all.match(EMAIL)?.[0] ?? '';
-  const phone = all.split('\n').find((l) => !EMAIL.test(l) && PHONE.test(l) && (l.match(/\d/g) || []).length >= 8);
-  r.basics.phone = phone ? (phone.match(PHONE)?.[0].trim() ?? '') : '';
+
+  // A contact line is usually one row of fragments split by pipes or bullets, so the
+  // phone and the location sit beside the email rather than on lines of their own.
+  const fragments = lines
+    .slice(0, 14)
+    .flatMap((l) => l.split(/\s*[|•·]\s*|\s{3,}/))
+    .map((f) => f.trim())
+    .filter(Boolean);
+
+  const phoneFrag = fragments.find((f) => !EMAIL.test(f) && PHONE.test(f) && (f.match(/\d/g) || []).length >= 8);
+  r.basics.phone = phoneFrag ? (phoneFrag.match(PHONE)?.[0].trim() ?? '') : '';
 
   const seen = new Set<string>();
   for (const l of sections.head.slice(0, 12)) {
@@ -95,8 +114,9 @@ export function textToResume(text: string): Resume {
     const after = sections.head[sections.head.indexOf(nameLine) + 1];
     if (after && after.length < 64 && !EMAIL.test(after) && !/\d{4}/.test(after)) r.basics.title = after;
   }
-  const loc = sections.head.find((l) => /\b(remote|france|switzerland|belgium|germany|spain|paris|lyon|london|berlin|amsterdam|madrid|suisse|belgique|allemagne)\b/i.test(l) && l.length < 60);
-  if (loc && loc !== r.basics.title) r.basics.location = loc;
+  const PLACE = /\b(remote|hybrid|onsite|france|switzerland|belgium|germany|spain|italy|portugal|netherlands|ireland|poland|paris|lyon|marseille|london|berlin|munich|amsterdam|madrid|barcelona|lisbon|dublin|zurich|geneva|lausanne|brussels|milan|warsaw|suisse|belgique|allemagne|espagne|cet|cest|gmt|utc)\b/i;
+  const loc = fragments.find((f) => PLACE.test(f) && f.length < 60 && !EMAIL.test(f) && f !== r.basics.title);
+  if (loc) r.basics.location = loc;
 
   // ---- summary
   r.basics.summary = sections.summary.join(' ').replace(BULLET, '').trim();
@@ -126,7 +146,9 @@ function blockToRoles(block: string[]): Role[] {
   let cur: Role | null = null;
 
   for (const line of block) {
-    const dates = line.match(DATE_RANGE)?.[0] ?? (/^\s*((19|20)\d{2})\s*$/.test(line) ? line.trim() : '');
+    // "Full Stack Developer      2023" is a role too, not only "2021 - 2024".
+    const single = line.match(/^(?![•▪◦●·*\-–—\s]*[•▪◦●·*])(?=.{4,70}$).*?\s((?:19|20)\d{2})\s*$/);
+    const dates = line.match(DATE_RANGE)?.[0] ?? (single ? single[1] : /^\s*((19|20)\d{2})\s*$/.test(line) ? line.trim() : '');
     const isBullet = BULLET.test(line);
 
     if (dates && !isBullet) {
