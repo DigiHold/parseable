@@ -100,9 +100,13 @@ export function textToResume(text: string): Resume {
   r.basics.phone = phoneFrag ? (phoneFrag.match(PHONE)?.[0].trim() ?? '') : '';
 
   const seen = new Set<string>();
-  for (const l of sections.head.slice(0, 12)) {
-    const u = l.match(URL)?.[0];
-    if (u && !EMAIL.test(u) && !seen.has(u.toLowerCase())) { seen.add(u.toLowerCase()); r.basics.links.push({ label: u, url: u.startsWith('http') ? u : `https://${u}` }); }
+  for (const raw of sections.head.slice(0, 12)) {
+    // Strip addresses first, otherwise the domain inside an email reads as a link.
+    const u = raw.replace(new RegExp(EMAIL.source, 'g'), ' ').match(URL)?.[0];
+    if (u && !seen.has(u.toLowerCase())) {
+      seen.add(u.toLowerCase());
+      r.basics.links.push({ label: u, url: u.startsWith('http') ? u : `https://${u}` });
+    }
   }
 
   // ---- name and title: the first plausible name line, then the line under it
