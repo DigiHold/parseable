@@ -16,13 +16,18 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 
 await page.goto(base, { waitUntil: 'networkidle' });
-check('workspace hidden before any resume', !(await page.locator('#workspace').isVisible()));
+check('the tool is open on arrival with a sample', (await page.locator('#sheet').innerText()).includes('Marie Dubois'));
 
 // import a real PDF
+// the sample is on screen already, so wait for the imported name to replace it
 await page.setInputFiles('[data-file="pdf"]', pdf);
-await page.waitForSelector('#f-name', { timeout: 15000 });
+await page.waitForFunction(() => {
+  const el = document.querySelector('#f-name');
+  return el && el.value.length > 3 && !el.value.includes('Marie Dubois');
+}, null, { timeout: 15000 });
 const name = await page.locator('#f-name').inputValue();
-check('PDF import fills the name', name.length > 3, name);
+check('PDF import replaces the sample', name.length > 3 && !name.includes('Marie'), name);
+check('the sample note disappears after import', !(await page.locator('[data-role="demo-note"]').isVisible()));
 check('PDF import finds roles', (await page.locator('[data-bind^="experience."][data-bind$=".title"]').count()) >= 3);
 
 // zoom, before and after switching views

@@ -7,9 +7,13 @@ type StepId = 'details' | 'template' | 'posting' | 'export';
 const STEPS: StepId[] = ['details', 'template', 'posting', 'export'];
 const KEY = 'parseable/draft';
 
-let data: Resume = emptyResume();
+/* A sample resume sits in the tool on arrival, so the page shows the product rather than a picture of it. */
+const DEMO: Resume = {"schema": "ats-resume-builder/v1", "basics": {"name": "Marie Dubois", "title": "Senior Backend Engineer", "email": "marie.dubois@example.com", "phone": "+33 6 12 34 56 78", "location": "Lyon, France, remote across CET", "links": [{"label": "github.com/mariedubois", "url": "https://github.com/mariedubois"}], "photo": null, "summary": "Backend engineer with nine years building payment systems in Python and Go. Led the migration of a monolith to services handling four thousand requests per second, and mentored the team through it. Works remotely across CET."}, "skills": [{"label": "Languages", "items": "Python, Go, SQL, TypeScript"}, {"label": "Infrastructure", "items": "Kubernetes, Docker, PostgreSQL, Terraform, AWS"}, {"label": "Practices", "items": "CI/CD, on call, incident reviews, technical writing"}], "experience": [{"title": "Senior Backend Engineer", "org": "Payfit, Paris", "dates": "2021 - 2026", "bullets": ["Rebuilt the billing service in Go and cut p99 latency from 800ms to 90ms.", "Mentored four engineers through the migration and ran the on call rotation.", "Wrote the incident review process the whole platform team now follows."], "env": "Go, Python, PostgreSQL, Kubernetes, AWS"}, {"title": "Backend Engineer", "org": "Doctolib, Paris", "dates": "2017 - 2021", "bullets": ["Shipped the appointment reminder pipeline, sending two million messages a day.", "Moved the search index to a managed cluster with zero downtime."], "env": ""}], "projects": [], "education": [{"degree": "MSc Computer Science", "school": "INSA Lyon", "dates": "2015 - 2017", "detail": ""}], "languages": "French (native), English (professional)", "settings": {"template": "classic", "showPhoto": false}} as Resume;
+
+let data: Resume = DEMO;
+let demo = true;
 let step: StepId = 'details';
-let started = false;
+let started = true;
 let posting = '';
 let lastAudit: Audit | null = null;
 let zoom = 0.6;
@@ -20,15 +24,16 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 /* The draft lives in sessionStorage, so it survives a reload and is gone when
    the tab closes. It never reaches a server, because there is no server. */
 function save() {
-  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, step, started })); } catch { /* private mode */ }
+  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, step, started, demo })); } catch { /* private mode */ }
 }
 function restore() {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return;
-    const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId; started?: boolean };
+    const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId; started?: boolean; demo?: boolean };
     data = normalise(p.data);
-    started = p.started === true;
+    demo = p.demo === true;
+    started = true;
     posting = typeof p.posting === 'string' ? p.posting : '';
     if (p.step && STEPS.includes(p.step)) step = p.step;
   } catch { /* corrupt draft, start clean */ }
@@ -261,8 +266,8 @@ function render() {
   const prev = $<HTMLButtonElement>('[data-nav="prev"]');
   const next = $<HTMLButtonElement>('[data-nav="next"]');
   if (prev) prev.disabled = step === 'details';
-  const ws = $('#workspace');
-  if (ws) ws.hidden = !started;
+  const note = $('[data-role="demo-note"]');
+  if (note) note.hidden = !demo;
   if (next) { next.disabled = step === 'export'; next.textContent = 'Continue'; }
 
   renderPreview();
@@ -440,7 +445,7 @@ function bootstrap() {
       if (drop) { $<HTMLInputElement>('[data-file="pdf"]')?.click(); }
       return;
     }
-    if (action === 'blank') { data = emptyResume(); goto('details'); }
+    if (action === 'blank') { data = emptyResume(); demo = false; goto('details'); }
     if (action === 'pick-pdf') $<HTMLInputElement>('[data-file="pdf"]')?.click();
     if (action === 'import-json') $<HTMLInputElement>('[data-file="json"]')?.click();
     if (action === 'pick-photo') $<HTMLInputElement>('[data-file="photo"]')?.click();
@@ -468,7 +473,7 @@ function bootstrap() {
     if (kind === 'pdf') void loadPdf(file);
     if (kind === 'json') {
       void file.text().then((txt) => {
-        try { data = normalise(JSON.parse(txt)); goto('details'); }
+        try { data = normalise(JSON.parse(txt)); demo = false; goto('details'); }
         catch { status('That file is not a resume export from here.'); }
       });
     }
@@ -505,6 +510,7 @@ async function loadPdf(file: File) {
       return;
     }
     data = textToResume(text);
+    demo = false;
     goto('details');
   } catch (err) {
     status('That file could not be read. Try exporting it again as a PDF, or start blank.');
