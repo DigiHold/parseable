@@ -112,6 +112,7 @@ const schema = {
   <link rel="canonical" href={site + '/'} />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
   <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/img/sheet-hero.avif" as="image" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={site + '/'} />
@@ -130,8 +131,8 @@ const schema = {
 <header class="site-head sticky top-0 z-40 transition-[background-color,backdrop-filter] duration-300" data-head>
   <div class="mx-auto flex h-[72px] max-w-[1240px] items-center gap-6 px-6">
     <a href="/" class="font-display text-[26px] tracking-[-0.02em] no-underline" style="font-variation-settings:'opsz' 32">Parseable</a>
-    <nav class="ml-auto hidden items-center gap-8 text-[15px] font-medium sm:flex">
-      <a href="#how" class="text-ink-2 no-underline transition-colors hover:text-ink">How it works</a>
+    <nav class="ml-auto flex items-center gap-4 whitespace-nowrap text-[14px] font-medium sm:gap-8 sm:text-[15px]">
+      <a href="#how" class="text-ink-2 no-underline transition-colors hover:text-ink"><span class="sm:hidden">Steps</span><span class="hidden sm:inline">How it works</span></a>
       <a href="#faq" class="text-ink-2 no-underline transition-colors hover:text-ink">Questions</a>
       <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="text-ink-2 no-underline transition-colors hover:text-ink">Source</a>
     </nav>
@@ -140,39 +141,32 @@ const schema = {
 
 <main>
   <!-- hero: a real sheet of paper, and the beam that reads it -->
-  <section class="hero">
-    <div class="relative z-[1] mx-auto max-w-[1240px] px-6 pb-16 pt-12 lg:min-h-[720px] lg:pb-28 lg:pt-24">
-      <div class="max-w-[560px]">
-        <p class="mb-7 font-mono text-[12.5px] uppercase tracking-[0.14em] text-ink-3">Free ATS friendly resume checker</p>
-        <h1 class="mb-7 text-[clamp(44px,6.4vw,84px)]">Get past the software and in front of <span class="ink">a person<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C 60 6, 120 16, 180 10 S 270 8, 296 12"/></svg></span></h1>
-        <p class="mb-9 max-w-[46ch] text-[18px] leading-relaxed text-ink-2">
+  <section class="hero overflow-hidden">
+    <div class="dropzone mx-auto grid max-w-[1240px] items-start gap-12 px-6 pb-14 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:pb-20 lg:pt-10" data-drop="pdf">
+      <div class="max-w-[560px] lg:pt-6">
+        <h1 class="mb-6 max-w-[12ch] text-[clamp(42px,5.5vw,72px)]" style="text-wrap:balance">Get past the software and in front of a person</h1>
+        <p class="mb-9 max-w-[44ch] text-[17px] leading-relaxed text-ink-2 sm:text-[18px]">
           Software reads your resume before a human does. Drop yours in, paste the job posting, and
           download a PDF the screening system reads correctly. Nothing leaves your browser.
         </p>
-
-        <div class="dropzone relative max-w-[520px] rounded-[22px] border border-rule bg-paper p-6 shadow-[var(--shadow-float)] sm:p-7" data-drop="pdf">
-          <div class="flex flex-wrap items-center gap-4">
-            <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
-            <div class="min-w-[150px]">
-              <p class="m-0 font-ui text-[15.5px] font-semibold text-ink">or drop a PDF here</p>
-              <p class="m-0 text-[13.5px] text-ink-3" data-role="pdf-status">Read in your browser, never uploaded.</p>
-            </div>
-          </div>
-          <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-rule pt-5 text-[14.5px]">
-            <button class="cursor-pointer border-0 bg-transparent p-0 font-medium text-ink-2 underline decoration-edge underline-offset-4 transition-colors hover:text-ink hover:decoration-ink" data-action="blank">Start from scratch</button>
-            <button class="cursor-pointer border-0 bg-transparent p-0 font-medium text-ink-2 underline decoration-edge underline-offset-4 transition-colors hover:text-ink hover:decoration-ink" data-action="import-json">Import a saved JSON</button>
-          </div>
-          <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
-          <input type="file" accept="application/json,.json" class="hidden" data-file="json">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+          <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
+          <p class="m-0 text-[15px] text-ink-2">or drop a PDF anywhere on this page.</p>
         </div>
-
-        <p class="mt-7 flex flex-wrap gap-x-6 gap-y-1.5 text-[14px] text-ink-3">
-          <span><b class="font-semibold text-ink-2">No account and no database,</b> your file never leaves the tab.</span>
-          <span><b class="font-semibold text-ink-2">Open source,</b> MIT licensed, host your own copy.</span>
+        <p class="mt-5 text-[14px] text-ink-3" data-role="pdf-status">Read in your browser, never uploaded. No account, nothing stored, MIT licensed.</p>
+        <p class="mt-8 border-t border-rule pt-5 text-[14px] text-ink-3">
+          <button class="cursor-pointer border-0 bg-transparent p-0 text-ink-2 underline decoration-edge underline-offset-4 hover:text-ink" data-action="blank">Start from scratch</button>
+          <span class="mx-2">or</span>
+          <button class="cursor-pointer border-0 bg-transparent p-0 text-ink-2 underline decoration-edge underline-offset-4 hover:text-ink" data-action="import-json">import a saved JSON</button>
         </p>
+        <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
+        <input type="file" accept="application/json,.json" class="hidden" data-file="json">
+      </div>
+
+      <div class="hero-photo" aria-hidden="true">
+        <img src="/img/sheet-hero.avif" alt="" width="640" height="720" decoding="async" fetchpriority="high">
       </div>
     </div>
-    <div class="hero-photo" aria-hidden="true"></div>
   </section>
 
   <!-- workspace: appears once a resume is loaded -->
@@ -227,44 +221,49 @@ const schema = {
     </div>
   </section>
 
-  <!-- where it goes wrong: the pipeline, and the three points on it -->
-  <section class="border-t border-rule bg-paper">
-    <div class="mx-auto grid max-w-[1240px] gap-12 px-6 py-20 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)] lg:items-start lg:gap-20 lg:py-28">
-      <div data-reveal>
-        <p class="mb-5 font-mono text-[13px] font-medium uppercase tracking-[0.12em] text-ink-3">Where it goes wrong</p>
-        <h2 class="mb-5 text-[clamp(32px,4.2vw,50px)]">Three points on the line where an application dies</h2>
-        <p class="m-0 text-[18px] text-ink-2">Every application crosses the same four stages before a person is involved. The rejection email looks identical whichever stage failed.</p>
-      </div>
+  <!-- what the machine read from a two column resume, at full width -->
+  <section class="border-t border-rule">
+    <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-24">
+      <h2 class="mb-4 max-w-[20ch] text-[clamp(32px,4.2vw,50px)]">What the software read from a two column resume</h2>
+      <p class="mb-12 max-w-[60ch] text-[18px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, and the three places where the application dies are marked.</p>
+      <div class="read">
+        <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
+Full Stack Developer
 
-      <div data-reveal>
-        <ol class="pipe">
-          <li><span class="pipe-dot"></span><span class="pipe-label">Your PDF</span></li>
-          <li class="fails"><span class="pipe-tag">01</span><span class="pipe-dot"></span><span class="pipe-label">Text extraction</span></li>
-          <li><span class="pipe-dot"></span><span class="pipe-label">Field sorting</span></li>
-          <li class="fails"><span class="pipe-tag">02</span><span class="pipe-dot"></span><span class="pipe-label">Keyword score</span></li>
-          <li class="fails"><span class="pipe-tag">03</span><span class="pipe-dot"></span><span class="pipe-label">A person, or the email</span></li>
-        </ol>
+<s>Skills</s>                    <s>Experience</s>
+<b>WordPress                 Founder &amp; Developer          2025 - 2026</b>
+HTML/CSS                  At Vayalis, my own company, I develop and
+Vercel                    launch my own products, handling the full
+Cloudflare                cycle from idea to release.
+React                     <b>Web Designer                   2023 - 2025</b>
+Next.js                   Trivial Mass SA, Lausanne
+Node.js                   Graphic integration, website development,
+PHP                       <i>client follow up management</i>, as well as
+SQL                       invoicing.
 
-        <ol class="notes">
+<s>Language</s>                  <i>client relations to understand their</i>
+French                    <i>requirements</i>, and monitoring the specs.
+English</pre>
+        <ol>
           <li>
-            <span class="note-num">01</span>
+            <span class="num">01</span>
             <div>
               <h3>The layout breaks the extractor</h3>
-              <p>A skills sidebar reads as one interleaved run of words, so the parser files your job title under your employer and scores a resume that never existed.</p>
+              <p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p>
             </div>
           </li>
           <li>
-            <span class="note-num">02</span>
+            <span class="num">02</span>
             <div>
               <h3>The words do not match the posting</h3>
-              <p>Say "worked with teams" where the requisition says "stakeholder management" and the match rate reads zero on that line, whatever you actually did.</p>
+              <p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p>
             </div>
           </li>
           <li>
-            <span class="note-num">03</span>
+            <span class="num">03</span>
             <div>
               <h3>Nobody tells you which one it was</h3>
-              <p>The rejection email is the same either way, so most people rewrite the cover letter and send the same unreadable file again.</p>
+              <p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p>
             </div>
           </li>
         </ol>
@@ -274,10 +273,9 @@ const schema = {
 
   <!-- how it works: the steps on the left, the real interface following on the right -->
   <section id="how" class="scroll-mt-[72px] border-t border-rule">
-    <div class="mx-auto grid max-w-[1240px] gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-28">
-      <div>
-        <p class="mb-5 font-mono text-[13px] font-medium uppercase tracking-[0.12em] text-ink-3" data-reveal>How it works</p>
-        <h2 class="mb-12 max-w-[16ch] text-[clamp(32px,4.2vw,50px)]" data-reveal>Four steps, about ten minutes the first time</h2>
+    <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-24">
+      <h2 class="mb-12 max-w-[18ch] text-[clamp(32px,4.2vw,50px)]">Four steps, about ten minutes the first time</h2>
+      <div class="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
         <ol class="how">
           <li data-how-step="0">
             <h3>Bring what you have</h3>
@@ -296,25 +294,18 @@ const schema = {
             <p>Print to a PDF that keeps a real text layer, then export the JSON so the next application only costs you the posting step.</p>
           </li>
         </ol>
-      </div>
 
-      <div class="lg:sticky lg:top-[104px]">
-        <div class="frag-frame" aria-hidden="true">
-          <div class="frag" data-how-frag="0">
-            <div class="rounded-[22px] border border-rule bg-paper p-6 shadow-[var(--shadow-float)]">
-              <div class="flex flex-wrap items-center gap-4">
-                <span class="btn btn-primary">Upload your resume</span>
-                <span class="font-display text-[15px] font-semibold">or drop a PDF here</span>
+        <div class="lg:sticky lg:top-[96px]">
+          <div class="frag-frame" aria-hidden="true">
+            <div class="frag" data-how-frag="0">
+              <div class="rounded-xl border border-rule bg-paper p-6">
+                <div class="field"><label>Full name</label><input value="Marie Dubois" readonly tabindex="-1"></div>
+                <div class="field"><label>Job title</label><input value="Senior Backend Engineer" readonly tabindex="-1"></div>
+                <div class="field mb-0"><label>Professional summary</label><textarea readonly tabindex="-1" rows="3">Backend engineer with nine years building payment systems in Python and Go.</textarea></div>
               </div>
-              <div class="mt-5 border-t border-rule pt-4 text-[13.5px] text-ink-2">Start from scratch &nbsp;&nbsp; Import a saved JSON</div>
             </div>
-          </div>
-          <div class="frag" data-how-frag="1">
-            <div class="mb-3 inline-flex rounded-full border border-rule bg-paper p-1">
-              <span class="rounded-full px-4 py-2 font-display text-[14px] font-semibold text-ink-2">Human view</span>
-              <span class="rounded-full bg-ink px-4 py-2 font-display text-[14px] font-semibold text-white">Parser view</span>
-            </div>
-            <pre class="m-0 rounded-2xl bg-[#0b1220] p-6 font-mono text-[12.5px] leading-[1.75] text-[#d1d5db]">Marie Dubois
+            <div class="frag" data-how-frag="1">
+              <pre class="m-0 rounded-xl bg-[#0f1520] p-6 font-mono text-[12.5px] leading-[1.75] text-[#c7ccd4]">Marie Dubois
 Senior Backend Engineer
 marie@example.com | Lyon, France
 
@@ -324,21 +315,23 @@ payment systems in Python and Go.
 
 SKILLS
 Languages: Python, Go, SQL, TypeScript</pre>
-          </div>
-          <div class="frag" data-how-frag="2">
-            <div class="rounded-[22px] border border-rule bg-paper p-6 shadow-[var(--shadow-float)]">
-              <div class="flex items-baseline gap-2.5"><b class="font-display text-[36px] font-bold leading-none tracking-[-0.03em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
-              <div class="my-3 mb-5 h-1.5 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-match"></i></div>
-              <div class="flex flex-wrap gap-1.5">
-                <span class="chip chip-miss">WCAG</span><span class="chip chip-hit">Accessibility</span><span class="chip chip-hit">JavaScript</span><span class="chip chip-hit">Next.js</span><span class="chip chip-hit">React</span><span class="chip chip-hit">TypeScript</span>
+            </div>
+            <div class="frag" data-how-frag="2">
+              <div class="rounded-xl border border-rule bg-paper p-6">
+                <div class="flex items-baseline gap-2.5"><b class="font-display text-[40px] font-normal leading-none tracking-[-0.02em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
+                <div class="my-3 mb-5 h-1.5 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-primary"></i></div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="chip chip-miss">WCAG</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Accessibility</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">JavaScript</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Next.js</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">React</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">TypeScript</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="frag" data-how-frag="3">
-            <div class="rounded-[22px] border border-rule bg-paper p-6 shadow-[var(--shadow-float)]">
-              <span class="btn btn-primary mb-3 w-full">Download PDF</span>
-              <span class="btn btn-ghost mb-5 w-full">Export JSON</span>
-              <div class="notice mb-0"><strong>Name the file plainly</strong>FirstnameLastname_Resume.pdf. Some parsers choke on spaces, brackets and accents.</div>
+            <div class="frag" data-how-frag="3">
+              <article class="sheet" data-tpl="classic">
+                <header class="s-head"><div class="s-head-txt"><h1 class="s-name">Marie Dubois</h1><p class="s-role">Senior Backend Engineer</p><p class="s-contact"><span>marie@example.com</span><span class="sep">|</span><span>Lyon, France</span></p></div></header>
+                <section><h2>Professional Summary</h2><p class="s-summary">Backend engineer with nine years building payment systems in Python and Go. Led the migration of a monolith to services handling four thousand requests per second.</p></section>
+                <section><h2>Skills</h2><p class="s-skill"><b>Languages:</b> Python, Go, SQL, TypeScript</p><p class="s-skill"><b>Infrastructure:</b> Kubernetes, Docker, PostgreSQL, AWS</p></section>
+                <section><h2>Experience</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in Go and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li></ul></div></section>
+              </article>
             </div>
           </div>
         </div>
@@ -346,16 +339,13 @@ Languages: Python, Go, SQL, TypeScript</pre>
     </div>
   </section>
 
-  <div class="torn" aria-hidden="true"><img src="/img/torn-strip.avif" alt="" loading="lazy" decoding="async" width="1376" height="768"></div>
-
   <!-- questions: an index, one answer at a time -->
-  <section id="faq" class="scroll-mt-[72px] bg-paper">
+  <section id="faq" class="scroll-mt-[72px] border-t border-rule">
     <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
-      <div class="mb-12 max-w-[640px]" data-reveal>
-        <p class="mb-5 font-mono text-[13px] font-medium uppercase tracking-[0.12em] text-ink-3">Questions</p>
+      <div class="mb-12 max-w-[640px]">
         <h2 class="text-[clamp(32px,4.2vw,50px)]">What people ask before they trust a resume checker</h2>
       </div>
-      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-16" data-reveal>
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-16">
         <ol class="faq-index">
           {faq.map((f, i) => (
             <li><button type="button" data-faq-q aria-selected={i === 0 ? 'true' : 'false'}><span class="faq-num">{String(i + 1).padStart(2, '0')}</span><span>{f.q}</span></button></li>
@@ -374,11 +364,8 @@ Languages: Python, Go, SQL, TypeScript</pre>
   </section>
 </main>
 
-<footer class="overflow-hidden border-t border-rule">
-  <div class="mx-auto max-w-[1240px] px-6 pt-14">
-    <p class="ghost" aria-hidden="true">Parseable</p>
-  </div>
-  <div class="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-8 gap-y-4 px-6 pb-10 text-[14.5px] text-ink-2">
+<footer class="border-t border-rule">
+  <div class="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-8 gap-y-4 px-6 py-10 text-[14.5px] text-ink-2">
     <p class="inline-flex flex-wrap items-center gap-[.35rem] m-0">Made with love in <svg class="inline-block h-[15px] w-[15px] rounded-full align-middle" viewBox="0 0 512 512" role="img" aria-label="France"><circle cx="256" cy="256" fill="#fff" r="256"></circle><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"></path><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"></path></svg> by <a class="inline-flex items-center gap-[.4rem] text-fg-2 transition-colors duration-200 ease-soft hover:text-accent-text [&>img]:w-[1.35rem] [&>img]:h-[1.35rem] [&>img]:rounded-full [&>img]:object-cover [&>img]:border [&>img]:border-line-2" href="https://nicolaslecocq.com/" rel="noopener noreferrer" target="_blank"><img src="/nicolas.avif" width="24" height="24" alt="" loading="lazy" decoding="async">Nicolas Lecocq</a></p>
     <nav class="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
       <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="text-ink-2 no-underline hover:text-ink">Source on GitHub</a>

@@ -1,20 +1,6 @@
 /* Page behaviour outside the wizard: reveals, the FAQ index, the sticky how it works. */
 
 export function mountSite(): void {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // Reveal on entry. One observer, one class, nothing that blocks reading.
-  const revealed = document.querySelectorAll<HTMLElement>('[data-reveal]');
-  if (reduce) revealed.forEach((el) => el.classList.add('is-in'));
-  else {
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    revealed.forEach((el) => io.observe(el));
-    // Nothing on the page may depend on an observer firing. After a moment, everything is visible.
-    window.setTimeout(() => revealed.forEach((el) => el.classList.add('is-in')), 1200);
-  }
-
   // The header is glass only once the page has moved under it.
   const head = document.querySelector<HTMLElement>('[data-head]');
   if (head) {
