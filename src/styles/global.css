@@ -9,9 +9,9 @@
    ============================================================ */
 @theme {
   --color-paper: #ffffff;
-  --color-page: #f4f3f0;
-  --color-canvas: #f4f3f0;
-  --color-ink: #0f172a;
+  --color-page: #f5f4f1;
+  --color-canvas: #f5f4f1;
+  --color-ink: #141517;
   --color-ink-2: #475569;
   --color-ink-3: #778090;
   --color-rule: #e7eaef;
@@ -33,14 +33,18 @@
   --ease-soft: cubic-bezier(.22, 1, .36, 1);
 
   --font-display: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-ui: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --font-ui: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --shadow-card: 0 1px 2px rgba(15, 23, 42, .04), 0 14px 40px rgba(15, 23, 42, .07);
   --shadow-float: 0 2px 6px rgba(15, 23, 42, .05), 0 24px 60px rgba(15, 23, 42, .10);
 }
 
+@font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/plex-1.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-2.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-3.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-4.woff2') format('woff2'); font-weight: 600; font-display: swap; }
 @font-face {
   font-family: 'Newsreader';
   src: url('/fonts/newsreader.woff2') format('woff2');
@@ -52,6 +56,7 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body { @apply m-0 bg-page text-ink font-sans text-[17px] leading-relaxed antialiased; }
+  a { text-decoration-thickness: 1px; text-underline-offset: 4px; }
   h1, h2 { @apply font-display font-normal leading-[1.02] tracking-[-0.02em] m-0; font-variation-settings: 'opsz' 72; }
   h3, h4 { @apply font-ui font-semibold leading-tight tracking-[-0.015em] m-0; }
   :focus-visible { @apply outline-[3px] outline-primary/60 outline-offset-2 rounded-lg; }
@@ -146,22 +151,33 @@ body[data-view='parser'] .zoomctl { display: none; }
   position: absolute; inset: 0; background: #fff; overflow: hidden;
   box-shadow: 1px 2px 0 #d8d5cf, 0 18px 40px -18px rgba(15, 23, 42, .28);
 }
-.demo-sheet .sheet { transform: scale(var(--k, .705)); transform-origin: top left; width: 210mm; min-height: 0; box-shadow: none; }
+.demo-sheet .sheet { transform: scale(var(--k, .705)); transform-origin: top left; width: 210mm; min-height: 0; box-shadow: none; --s-accent: #141517; }
 .demo-sheet { clip-path: inset(0 0 calc(100% - var(--scan)) 0); z-index: 2; }
 .demo-read { clip-path: inset(var(--scan) 0 0 0); z-index: 1; }
 /* top as a percentage resolves against the box height, which is what the line uses too */
 .demo-read pre {
-  position: absolute; left: 0; right: 0; top: calc(var(--scan) + 30px); margin: 0; padding: 0 36px 34px;
-  font: 400 11px/1.7 var(--font-mono); color: #1f2937; white-space: pre-wrap; word-break: break-word;
+  position: absolute; left: 0; right: 0; top: calc(var(--scan) + 26px); margin: 0; padding: 0 36px 34px;
+  font: 400 9.4px/1.62 var(--font-mono); color: #1f2937; white-space: pre-wrap; word-break: break-word;
 }
 .demo-read-full pre { top: 34px; }
-.demo-read pre b { font-weight: 400; color: #1d4ed8; background: #e8eefc; border-radius: 2px; }
-.demo-line { position: absolute; left: 0; right: 0; top: var(--scan); height: 1px; background: #2563eb; z-index: 3; }
-.demo-line::after { content: 'what the software reads'; position: absolute; left: 36px; top: 9px; font: 500 11px/1 var(--font-ui); color: #1d4ed8; letter-spacing: .01em; }
+.demo-read pre b { font-weight: 500; color: #1d4ed8; background: #e6eefb; border-radius: 2px; }
+.demo-line {
+  position: absolute; left: 0; right: 0; top: var(--scan); height: 1px; z-index: 3;
+  background: #3b82f6; box-shadow: 0 0 6px 1px rgba(59,130,246,.55), 0 0 22px 4px rgba(59,130,246,.18);
+}
+.demo-line::before {
+  content: ''; position: absolute; top: -1px; bottom: -1px; left: -20%; width: 40%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.95), transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo-line::before { animation: glint 5.5s ease-in-out infinite; }
+  @keyframes glint { from { transform: translateX(0); } to { transform: translateX(300%); } }
+}
+.demo-line::after { content: 'what the software reads'; position: absolute; left: 36px; top: 8px; font: 500 10.5px/1 var(--font-ui); color: #1d4ed8; }
 /* the line sits exactly on the Experience heading of the sheet above it */
 .demo { --scan: 46.4%; }
 @media (max-width: 1023px) { .demo { max-width: 520px; margin: 8px auto 0; } .demo-sheet .sheet { --k: .62; } }
-@media (max-width: 560px) { .demo-sheet .sheet { --k: .44; } .demo-read pre { padding: 22px 24px; font-size: 10px; } }
+@media (max-width: 560px) { .demo-sheet .sheet { --k: .44; } .demo-read pre { padding: 0 22px 22px; font-size: 8.4px; line-height: 1.55; } }
 
 /* ---------- what the machine read, full width, ink on paper ---------- */
 .read { display: grid; gap: 40px; }
@@ -175,28 +191,26 @@ body[data-view='parser'] .zoomctl { display: none; }
 .read pre s { text-decoration: none; color: #9aa3b2; }
 .read pre i { font-style: normal; color: #1d4ed8; }
 .read ol { list-style: none; margin: 0; padding: 0; }
-.read li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 22px 0; border-top: 1px solid var(--color-rule); }
+.read li { display: grid; grid-template-columns: 18px 1fr; gap: 12px; padding: 22px 0; border-top: 1px solid var(--color-rule); }
 .read li:last-child { border-bottom: 1px solid var(--color-rule); }
-.read .num { font-family: var(--font-display); font-size: 22px; color: var(--color-ink-2); font-variation-settings: 'opsz' 72; line-height: 1.2; }
+.read .num { width: 10px; height: 10px; margin-top: 7px; border-radius: 50%; background: #2563eb; font-size: 0; }
 .read h3 { font-size: 18px; margin: 0 0 6px; }
 .read p { margin: 0; font-size: 15.5px; color: var(--color-ink-2); }
 
 /* ---------- how it works ---------- */
 .how { list-style: none; margin: 0; padding: 0; counter-reset: how; }
-.how li { counter-increment: how; position: relative; padding: 0 0 44px 36px; }
+.how li { position: relative; padding: 0 0 40px 0; }
 .how li::marker { content: ''; }
-.how li.is-active::before { background: var(--color-ink); }
 
-.how li::before { content: ''; position: absolute; left: 0; top: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--color-edge); transition: background .3s; }
-.how li::after { content: ''; position: absolute; left: 4px; top: 26px; bottom: 6px; width: 2px; background: var(--color-rule); }
-.how li:last-child::after { display: none; }
-.how h3 { font-size: 22px; margin: 0 0 10px; }
+.how h3 { font-size: 22px; margin: 0 0 10px; color: var(--color-ink-2); transition: color .3s; }
+.how li.is-active h3 { color: var(--color-ink); }
 .how p { margin: 0; font-size: 16.5px; color: var(--color-ink-2); max-width: 46ch; }
 
 .frag-frame { position: relative; height: 520px; overflow: hidden; }
 .frag { position: absolute; inset: 0; display: grid; place-items: center; padding: 0; opacity: 0; transform: translateY(10px) scale(.985); transition: opacity .45s var(--ease-soft), transform .45s var(--ease-soft); pointer-events: none; }
 .frag.is-active { opacity: 1; transform: none; }
 .frag > * { width: 100%; max-width: 560px; }
+.frag .demo { -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent); mask-image: linear-gradient(to bottom, #000 78%, transparent); }
 @media (max-width: 1023px) { .frag-frame { height: 380px; } }
 @media (prefers-reduced-motion: reduce) { .frag { transition: none; } }
 

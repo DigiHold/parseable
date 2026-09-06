@@ -155,6 +155,7 @@ const schema = {
   <link rel="canonical" href={site + '/'} />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
   <link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/plex-2.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={site + '/'} />
@@ -195,12 +196,7 @@ const schema = {
           <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
           <p class="m-0 hidden text-[15px] text-ink-2 [@media(hover:hover)]:block">or drop a PDF anywhere on this page.</p>
         </div>
-        <p class="mt-5 text-[14px] text-ink-3" data-role="pdf-status">Read in your browser, never uploaded. No account, nothing stored, MIT licensed.</p>
-        <p class="mt-8 border-t border-rule pt-5 text-[14px] text-ink-3">
-          <button class="cursor-pointer border-0 bg-transparent p-0 text-ink-2 underline decoration-edge underline-offset-4 hover:text-ink" data-action="blank">Start from scratch</button>
-          <span class="mx-2">or</span>
-          <button class="cursor-pointer border-0 bg-transparent p-0 text-ink-2 underline decoration-edge underline-offset-4 hover:text-ink" data-action="import-json">import a saved JSON</button>
-        </p>
+        <p class="mt-5 max-w-[52ch] text-[14.5px] leading-relaxed text-ink-3" data-role="pdf-status">Read in your browser, never uploaded, nothing stored. You can also <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="blank">start from scratch</button> or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink-2 underline hover:text-ink" data-action="import-json">import a saved JSON</button>.</p>
         <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
         <input type="file" accept="application/json,.json" class="hidden" data-file="json">
       </div>
@@ -290,21 +286,21 @@ French                    <i>requirements</i>, and monitoring the specs.
 English</pre>
         <ol>
           <li>
-            <span class="num">01</span>
+            <span class="num" aria-hidden="true"></span>
             <div>
               <h3>The layout breaks the extractor</h3>
               <p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p>
             </div>
           </li>
           <li>
-            <span class="num">02</span>
+            <span class="num" aria-hidden="true"></span>
             <div>
               <h3>The words do not match the posting</h3>
               <p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p>
             </div>
           </li>
           <li>
-            <span class="num">03</span>
+            <span class="num" aria-hidden="true"></span>
             <div>
               <h3>Nobody tells you which one it was</h3>
               <p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p>
@@ -348,7 +344,7 @@ English</pre>
               <div class="demo" style="--scan:0%"><div class="demo-read demo-read-full"><pre set:html={demoReadFull}></pre></div></div>
             </div>
             <div class="frag" data-how-frag="2">
-              <div class="rounded-xl bg-paper p-6 shadow-[1px_2px_0_#d8d5cf,0_18px_40px_-18px_rgba(15,23,42,.22)]">
+              <div class="rounded-xl border border-rule bg-paper p-6">
                 <div class="flex items-baseline gap-2.5"><b class="font-display text-[40px] font-normal leading-none tracking-[-0.02em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
                 <div class="my-3 mb-5 h-1 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-primary"></i></div>
                 <div class="flex flex-wrap gap-1.5">
@@ -357,7 +353,11 @@ English</pre>
               </div>
             </div>
             <div class="frag" data-how-frag="3">
-              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div></div>
+              <div class="rounded-xl border border-rule bg-paper p-6">
+                <span class="btn btn-primary mb-3 w-full">Download PDF</span>
+                <span class="btn btn-ghost mb-5 w-full">Export JSON</span>
+                <p class="m-0 text-[14px] text-ink-2">The PDF keeps a real text layer, the one every parser reads. The JSON brings everything back next time, photo included.</p>
+              </div>
             </div>
           </div>
         </div>
