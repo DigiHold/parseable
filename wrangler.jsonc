@@ -4,6 +4,11 @@
   "compatibility_date": "2026-09-01",
   // Static assets only. There is no Worker script, no KV, no D1, no R2.
   // Static asset requests are not billed, so this runs at zero cost.
+  // The zone is already on Cloudflare, so this creates the DNS record and the
+  // certificate on deploy. Nothing to add by hand in the dashboard.
+  "routes": [
+    { "pattern": "resume.nicolaslecocq.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page"
