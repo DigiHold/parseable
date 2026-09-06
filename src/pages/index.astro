@@ -6,6 +6,53 @@ const title = 'Free ATS Friendly Resume Checker · Parseable';
 const description =
   'Free ATS friendly resume checker. Paste a job posting, see which required keywords you match, and export a PDF screening software reads correctly.';
 
+// The demo resume as real markup, so the object on the stage is the product at print size.
+// The summary carries fixed breaks and every line is one line, so both faces share one geometry.
+const demoSheet = `
+<header class="s-head"><div class="s-head-txt"><h1 class="s-name">Marie Dubois</h1><p class="s-role">Senior Backend Engineer</p><p class="s-contact"><span>marie.dubois@example.com</span><span class="sep">|</span><span>+33 6 12 34 56 78</span><span class="sep">|</span><span>Lyon, France, remote across CET</span></p></div></header>
+<section><h2>Professional Summary</h2><p class="s-summary">Backend engineer with nine years building payment systems in <b class="lit">Python</b> and <b class="lit">Go</b>.<br>Led the migration of a monolith to services handling four thousand requests per second.</p></section>
+<section><h2>Skills</h2><p class="s-skill"><b>Languages:</b> <b class="lit">Python</b>, <b class="lit">Go</b>, SQL, TypeScript</p><p class="s-skill"><b>Infrastructure:</b> <b class="lit">Kubernetes</b>, <b class="lit">Docker</b>, <b class="lit">PostgreSQL</b>, Terraform, AWS</p><p class="s-skill"><b>Practices:</b> <b class="lit">CI/CD</b>, on call, incident reviews, technical writing</p></section>
+<section><h2>Experience</h2>
+<div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in <b class="lit">Go</b> and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li><li>Wrote the incident review process the whole platform team now follows.</li></ul></div>
+<div class="s-item"><div class="s-item-head"><p class="s-item-title">Backend Engineer</p><span class="s-item-dates">2017 - 2021</span></div><p class="s-item-org">Doctolib, Paris</p><ul><li>Shipped the appointment reminder pipeline, sending two million messages a day.</li><li>Moved the search index to a managed cluster with zero downtime.</li></ul></div>
+</section>
+<section><h2>Education</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">MSc Computer Science</p><span class="s-item-dates">2015 - 2017</span></div><p class="s-item-org">INSA Lyon</p></div></section>`;
+
+const faq = [
+  {
+    q: 'What is an ATS and why does it reject resumes?',
+    a: 'An applicant tracking system is the software an employer uses to receive applications. It extracts the text from your file, sorts it into fields such as employer, job title and dates, then scores those fields against the job requisition. Most resumes fail at the sorting step rather than the scoring step. A two column layout with a skills sidebar is the usual culprit, because the extractor reads the page in one pass and interleaves the columns, so your employer and your dates land in the wrong fields before anyone reads a word.',
+  },
+  {
+    q: 'Does this ATS friendly resume checker store my data?',
+    a: 'Nothing is stored, because there is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
+  },
+  {
+    q: 'Should I put white keywords on my resume to get past the AI?',
+    a: 'No, and this builder will not do it. Parsers strip styling and read the raw text layer, so a block of white on white keywords lands in the middle of the recruiter screen looking exactly like what it is. Screening platforms flag the pattern, and a flagged application can be rejected automatically with a fraud marker attached to your candidate record, which follows you across every future role at that company. The same applies to hidden instructions aimed at an AI reader. Putting the same words in visibly, inside your summary and your real bullets, scores identically and survives a human reading it.',
+  },
+  {
+    q: 'What resume format parses most reliably?',
+    a: 'A PDF with a real text layer, in one column, with standard headings such as Professional Summary, Experience, Skills and Education. Keep your contact details in the body of the document rather than in a page header, use one date format throughout, and avoid tables, text boxes and letter spacing on headings. Letter spacing is the quiet one: it survives into the text layer and your heading comes out as a string of separated capitals that no parser recognises.',
+  },
+  {
+    q: 'Should I put a photo on my resume?',
+    a: 'It depends where you are applying. A photo is normal in France, Germany, Switzerland, Spain and much of continental Europe. In the United Kingdom, Ireland and the United States it is usually left off, because employers avoid material that could support a discrimination claim. The photo toggle is off by default here, so turn it on only when you know the local convention.',
+  },
+  {
+    q: 'How long should a resume be?',
+    a: 'One page for under about eight years of work, two pages beyond that. Cutting a fifteen year career onto one page throws away keyword surface that the requisition is scoring you on, and no recruiter has ever rejected a strong second page. What does hurt is padding, so every line should either carry a keyword the job asked for or a result worth reading.',
+  },
+  {
+    q: 'Can I check a resume I already have against a job description?',
+    a: 'Yes, and that is what the posting step is for. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
+  },
+  {
+    q: 'Is it really free, and can I run it myself?',
+    a: 'It is free and you can run your own copy. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
+  },
+];
+
 const steps = [
   { id: 'details', label: 'Details' },
   { id: 'template', label: 'Template' },
@@ -41,6 +88,11 @@ const schema = {
       name: 'Nicolas Lecocq',
       url: 'https://nicolaslecocq.com/',
       jobTitle: 'Full Stack Developer',
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${site}/#faq`,
+      mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     },
     {
       '@type': 'HowTo',
@@ -87,36 +139,49 @@ const schema = {
   <div class="mx-auto flex h-16 max-w-[1120px] items-center gap-6 px-6">
     <a href="/" class="font-ui text-[16px] font-semibold tracking-[-0.01em] text-current no-underline">Parseable</a>
     <nav class="ml-auto flex items-center gap-5 whitespace-nowrap text-[14px] opacity-80 sm:gap-7">
-      <a href="/questions" class="text-current no-underline transition-opacity hover:opacity-100">Questions</a>
+      <a href="#read" class="text-current no-underline transition-opacity hover:opacity-100">Why resumes fail</a>
+      <a href="#how" class="text-current no-underline transition-opacity hover:opacity-100">How it works</a>
+      <a href="#faq" class="text-current no-underline transition-opacity hover:opacity-100">Questions</a>
       <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="text-current no-underline transition-opacity hover:opacity-100">Source</a>
     </nav>
   </div>
 </header>
 
 <main class="dropzone" data-drop="pdf">
-  <!-- the stage: a sheet of paper under a blade of light -->
-  <section class="stage-dark relative -mt-16 overflow-hidden bg-[#0a0b0e] text-white">
-    <div class="absolute inset-0" data-hero-3d aria-hidden="true">
-      <div class="hero-fallback absolute inset-0"></div>
-    </div>
-    <div class="relative mx-auto grid min-h-[100svh] max-w-[1120px] grid-cols-1 items-start px-6 pb-[46vh] pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:pb-16 lg:pt-16">
-      <div class="hero-copy">
+  <!-- the stage: the resume as a lit object, read by a blade of light -->
+  <section class="stage-dark relative -mt-16 overflow-hidden bg-[#08090c] text-white">
+    <div class="relative mx-auto grid min-h-[100svh] max-w-[1180px] grid-cols-1 items-center gap-10 px-6 pb-16 pt-24 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-6 lg:pb-12 lg:pt-16">
+      <div class="hero-copy relative z-10">
         <h1 class="mb-6 text-[clamp(38px,4.6vw,64px)] text-white"><span class="block whitespace-nowrap">Get past the</span><span class="block whitespace-nowrap">software and in</span><span class="block whitespace-nowrap">front of a person</span></h1>
-        <p class="mb-8 max-w-[36ch] text-[17px] leading-[1.55] text-white/65">Software reads your resume before a human does. Check yours against the posting and download a PDF it reads correctly.</p>
+        <p class="mb-8 max-w-[34ch] text-[17px] leading-[1.55] text-white/60">Software reads your resume before a human does. Check yours against the posting and download a PDF it reads correctly.</p>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
           <button class="btn btn-light btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
-          <p class="m-0 whitespace-nowrap text-center text-[15px] text-white/70 sm:text-left">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-white/80 underline decoration-white/40 underline-offset-4 hover:text-white" data-action="sample">try it with a sample</button></p>
+          <p class="m-0 whitespace-nowrap text-center text-[15px] text-white/60 sm:text-left">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-white/75 underline decoration-white/30 underline-offset-4 hover:text-white" data-action="sample">try it with a sample</button></p>
         </div>
         <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
         <input type="file" accept="application/json,.json" class="hidden" data-file="json">
-        <p class="mt-4 min-h-[20px] text-[13px] text-white/50" data-role="pdf-status"></p>
+        <p class="mt-4 min-h-[20px] text-[13px] text-white/40" data-role="pdf-status"></p>
       </div>
-      <div class="hidden lg:block" aria-hidden="true"></div>
+
+      <div class="scene" aria-label="A resume, and below the blade of light the text a screening system extracts from it">
+        <div class="spill" aria-hidden="true"></div>
+        <div class="obj">
+          <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
+          <div class="face face-machine" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="blade" aria-hidden="true"></div>
+          <div class="edge" aria-hidden="true"></div>
+        </div>
+        <div class="floor" aria-hidden="true"></div>
+      </div>
     </div>
   </section>
 
-  <section class="bg-[#0a0b0e] text-white/55" data-role="acts">
-    <p class="mx-auto m-0 max-w-[1120px] border-t border-white/10 px-6 py-6 text-[14px]">Extraction, the match against a posting, and a PDF with a real text layer. In your browser, nothing uploaded.</p>
+  <section class="bg-[#08090c] text-white/55" data-role="acts">
+    <div class="mx-auto max-w-[1180px] border-t border-white/10 px-6 py-7">
+      <h2 class="m-0 text-[15px] font-medium text-white/80">A free ATS friendly resume checker that runs in your browser</h2>
+      <p class="m-0 mt-1 text-[14px]">It shows the text a parser extracts, marks the terms a job posting asks for, and prints a PDF with a real text layer. Nothing is uploaded and nothing is stored.</p>
+    </div>
   </section>
 
   <section id="workspace" class="mx-auto max-w-[1120px] px-6 pb-20 pt-14" hidden>
@@ -166,13 +231,119 @@ const schema = {
       </div>
     </div>
   </section>
+
+  <!-- why resumes fail, in the extractor's own output -->
+  <section id="read" class="scroll-mt-[80px] border-t border-rule">
+    <div class="mx-auto grid max-w-[1180px] gap-10 px-6 py-20 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-16 lg:py-24">
+      <div>
+        <h2 class="mb-4 max-w-[22ch] text-[clamp(30px,3.6vw,44px)]">What the software read from a two column resume</h2>
+        <p class="mb-8 max-w-[52ch] text-[17px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, with the three places where the application dies marked.</p>
+        <div class="read">
+          <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
+Full Stack Developer
+
+<s>Skills</s>                    <s>Experience</s>
+<b>WordPress                 Founder &amp; Developer          2025 - 2026</b>
+HTML/CSS                  At Vayalis, my own company, I develop and
+Vercel                    launch my own products, handling the full
+Cloudflare                cycle from idea to release.
+React                     <b>Web Designer                   2023 - 2025</b>
+Next.js                   Trivial Mass SA, Lausanne
+Node.js                   Graphic integration, website development,
+PHP                       <i>client follow up management</i>, as well as
+SQL                       invoicing.
+
+<s>Language</s>                  <i>client relations to understand their</i>
+French                    <i>requirements</i>, and monitoring the specs.
+English</pre>
+        </div>
+      </div>
+      <ol class="notes lg:pt-24">
+        <li><span class="num">1</span><div><h3>The layout breaks the extractor</h3><p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p></div></li>
+        <li><span class="num">2</span><div><h3>The words do not match the posting</h3><p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p></div></li>
+        <li><span class="num">3</span><div><h3>Nobody tells you which one it was</h3><p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- how it works: the steps, and the real interface following on the right -->
+  <section id="how" class="scroll-mt-[80px] border-t border-rule bg-canvas">
+    <div class="mx-auto max-w-[1180px] px-6 py-20 lg:py-24">
+      <h2 class="mb-12 max-w-[18ch] text-[clamp(30px,3.6vw,44px)]">Four steps, about ten minutes the first time</h2>
+      <div class="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
+        <ol class="how">
+          <li data-how-step="0"><h3>Bring what you have</h3><p>Drop in your current resume as a PDF and the text is pulled out in your browser, sorted into fields you then correct. Starting from nothing works too.</p></li>
+          <li data-how-step="1"><h3>See what the machine reads</h3><p>The parser view shows your document as plain extracted text, the way the employer's software receives it. Anything wrong there is wrong on their screen.</p></li>
+          <li data-how-step="2"><h3>Answer the actual posting</h3><p>Paste the job description and see which required terms your resume already contains, and which are missing. You decide which missing ones are true of you.</p></li>
+          <li data-how-step="3"><h3>Download and keep the JSON</h3><p>Print to a PDF that keeps a real text layer, then export the JSON so the next application only costs you the posting step.</p></li>
+        </ol>
+        <div class="lg:sticky lg:top-[96px]">
+          <div class="frag-frame" aria-hidden="true">
+            <div class="frag" data-how-frag="0">
+              <div class="border border-rule bg-paper p-6">
+                <div class="field"><label>Full name</label><input value="Marie Dubois" readonly tabindex="-1"></div>
+                <div class="field"><label>Job title</label><input value="Senior Backend Engineer" readonly tabindex="-1"></div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="field mb-0"><label>Company and place</label><input value="Payfit, Paris" readonly tabindex="-1"></div>
+                  <div class="field mb-0"><label>Dates</label><input value="2021 - 2026" readonly tabindex="-1"></div>
+                </div>
+              </div>
+            </div>
+            <div class="frag" data-how-frag="1">
+              <pre class="m-0 border border-rule bg-paper p-6 font-mono text-[12.5px] leading-[1.75] text-ink">Marie Dubois
+Senior Backend Engineer
+marie.dubois@example.com | Lyon, France
+
+PROFESSIONAL SUMMARY
+Backend engineer with nine years building
+payment systems in Python and Go.
+
+SKILLS
+Languages: Python, Go, SQL, TypeScript</pre>
+            </div>
+            <div class="frag" data-how-frag="2">
+              <div class="border border-rule bg-paper p-6">
+                <div class="flex items-baseline gap-2.5"><b class="font-display text-[40px] font-semibold leading-none tracking-[-0.03em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
+                <div class="my-3 mb-5 h-1 overflow-hidden bg-rule"><i class="block h-full w-[83%] bg-ink"></i></div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="chip chip-miss">Terraform</span><span class="chip chip-hit">Python</span><span class="chip chip-hit">Go</span><span class="chip chip-hit">Kubernetes</span><span class="chip chip-hit">Docker</span><span class="chip chip-hit">PostgreSQL</span>
+                </div>
+              </div>
+            </div>
+            <div class="frag" data-how-frag="3">
+              <div class="border border-rule bg-paper p-6">
+                <span class="btn btn-primary mb-3 w-full">Download PDF</span>
+                <span class="btn btn-ghost mb-5 w-full">Export JSON</span>
+                <p class="m-0 text-[14px] text-ink-2">The PDF keeps a real text layer, the one every parser reads. The JSON brings everything back next time, photo included.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- questions -->
+  <section id="faq" class="scroll-mt-[80px] border-t border-rule">
+    <div class="mx-auto max-w-[1180px] px-6 py-20 lg:py-24">
+      <h2 class="mb-10 max-w-[22ch] text-[clamp(30px,3.6vw,44px)]">What people ask before they trust a resume checker</h2>
+      <div class="faq-panel max-w-[760px]">
+        {faq.map((f) => (
+          <article>
+            <h3>{f.q}</h3>
+            <p>{f.a}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="bg-[#0a0b0e] text-white/60" data-foot>
   <div class="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 px-6 py-10 text-[14px]">
     <p class="inline-flex flex-wrap items-center gap-[.35rem] m-0">Made with love in <svg class="inline-block h-[15px] w-[15px] rounded-full align-middle" viewBox="0 0 512 512" role="img" aria-label="France"><circle cx="256" cy="256" fill="#fff" r="256"></circle><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"></path><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"></path></svg> by <a class="inline-flex items-center gap-[.4rem] text-white/80 transition-colors duration-200 ease-soft hover:text-white [&>img]:w-[1.35rem] [&>img]:h-[1.35rem] [&>img]:rounded-full [&>img]:object-cover [&>img]:border [&>img]:border-line-2" href="https://nicolaslecocq.com/" rel="noopener noreferrer" target="_blank"><img src="/nicolas.avif" width="24" height="24" alt="" loading="lazy" decoding="async">Nicolas Lecocq</a></p>
     <nav class="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
-      <a href="/questions" class="text-white/60 no-underline hover:text-white">Questions</a>
+      <a href="#faq" class="text-white/60 no-underline hover:text-white">Questions</a>
       <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="text-white/60 no-underline hover:text-white">Source on GitHub</a>
       <a href="https://github.com/DigiHold/parseable/blob/main/LICENSE" rel="noopener" target="_blank" class="text-white/60 no-underline hover:text-white">MIT licence</a>
       <a href="https://x.com/NicolasLecocqHQ" rel="noopener me" target="_blank" aria-label="Nicolas Lecocq on X" class="transition-colors hover:text-white"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
