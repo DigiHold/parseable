@@ -44,7 +44,7 @@ const PAPER_FRAG = /* glsl */ `
   void main() {
     // cotton paper: layered noise, faint fibres
     float fibre = noise(vUv * 900.0) * 0.5 + noise(vUv * 220.0) * 0.35 + noise(vUv * 40.0) * 0.15;
-    vec3 paper = vec3(0.80, 0.795, 0.785) - fibre * 0.09;
+    vec3 paper = vec3(0.93, 0.925, 0.91) - fibre * 0.09;
     // the cut edge of the sheet, a hair darker
     float edge = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
     paper *= 0.78 + 0.22 * smoothstep(0.0, 0.006, edge);
@@ -67,10 +67,15 @@ const PAPER_FRAG = /* glsl */ `
     float d = abs(vUv.y - uScan);
     float core = exp(-d * 420.0);
     float fall = exp(-d * 26.0);
-    col += vec3(0.12, 0.12, 0.13) * fall;
-    // the paper darkens away from the blade, and across its width away from the light
-    col *= 0.86 + 0.14 * exp(-d * 2.2);
-    col *= 0.90 + 0.10 * (1.0 - vUv.x) + 0.04 * vUv.y;
+    col += vec3(0.10, 0.10, 0.11) * fall;
+    // the light model: the blade is the source. Paper beside it goes to white, the far
+    // corners fall to about half, and the near (left) edge catches more than the far one.
+    float toBlade = exp(-d * 3.4);
+    float across = 1.0 - vUv.x * 0.35;
+    float lit = clamp(0.52 + 0.62 * toBlade * across + 0.10 * (1.0 - vUv.x), 0.45, 1.25);
+    col *= lit;
+    // the cut edge on the lit side, a hair brighter, as a sheet with thickness would show
+    col += vec3(0.10) * (1.0 - smoothstep(0.0, 0.004, vUv.x)) * toBlade;
     col += vec3(0.45, 0.62, 1.0) * core * 0.9;
 
     // shading from the bend, a hair darker where the paper turns away
@@ -203,13 +208,13 @@ export async function mountHero(host: HTMLElement): Promise<void> {
     const r = g.createRadialGradient(256, 256, 60, 256, 256, 256); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = r; g.fillRect(0, 0, 512, 512); return new THREE.CanvasTexture(c);
   })();
-  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 4.4), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 0.9 }));
-  shadow.position.set(0.16, -0.24, -0.3);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 4.6), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 1 }));
+  shadow.position.set(0.22, -0.32, -0.26);
 
   // the blade of light, emissive, bloomed by the composer
   const bladeMat = new THREE.MeshBasicMaterial({ toneMapped: false });
-  bladeMat.color.setRGB(1.6, 2.1, 3.4);
-  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.02, 0.010), bladeMat);
+  bladeMat.color.setRGB(2.4, 3.0, 4.6);
+  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.02, 0.006), bladeMat);
   blade.position.z = 0.09;
   const spillTex = (() => {
     const [c, g] = canvas(512, 512); g.clearRect(0, 0, 512, 512);
@@ -226,15 +231,16 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   scene.add(group);
   const place = () => {
     const narrow = host.clientWidth < 760;
-    group.position.set(narrow ? 0.5 : 1.3, narrow ? -1.55 : 0.08, 0);
-    group.scale.setScalar(narrow ? 1.0 : 0.94);
+    group.rotation.set(narrow ? 0.06 : 0.14, narrow ? -0.16 : -0.5, narrow ? 0.02 : 0.05);
+    group.position.set(narrow ? 0.4 : 1.32, narrow ? -1.55 : -0.42, 0);
+    group.scale.setScalar(narrow ? 1.0 : 1.12);
   };
   place();
 
   host.replaceChildren(renderer.domElement);
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.85, 1.05);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 1.0, 1.02);
   composer.addPass(bloom);
   const grain = new ShaderPass(GRAIN_SHADER);
   composer.addPass(grain);
@@ -276,8 +282,8 @@ export async function mountHero(host: HTMLElement): Promise<void> {
     paper.uniforms.uTime.value = t;
     grain.uniforms.uTime.value = t;
     cur.x += (target.x - cur.x) * 0.045; cur.y += (target.y - cur.y) * 0.045;
-    group.rotation.set(cur.x, cur.y, 0.04 + Math.sin(t * 0.5) * 0.012);
-    group.position.y = (host.clientWidth < 760 ? -1.55 : 0.08) + Math.sin(t * 0.7) * 0.04;
+    if (host.clientWidth >= 760) group.rotation.set(cur.x, cur.y, 0.04 + Math.sin(t * 0.5) * 0.012);
+    group.position.y = (host.clientWidth < 760 ? -1.55 : -0.42) + Math.sin(t * 0.7) * 0.04;
     composer.render();
   };
   new IntersectionObserver(([e]) => {
