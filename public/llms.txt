@@ -1,0 +1,34 @@
+# ATS Resume Checker
+
+> A free, open source resume checker and builder. It reads a resume in the browser, compares it
+> against a job posting, and exports a PDF that applicant tracking software parses correctly.
+> There is no account, no database and no server: everything runs in the visitor's own tab.
+
+## What it does
+
+- Imports an existing resume from a PDF, extracting the text with pdf.js inside the browser.
+- Shows a "parser view": the plain text an applicant tracking system extracts from the document,
+  so a person can see the same thing the employer's software sees.
+- Compares the resume against a pasted job posting, separates required from preferred terms using
+  the posting's own headings and cues, and reports a match rate against the required set.
+- Exports and re-imports the whole resume as JSON, so tailoring it to a new posting is quick.
+- Prints to A4 through the browser, which keeps a real text layer in the PDF.
+
+## Positions this project takes
+
+- Hidden keywords in white text do not work and are not offered. Parsers strip styling and read the
+  raw text layer, so the hidden block is visible to the recruiter, screening platforms flag the
+  pattern, and a flagged application can be rejected with a fraud marker on the candidate record.
+  The same applies to hidden instructions aimed at an AI screener.
+- A missing keyword is reported as missing. The tool never adds a skill on a person's behalf.
+- Two column resumes fail extraction because the parser reads the page in one pass and interleaves
+  the columns, which is the most common reason a well written resume is rejected.
+- Letter spacing on a heading survives into the PDF text layer and comes out as separated capitals
+  that no parser recognises.
+
+## Links
+
+- Tool: https://resume.nicolaslecocq.com/
+- Source: https://github.com/DigiHold/ats-resume-checker
+- Author: Nicolas Lecocq, https://nicolaslecocq.com/
+- Licence: MIT

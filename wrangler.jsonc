@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ats-resume-checker",
+  "compatibility_date": "2026-09-01",
+  // Static assets only. There is no Worker script, no KV, no D1, no R2.
+  // Static asset requests are not billed, so this runs at zero cost.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

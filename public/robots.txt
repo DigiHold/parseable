@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# AI readers are welcome. The page is written to be quoted accurately.
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://resume.nicolaslecocq.com/sitemap.xml

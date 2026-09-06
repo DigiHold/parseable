@@ -1,0 +1,101 @@
+/* ============================================================
+   The resume sheet. Three templates, one shared skeleton.
+   Every template is a single column in DOM order, uses standard
+   section headings and never applies letter-spacing to a heading,
+   because letter-spacing survives into the PDF text layer and
+   comes out as "P R O F I L E".
+   ============================================================ */
+
+.sheet {
+  --s-ink: #16130f;
+  --s-mut: #5c564e;
+  --s-rule: #e2ddd4;
+  --s-accent: #b98d3e;
+  --s-fs: 9.6pt;
+  --s-lh: 1.42;
+
+  width: 210mm;
+  min-height: 297mm;
+  padding: 13mm 14mm;
+  background: #fff;
+  color: var(--s-ink);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: var(--s-fs);
+  line-height: var(--s-lh);
+  box-shadow: 0 1px 3px rgba(22,24,28,.1), 0 12px 34px rgba(22,24,28,.13);
+  box-sizing: border-box;
+}
+.sheet * { box-sizing: border-box; }
+.sheet p { margin: 0 0 6px; }
+.sheet ul { margin: 0; padding-left: 15px; }
+.sheet li { margin-bottom: 2.5px; }
+.sheet li::marker { color: var(--s-accent); }
+.sheet a { color: inherit; text-decoration: none; }
+
+.s-head { border-bottom: 2px solid var(--s-accent); padding-bottom: 7px; margin-bottom: 13px; display: flex; gap: 14px; align-items: flex-start; }
+.s-head-txt { flex: 1; min-width: 0; }
+.s-photo { width: 26mm; height: 32mm; object-fit: cover; border-radius: 2px; flex: none; }
+.s-name { font-size: 21pt; font-weight: 700; letter-spacing: -.4px; margin: 0 0 2px; line-height: 1.08; }
+.s-role { font-size: 10.8pt; color: var(--s-mut); font-weight: 500; margin: 0 0 6px; }
+.s-contact { font-size: 8.9pt; color: #45403a; margin: 0; }
+.s-contact .sep { color: var(--s-accent); padding: 0 5px; }
+
+.sheet h2 {
+  font-size: 9.6pt; text-transform: uppercase; font-weight: 700;
+  margin: 15px 0 7px; padding-bottom: 3px; border-bottom: 1px solid var(--s-rule);
+}
+.sheet section:first-of-type h2 { margin-top: 0; }
+.s-summary { text-align: justify; }
+.s-skill { margin: 0 0 3.5px; }
+
+.s-item { margin-bottom: 11px; page-break-inside: avoid; break-inside: avoid; }
+.s-item-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.s-item-title { font-size: 10.3pt; font-weight: 700; margin: 0; }
+.s-item-dates { font-size: 8.8pt; color: var(--s-mut); white-space: nowrap; font-weight: 500; }
+.s-item-org { font-size: 9.4pt; color: #45403a; margin: 0 0 4px; font-style: italic; }
+.s-env { font-size: 8.9pt; color: #45403a; margin-top: 3px; }
+
+/* -- template: compact. Dense, achromatic, for a long career. -- */
+.sheet[data-tpl="compact"] {
+  --s-accent: #16130f;
+  --s-rule: #cfcfcf;
+  --s-fs: 9.1pt;
+  --s-lh: 1.34;
+  padding: 11mm 12mm;
+}
+.sheet[data-tpl="compact"] .s-head { border-bottom-width: 1px; padding-bottom: 5px; margin-bottom: 10px; }
+.sheet[data-tpl="compact"] .s-name { font-size: 17.5pt; }
+.sheet[data-tpl="compact"] .s-role { font-size: 9.8pt; }
+.sheet[data-tpl="compact"] h2 { font-size: 8.8pt; margin: 11px 0 5px; }
+.sheet[data-tpl="compact"] .s-item { margin-bottom: 8px; }
+.sheet[data-tpl="compact"] li::marker { color: #9a9a9a; }
+
+/* -- template: open. More air, larger name, for shorter careers. -- */
+.sheet[data-tpl="open"] {
+  --s-accent: #1f6f52;
+  --s-rule: #e4e6e3;
+  --s-fs: 10pt;
+  --s-lh: 1.55;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 16mm 16mm;
+}
+.sheet[data-tpl="open"] .s-head { border-bottom: none; padding-bottom: 0; margin-bottom: 18px; }
+.sheet[data-tpl="open"] .s-name { font-size: 25pt; letter-spacing: -.6px; }
+.sheet[data-tpl="open"] .s-role { font-size: 11.4pt; color: var(--s-accent); font-weight: 600; }
+.sheet[data-tpl="open"] h2 { border-bottom: none; color: var(--s-accent); font-size: 9.4pt; margin: 19px 0 6px; }
+.sheet[data-tpl="open"] .s-item { margin-bottom: 13px; }
+.sheet[data-tpl="open"] .s-summary { text-align: left; }
+
+/* ---------- print. Only the sheet reaches the paper. ---------- */
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block !important; position: static !important; }
+  #print-root .sheet {
+    box-shadow: none !important; width: 210mm !important; min-height: 0 !important;
+    margin: 0 !important; transform: none !important;
+  }
+  .sheet section, .s-item { break-inside: auto; }
+}
+#print-root { display: none; }

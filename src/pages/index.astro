@@ -1,0 +1,301 @@
+---
+import '../styles/global.css';
+
+const site = 'https://resume.nicolaslecocq.com';
+const title = 'ATS Friendly Resume Checker and Builder, Free';
+const description =
+  'Free ATS friendly resume checker. Paste a job posting, see which required keywords you match, and export a PDF screening software reads correctly.';
+
+const steps = [
+  { id: 'import', label: 'Import' },
+  { id: 'details', label: 'Details' },
+  { id: 'template', label: 'Template' },
+  { id: 'posting', label: 'Job posting' },
+  { id: 'export', label: 'Download' },
+];
+
+const faq = [
+  {
+    q: 'What is an ATS and why does it reject resumes?',
+    a: 'An applicant tracking system is the software an employer uses to receive applications. It extracts the text from your file, sorts it into fields such as employer, job title and dates, then scores those fields against the job requisition. Most resumes fail at the sorting step rather than the scoring step. A two column layout with a skills sidebar is the usual culprit, because the extractor reads the page in one pass and interleaves the columns, so your employer and your dates land in the wrong fields before anyone reads a word.',
+  },
+  {
+    q: 'Does this ATS friendly resume checker store my data?',
+    a: 'No. There is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
+  },
+  {
+    q: 'Should I put white keywords on my resume to get past the AI?',
+    a: 'No, and this builder will not do it. Parsers strip styling and read the raw text layer, so a block of white on white keywords lands in the middle of the recruiter screen looking exactly like what it is. Screening platforms flag the pattern, and a flagged application can be rejected automatically with a fraud marker attached to your candidate record, which follows you across every future role at that company. The same applies to hidden instructions aimed at an AI reader. Putting the same words in visibly, inside your summary and your real bullets, scores identically and survives a human reading it.',
+  },
+  {
+    q: 'What resume format parses most reliably?',
+    a: 'A PDF with a real text layer, in one column, with standard headings such as Professional Summary, Experience, Skills and Education. Keep your contact details in the body of the document rather than in a page header, use one date format throughout, and avoid tables, text boxes and letter spacing on headings. Letter spacing is the quiet one: it survives into the text layer and your heading comes out as a string of separated capitals that no parser recognises.',
+  },
+  {
+    q: 'Should I put a photo on my resume?',
+    a: 'It depends where you are applying. A photo is normal in France, Germany, Switzerland, Spain and much of continental Europe. In the United Kingdom, Ireland and the United States it is usually left off, because employers avoid material that could support a discrimination claim. The photo toggle is off by default here, so turn it on only when you know the local convention.',
+  },
+  {
+    q: 'How long should a resume be?',
+    a: 'One page for under about eight years of work, two pages beyond that. Cutting a fifteen year career onto one page throws away keyword surface that the requisition is scoring you on, and no recruiter has ever rejected a strong second page. What does hurt is padding, so every line should either carry a keyword the job asked for or a result worth reading.',
+  },
+  {
+    q: 'Can I check a resume I already have against a job description?',
+    a: 'Yes. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
+  },
+  {
+    q: 'Is it really free, and can I run it myself?',
+    a: 'Yes to both. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
+  },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${site}/#app`,
+      name: 'ATS Friendly Resume Checker',
+      url: site,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Any browser',
+      description,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: [
+        'Import an existing resume from PDF in the browser',
+        'Match a resume against a job posting and score the required keywords',
+        'Show the exact text an applicant tracking system extracts',
+        'Export and re-import a resume as JSON',
+        'Print to a PDF with a real text layer',
+      ],
+      author: { '@id': `${site}/#author` },
+      isAccessibleForFree: true,
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site}/#author`,
+      name: 'Nicolas Lecocq',
+      url: 'https://nicolaslecocq.com/',
+      jobTitle: 'Full Stack Developer',
+    },
+    {
+      '@type': 'HowTo',
+      name: 'How to build a resume that passes an ATS',
+      description: 'Import your existing resume, correct the extracted fields, pick a template, paste the job posting, then export a PDF with a real text layer.',
+      totalTime: 'PT10M',
+      step: [
+        { '@type': 'HowToStep', position: 1, name: 'Import', text: 'Drop in your current resume as a PDF, or import a JSON file you exported here before.' },
+        { '@type': 'HowToStep', position: 2, name: 'Correct the details', text: 'Check the fields the extractor filled in and add anything it missed.' },
+        { '@type': 'HowToStep', position: 3, name: 'Pick a template', text: 'Choose one of three single column layouts, all built to parse cleanly.' },
+        { '@type': 'HowToStep', position: 4, name: 'Match the posting', text: 'Paste the job description and see which required keywords your resume already contains.' },
+        { '@type': 'HowToStep', position: 5, name: 'Download', text: 'Print to PDF, and export the JSON so the next application takes a minute.' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${site}/#faq`,
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={site + '/'} />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={site + '/'} />
+  <meta property="og:title" content="ATS Friendly Resume Checker, Free" />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={site + '/og.png'} />
+  <meta property="og:locale" content="en" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ATS Friendly Resume Checker, Free" />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={site + '/og.png'} />
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+</head>
+<body>
+
+<header class="sticky top-0 z-40 border-b border-rule bg-chrome/90 backdrop-blur-md backdrop-saturate-150">
+  <div class="mx-auto flex h-14 max-w-[1180px] items-center gap-4 px-5">
+    <a href="/" class="flex items-center gap-2 font-display text-[15px] font-bold tracking-[-0.02em] no-underline">
+      <span class="relative block h-6 w-5 flex-none rounded-[2px] border-[1.5px] border-ink bg-paper
+                   before:absolute before:left-1 before:right-1 before:top-[6px] before:h-[1.5px] before:bg-ink
+                   after:absolute after:left-1 after:right-2 after:top-[11px] after:h-[1.5px] after:bg-match" aria-hidden="true"></span>
+      ATS Resume Checker
+    </a>
+    <nav class="ml-auto flex items-center gap-[18px] text-sm">
+      <a href="#how" class="text-ink-2 no-underline hover:text-ink">How it works</a>
+      <a href="#faq" class="text-ink-2 no-underline hover:text-ink">FAQ</a>
+      <a href="https://github.com/DigiHold/ats-resume-checker" rel="noopener" target="_blank" class="text-ink-2 no-underline hover:text-ink">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="mx-auto max-w-[1180px] px-5 pt-12 pb-10">
+    <p class="mb-4 font-display text-[13px] font-semibold uppercase tracking-[0.09em] text-match">Free ATS friendly resume checker</p>
+    <h1 class="mb-5 max-w-[22ch] text-[clamp(32px,4.6vw,50px)]">Get past the software and in front of a person</h1>
+    <p class="mb-4 max-w-[60ch] text-lg text-ink-2">
+      Your resume is pulled apart into fields and scored by software before a human opens it. When the
+      extraction goes wrong, and on a two column layout it usually does, your employer and your dates
+      land in the wrong fields and the automated rejection arrives before anyone has read a line.
+    </p>
+    <p class="mb-6 max-w-[60ch] text-lg text-ink-2">
+      Give this the resume you already have and the posting you are applying for. It returns a version
+      the software reads correctly, tuned to that specific job, so a person gets to see you. It is
+      free, nothing is uploaded, and the code is open source.
+    </p>
+    <div class="flex flex-wrap items-center gap-3">
+      <button class="btn btn-primary" data-start="import">Check my resume, free</button>
+      <button class="btn btn-ghost" data-start="blank">Start from scratch</button>
+    </div>
+    <p class="mt-[18px] flex flex-wrap gap-x-[18px] gap-y-1.5 text-[13.5px] text-ink-3">
+      <span><b class="font-semibold text-ink-2">No account.</b> Nothing to sign up to.</span>
+      <span><b class="font-semibold text-ink-2">No database.</b> Your file never leaves the tab.</span>
+      <span><b class="font-semibold text-ink-2">MIT licensed.</b> Host your own copy.</span>
+    </p>
+
+    <div class="mt-11 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-rule bg-rule md:grid-cols-3">
+      <div class="bg-paper p-5">
+        <h2 class="mb-1.5 text-[15px]">The layout breaks the extractor</h2>
+        <p class="m-0 text-[14px] text-ink-2">A skills sidebar reads as one interleaved run of words, so the parser files your job title under your employer and scores a resume that never existed.</p>
+      </div>
+      <div class="bg-paper p-5">
+        <h2 class="mb-1.5 text-[15px]">The words do not match the posting</h2>
+        <p class="m-0 text-[14px] text-ink-2">Say "worked with teams" where the requisition says "stakeholder management" and the match rate reads zero on that line, whatever you actually did.</p>
+      </div>
+      <div class="bg-paper p-5">
+        <h2 class="mb-1.5 text-[15px]">Nobody tells you which one it was</h2>
+        <p class="m-0 text-[14px] text-ink-2">The rejection email is the same either way, so most people rewrite the cover letter and send the same unreadable file again.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="mx-auto grid max-w-[1180px] grid-cols-1 items-start gap-6 px-5 pb-16 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+    <!-- left rail: the steps and their forms -->
+    <div class="overflow-hidden rounded-lg border border-rule bg-paper">
+      <ol class="m-0 flex list-none gap-0.5 overflow-x-auto border-b border-rule p-1.5 lg:flex-col" id="steps">
+        {steps.map((s, i) => (
+          <li class="lg:w-full">
+            <button class="step-btn" data-step={s.id} aria-current={i === 0 ? 'step' : undefined}>
+              <span class="step-num"><span>{i + 1}</span></span>
+              <span class="step-label whitespace-nowrap">{s.label}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div id="panels"></div>
+      <div class="flex gap-2.5 border-t border-rule bg-panel px-5 py-4">
+        <button class="btn btn-ghost flex-1" data-nav="prev">Back</button>
+        <button class="btn btn-primary flex-1" data-nav="next">Continue</button>
+      </div>
+    </div>
+
+    <!-- right: the document, and what the machine reads -->
+    <div class="lg:sticky lg:top-[76px]">
+      <div class="mb-3 flex flex-wrap items-center gap-2">
+        <div class="inline-flex rounded-[7px] border border-rule bg-paper p-[3px]" role="tablist" aria-label="Preview mode">
+          <button class="rounded-[5px] border-0 bg-transparent px-[13px] py-1.5 font-display text-[13px] font-semibold text-ink-2 cursor-pointer aria-selected:bg-ink aria-selected:text-white" role="tab" aria-selected="true" data-view="human">Human view</button>
+          <button class="rounded-[5px] border-0 bg-transparent px-[13px] py-1.5 font-display text-[13px] font-semibold text-ink-2 cursor-pointer aria-selected:bg-ink aria-selected:text-white" role="tab" aria-selected="false" data-view="parser">Parser view</button>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <div class="zoomctl flex items-center gap-1.5">
+            <button class="icon-btn" data-zoom="-1" aria-label="Zoom out">−</button>
+            <span class="min-w-[38px] text-center font-mono text-xs text-ink-3" id="zoomval">60%</span>
+            <button class="icon-btn" data-zoom="1" aria-label="Zoom in">+</button>
+          </div>
+          <button class="btn btn-primary btn-sm" data-action="print">Download PDF</button>
+        </div>
+      </div>
+
+      <div class="stage max-h-[calc(100vh-150px)] overflow-auto rounded-lg border border-rule bg-chrome p-[22px]">
+        <div class="sheet-scale flex origin-top justify-center transition-transform duration-200" id="scale">
+          <article class="sheet" id="sheet" data-tpl="classic"></article>
+        </div>
+        <div class="parser-out">
+          <p class="mb-2.5 text-[13px] text-ink-2">
+            This is the plain text a parser pulls out of your PDF. If a heading or a date looks wrong
+            here, it is wrong in the employer's system too.
+          </p>
+          <pre class="m-0 max-h-[calc(100vh-190px)] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-[#12151a] p-[22px] font-mono text-xs leading-[1.65] text-[#d7dbe0]" id="parser"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="border-t border-rule bg-paper py-[68px]">
+    <div class="mx-auto max-w-[1180px] px-5">
+      <div class="mb-9 max-w-[62ch]">
+        <p class="mb-3 font-display text-xs font-semibold uppercase tracking-[0.09em] text-match">How it works</p>
+        <h2 class="mb-3.5 text-[clamp(26px,3.4vw,36px)]">Five steps, about ten minutes the first time</h2>
+        <p class="m-0 text-[17px] text-ink-2">
+          After that, import your JSON and a new application takes a minute, because only the job
+          posting changes.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 gap-7 md:grid-cols-3">
+        <div>
+          <h3 class="mb-2 flex items-baseline gap-2.5 text-[17px]"><span class="font-mono text-xs font-medium text-ink-3">01</span>Bring what you have</h3>
+          <p class="m-0 text-[15px] text-ink-2">Drop in your current resume as a PDF and the text is pulled out in your browser, sorted into fields you then correct. Starting from nothing works too.</p>
+        </div>
+        <div>
+          <h3 class="mb-2 flex items-baseline gap-2.5 text-[17px]"><span class="font-mono text-xs font-medium text-ink-3">02</span>Check what the machine reads</h3>
+          <p class="m-0 text-[15px] text-ink-2">The parser view shows your document as plain extracted text, the way the employer's software receives it. Anything wrong there is wrong on their screen.</p>
+        </div>
+        <div>
+          <h3 class="mb-2 flex items-baseline gap-2.5 text-[17px]"><span class="font-mono text-xs font-medium text-ink-3">03</span>Answer the actual posting</h3>
+          <p class="m-0 text-[15px] text-ink-2">Paste the job description and see which required terms your resume already contains, and which are missing. You decide which missing ones are true of you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="border-t border-rule bg-paper py-[68px]">
+    <div class="mx-auto max-w-[1180px] px-5">
+      <div class="mb-9 max-w-[62ch]">
+        <p class="mb-3 font-display text-xs font-semibold uppercase tracking-[0.09em] text-match">Questions</p>
+        <h2 class="mb-3.5 text-[clamp(26px,3.4vw,36px)]">What people ask before they trust a resume checker</h2>
+      </div>
+      <div class="faq max-w-[800px]">
+        {faq.map((f) => (
+          <details class="border-b border-rule">
+            <summary class="relative cursor-pointer list-none py-[18px] pr-[34px] font-display text-[17px] font-semibold leading-snug after:absolute after:right-1 after:top-4 after:font-sans after:text-[22px] after:font-normal after:leading-none after:text-ink-3">{f.q}</summary>
+            <div class="pb-5 pr-[34px] text-[15.5px] text-ink-2"><p class="mb-0">{f.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-rule bg-paper py-[34px] text-sm text-ink-2">
+  <div class="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-7 gap-y-3.5 px-5">
+    <p class="inline-flex flex-wrap items-center gap-[.35rem] m-0">Made with love in <svg class="inline-block h-[15px] w-[15px] rounded-full align-middle" viewBox="0 0 512 512" role="img" aria-label="France"><circle cx="256" cy="256" fill="#fff" r="256"></circle><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"></path><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"></path></svg> by <a class="inline-flex items-center gap-[.4rem] text-fg-2 transition-colors duration-200 ease-soft hover:text-accent-text [&>img]:w-[1.35rem] [&>img]:h-[1.35rem] [&>img]:rounded-full [&>img]:object-cover [&>img]:border [&>img]:border-line-2" href="https://nicolaslecocq.com/" rel="noopener noreferrer" target="_blank"><img src="/nicolas.avif" width="24" height="24" alt="" loading="lazy" decoding="async">Nicolas Lecocq</a></p>
+    <nav class="ml-auto flex flex-wrap gap-x-6 gap-y-2">
+      <a href="https://github.com/DigiHold/ats-resume-checker" rel="noopener" target="_blank">Source on GitHub</a>
+      <a href="https://github.com/DigiHold/ats-resume-checker/blob/main/LICENSE" rel="noopener" target="_blank">MIT licence</a>
+    </nav>
+  </div>
+</footer>
+
+<div id="print-root" aria-hidden="true"></div>
+
+<script>
+  import '../scripts/app';
+</script>
+</body>
+</html>

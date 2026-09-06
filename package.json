@@ -1,0 +1,22 @@
+{
+  "name": "ats-resume-checker",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "astro build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^5.13.0",
+    "tailwindcss": "^4.3.3",
+    "wrangler": "^4.129.0"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^6.3.289"
+  }
+}
