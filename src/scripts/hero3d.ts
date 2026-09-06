@@ -44,27 +44,32 @@ const PAPER_FRAG = /* glsl */ `
   void main() {
     // cotton paper: layered noise, faint fibres
     float fibre = noise(vUv * 900.0) * 0.5 + noise(vUv * 220.0) * 0.35 + noise(vUv * 40.0) * 0.15;
-    vec3 paper = vec3(0.86, 0.855, 0.845) - fibre * 0.05;
+    vec3 paper = vec3(0.80, 0.795, 0.785) - fibre * 0.09;
+    // the cut edge of the sheet, a hair darker
+    float edge = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
+    paper *= 0.78 + 0.22 * smoothstep(0.0, 0.006, edge);
 
     vec3 human = texture2D(uHuman, vUv).rgb;
     vec3 machine = texture2D(uMachine, vUv).rgb;
 
     // the blade: everything above is the typeset page, below it the extraction
-    float edge = smoothstep(uScan - 0.004, uScan + 0.004, vUv.y);
+    float side = smoothstep(uScan - 0.004, uScan + 0.004, vUv.y);
     // in a thin band just under the blade the letters have not settled yet
     float below = uScan - vUv.y;
-    float unsettled = below > 0.0 ? 1.0 - smoothstep(0.0, 0.07, below) : 0.0;
-    vec2 jitter = vec2(hash(vec2(floor(vUv.y * 400.0), floor(uTime * 12.0))) - 0.5, 0.0) * unsettled * 0.012;
+    float unsettled = below > 0.0 ? 1.0 - smoothstep(0.0, 0.035, below) : 0.0;
+    vec2 jitter = vec2(hash(vec2(floor(vUv.y * 400.0), floor(uTime * 12.0))) - 0.5, 0.0) * unsettled * 0.004;
     vec3 machineJ = texture2D(uMachine, vUv + jitter).rgb;
 
-    vec3 ink = mix(machineJ, human, edge);
+    vec3 ink = mix(machineJ, human, side);
     vec3 col = paper * ink;
 
     // the blade on the paper: a thin tinted core, a broad falloff that lifts the paper to white
     float d = abs(vUv.y - uScan);
     float core = exp(-d * 420.0);
-    float fall = exp(-d * 18.0);
-    col += vec3(0.14, 0.14, 0.15) * fall;
+    float fall = exp(-d * 26.0);
+    col += vec3(0.12, 0.12, 0.13) * fall;
+    // the paper darkens away from the blade
+    col *= 0.86 + 0.14 * exp(-d * 2.2);
     col += vec3(0.45, 0.62, 1.0) * core * 0.9;
 
     // shading from the bend, a hair darker where the paper turns away
@@ -107,52 +112,59 @@ function canvas(w: number, h: number) {
   return [c, g] as const;
 }
 
-/* The typeset page, drawn with the page's own faces at print size. */
+/* One layout shared by both faces, so the machine reads the same words at the same places. */
+interface Run { text: string; y: number; x?: number; kind: 'name' | 'role' | 'contact' | 'head' | 'title' | 'date' | 'org' | 'line' | 'rule' }
+function layout(): Run[] {
+  const X = 118; const W = 1004; let y = 150; const runs: Run[] = [];
+  runs.push({ text: RESUME.name, y, kind: 'name' }); y += 46;
+  runs.push({ text: RESUME.role, y, kind: 'role' }); y += 36;
+  runs.push({ text: RESUME.contact, y, kind: 'contact' }); y += 26;
+  runs.push({ text: '', y, kind: 'rule' }); y += 50;
+  for (const [head, lines] of RESUME.sections) {
+    runs.push({ text: head, y, kind: 'head' }); y += 34;
+    for (const l of lines) {
+      if (/\d{4} - \d{4}$/.test(l)) {
+        runs.push({ text: l.replace(/\s{2,}.*$/, ''), y, kind: 'title' });
+        runs.push({ text: l.replace(/^.*\s{2,}/, ''), y, x: X + W, kind: 'date' });
+      } else if (/^(Payfit|Doctolib|INSA)/.test(l)) runs.push({ text: l, y, kind: 'org' });
+      else runs.push({ text: l, y, kind: 'line' });
+      y += 31;
+    }
+    y += 24;
+  }
+  return runs;
+}
+
 function humanFace(THREE: T) {
   const [c, g] = canvas(1240, 1506);
-  const X = 118; let y = 170;
-  g.fillStyle = '#111'; g.font = '600 56px "IBM Plex Sans"'; g.fillText(RESUME.name, X, y); y += 48;
-  g.fillStyle = '#555'; g.font = '400 26px "IBM Plex Sans"'; g.fillText(RESUME.role, X, y); y += 40;
-  g.fillStyle = '#444'; g.font = '400 19px "IBM Plex Sans"'; g.fillText(RESUME.contact, X, y); y += 30;
-  g.fillStyle = '#111'; g.fillRect(X, y, 1004, 3); y += 56;
-  for (const [head, lines] of RESUME.sections) {
-    g.fillStyle = '#111'; g.font = '600 20px "IBM Plex Sans"'; g.fillText(head, X, y); y += 12;
-    g.fillStyle = '#ddd'; g.fillRect(X, y, 1004, 1); y += 38;
-    for (const l of lines) {
-      const isTitle = /\d{4} - \d{4}$/.test(l);
-      const isOrg = /^(Payfit|Doctolib|INSA)/.test(l);
-      g.fillStyle = isOrg ? '#555' : '#222';
-      g.font = isTitle ? '600 21px "IBM Plex Sans"' : isOrg ? 'italic 400 19px "IBM Plex Sans"' : '400 19.5px "IBM Plex Sans"';
-      if (isTitle) {
-        const [t, d] = [l.replace(/\s{2,}.*$/, ''), l.replace(/^.*\s{2,}/, '')];
-        g.fillText(t, X, y); g.font = '400 18px "IBM Plex Sans"'; g.fillStyle = '#666';
-        g.fillText(d, X + 1004 - g.measureText(d).width, y);
-      } else g.fillText((head === 'EXPERIENCE' && !isOrg ? '   ' : '') + l, X, y);
-      y += 33;
-    }
-    y += 30;
+  const X = 118;
+  for (const r of layout()) {
+    if (r.kind === 'rule') { g.fillStyle = '#111'; g.fillRect(X, r.y, 1004, 3); continue; }
+    const font = { name: '600 50px', role: '400 24px', contact: '400 17px', head: '600 18px', title: '600 19px', date: '400 17px', org: 'italic 400 17px', line: '400 18px' }[r.kind];
+    g.font = `${font} "IBM Plex Sans"`;
+    g.fillStyle = r.kind === 'role' || r.kind === 'org' || r.kind === 'date' ? '#555' : r.kind === 'contact' ? '#444' : '#111';
+    const x = r.x !== undefined ? r.x - g.measureText(r.text).width : r.kind === 'line' && !/^(Languages|Infrastructure|Practices|Backend engineer|migration)/.test(r.text) ? X + 14 : X;
+    g.fillText(r.text, x, r.y);
+    if (r.kind === 'head') { g.fillStyle = '#ddd'; g.fillRect(X, r.y + 10, 1004, 1); }
   }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
-/* The same page as the extractor returns it: one weight, one face, the posting's terms lit. */
 function machineFace(THREE: T) {
   const [c, g] = canvas(1240, 1506);
-  const X = 118; let y = 170; const line = 34;
-  g.font = '400 19px "IBM Plex Mono"';
-  const put = (s: string) => {
-    let x = X;
-    for (const part of s.split(/(\b(?:Python|Go|Kubernetes|Docker|PostgreSQL|CI\/CD)\b)/)) {
+  const X = 118;
+  g.font = '400 17px "IBM Plex Mono"';
+  for (const r of layout()) {
+    if (r.kind === 'rule') continue;
+    let x = r.x !== undefined ? r.x - g.measureText(r.text).width : X;
+    for (const part of r.text.split(/(\b(?:Python|Go|Kubernetes|Docker|PostgreSQL|CI\/CD)\b)/)) {
       if (!part) continue;
       const w = g.measureText(part).width;
-      if (LIT.includes(part)) { g.fillStyle = '#d6e3ff'; g.fillRect(x - 2, y - 20, w + 4, 27); g.fillStyle = '#1d4ed8'; }
+      if (LIT.includes(part)) { g.fillStyle = '#d6e3ff'; g.fillRect(x - 2, r.y - 18, w + 4, 24); g.fillStyle = '#1d4ed8'; }
       else g.fillStyle = '#222';
-      g.fillText(part, x, y); x += w;
+      g.fillText(part, x, r.y); x += w;
     }
-    y += line;
-  };
-  put(RESUME.name); put(RESUME.role); put(RESUME.contact); y += line;
-  for (const [head, lines] of RESUME.sections) { put(head); for (const l of lines) put(l); y += line; }
+  }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
@@ -190,23 +202,31 @@ export async function mountHero(host: HTMLElement): Promise<void> {
     const r = g.createRadialGradient(256, 256, 60, 256, 256, 256); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = r; g.fillRect(0, 0, 512, 512); return new THREE.CanvasTexture(c);
   })();
-  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 4.2), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 0.7 }));
-  shadow.position.set(0.12, -0.18, -0.35);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 4.4), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 0.9 }));
+  shadow.position.set(0.16, -0.24, -0.3);
 
   // the blade of light, emissive, bloomed by the composer
   const bladeMat = new THREE.MeshBasicMaterial({ toneMapped: false });
   bladeMat.color.setRGB(2.2, 3.0, 5.0);
   const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.16, 0.012), bladeMat);
   blade.position.z = 0.09;
+  const spillTex = (() => {
+    const [c, g] = canvas(512, 512); g.clearRect(0, 0, 512, 512);
+    const r = g.createRadialGradient(256, 256, 4, 256, 256, 200);
+    r.addColorStop(0, 'rgba(90,130,255,0.22)'); r.addColorStop(0.45, 'rgba(50,80,170,0.07)'); r.addColorStop(0.85, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = r; g.fillRect(0, 0, 512, 512); return new THREE.CanvasTexture(c);
+  })();
+  const spill = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map: spillTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  spill.position.z = -0.6;
 
   const group = new THREE.Group();
-  group.add(shadow, sheet, blade);
-  group.rotation.set(0.12, -0.42, 0.04);
+  group.add(spill, shadow, sheet, blade);
+  group.rotation.set(0.14, -0.5, 0.05);
   scene.add(group);
   const place = () => {
     const narrow = host.clientWidth < 760;
-    group.position.set(narrow ? 0 : 1.3, narrow ? -1.15 : 0.08, 0);
-    group.scale.setScalar(narrow ? 0.62 : 0.94);
+    group.position.set(narrow ? 0.5 : 1.3, narrow ? -1.55 : 0.08, 0);
+    group.scale.setScalar(narrow ? 1.0 : 0.94);
   };
   place();
 
@@ -227,9 +247,9 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   resize();
   new ResizeObserver(resize).observe(host);
 
-  const setScan = (v: number) => { paper.uniforms.uScan.value = v; blade.position.y = (v - 0.5) * 2.55; blade.visible = v > 0 && v < 1; };
+  const setScan = (v: number) => { paper.uniforms.uScan.value = v; blade.position.y = (v - 0.5) * 2.55; spill.position.y = blade.position.y - 0.1; blade.visible = v > 0 && v < 1; (spill.material as THREE_NS.MeshBasicMaterial).opacity = blade.visible ? 1 : 0; };
 
-  const base = { x: 0.12, y: -0.42 };
+  const base = { x: 0.14, y: -0.5 };
   const target = { ...base }; const cur = { ...base };
   if (!reduce) {
     window.addEventListener('pointermove', (e) => {
@@ -256,7 +276,7 @@ export async function mountHero(host: HTMLElement): Promise<void> {
     grain.uniforms.uTime.value = t;
     cur.x += (target.x - cur.x) * 0.045; cur.y += (target.y - cur.y) * 0.045;
     group.rotation.set(cur.x, cur.y, 0.04 + Math.sin(t * 0.5) * 0.012);
-    group.position.y = (host.clientWidth < 760 ? -1.15 : 0.08) + Math.sin(t * 0.7) * 0.04;
+    group.position.y = (host.clientWidth < 760 ? -1.55 : 0.08) + Math.sin(t * 0.7) * 0.04;
     composer.render();
   };
   new IntersectionObserver(([e]) => {

@@ -184,7 +184,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .read p { margin: 0; font-size: 15.5px; color: var(--color-ink-2); }
 
 /* ---------- the dark stage and its fallback before three arrives ---------- */
-.hero-fallback { background: radial-gradient(60% 50% at 62% 50%, #1a1c22 0%, #0a0b0e 70%); }
+.hero-fallback { background: radial-gradient(60% 50% at 62% 50%, #1a1c22 0%, #0a0b0e 70%) center / cover no-repeat; }
 [data-hero-3d] canvas { display: block; width: 100% !important; height: 100% !important; }
 .hero-copy > * { animation: rise .9s var(--ease-soft) both; }
 .hero-copy > *:nth-child(2) { animation-delay: .08s; }

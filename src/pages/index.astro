@@ -13,41 +13,6 @@ const steps = [
   { id: 'export', label: 'Download' },
 ];
 
-const faq = [
-  {
-    q: 'What is an ATS and why does it reject resumes?',
-    a: 'An applicant tracking system is the software an employer uses to receive applications. It extracts the text from your file, sorts it into fields such as employer, job title and dates, then scores those fields against the job requisition. Most resumes fail at the sorting step rather than the scoring step. A two column layout with a skills sidebar is the usual culprit, because the extractor reads the page in one pass and interleaves the columns, so your employer and your dates land in the wrong fields before anyone reads a word.',
-  },
-  {
-    q: 'Does this ATS friendly resume checker store my data?',
-    a: 'Nothing is stored, because there is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
-  },
-  {
-    q: 'Should I put white keywords on my resume to get past the AI?',
-    a: 'No, and this builder will not do it. Parsers strip styling and read the raw text layer, so a block of white on white keywords lands in the middle of the recruiter screen looking exactly like what it is. Screening platforms flag the pattern, and a flagged application can be rejected automatically with a fraud marker attached to your candidate record, which follows you across every future role at that company. The same applies to hidden instructions aimed at an AI reader. Putting the same words in visibly, inside your summary and your real bullets, scores identically and survives a human reading it.',
-  },
-  {
-    q: 'What resume format parses most reliably?',
-    a: 'A PDF with a real text layer, in one column, with standard headings such as Professional Summary, Experience, Skills and Education. Keep your contact details in the body of the document rather than in a page header, use one date format throughout, and avoid tables, text boxes and letter spacing on headings. Letter spacing is the quiet one: it survives into the text layer and your heading comes out as a string of separated capitals that no parser recognises.',
-  },
-  {
-    q: 'Should I put a photo on my resume?',
-    a: 'It depends where you are applying. A photo is normal in France, Germany, Switzerland, Spain and much of continental Europe. In the United Kingdom, Ireland and the United States it is usually left off, because employers avoid material that could support a discrimination claim. The photo toggle is off by default here, so turn it on only when you know the local convention.',
-  },
-  {
-    q: 'How long should a resume be?',
-    a: 'One page for under about eight years of work, two pages beyond that. Cutting a fifteen year career onto one page throws away keyword surface that the requisition is scoring you on, and no recruiter has ever rejected a strong second page. What does hurt is padding, so every line should either carry a keyword the job asked for or a result worth reading.',
-  },
-  {
-    q: 'Can I check a resume I already have against a job description?',
-    a: 'Yes, and that is what the posting step is for. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
-  },
-  {
-    q: 'Is it really free, and can I run it myself?',
-    a: 'It is free and you can run your own copy. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
-  },
-];
-
 const schema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -131,12 +96,12 @@ const schema = {
 <main class="dropzone" data-drop="pdf">
   <!-- the stage: a sheet of paper under a blade of light -->
   <section class="stage-dark relative -mt-16 overflow-hidden bg-[#0a0b0e] text-white">
-    <div class="absolute inset-0 hidden lg:block" data-hero-3d aria-hidden="true">
+    <div class="absolute inset-0" data-hero-3d aria-hidden="true">
       <div class="hero-fallback absolute inset-0"></div>
     </div>
-    <div class="relative mx-auto grid min-h-[100svh] max-w-[1120px] grid-cols-1 items-start px-6 pb-12 pt-24 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:pb-16 lg:pt-16">
+    <div class="relative mx-auto grid min-h-[100svh] max-w-[1120px] grid-cols-1 items-start px-6 pb-[46vh] pt-24 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:pb-16 lg:pt-16">
       <div class="hero-copy">
-        <h1 class="mb-6 max-w-[12ch] text-[clamp(40px,5.6vw,80px)] text-white">Get past the software and in front of a person</h1>
+        <h1 class="mb-6 text-[clamp(38px,4.9vw,70px)] text-white"><span class="block whitespace-nowrap">Get past the</span><span class="block whitespace-nowrap">software and in</span><span class="block whitespace-nowrap">front of a person</span></h1>
         <p class="mb-8 max-w-[36ch] text-[17px] leading-[1.55] text-white/65">Software reads your resume before a human does. Check yours against the posting and download a PDF it reads correctly.</p>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
           <button class="btn btn-light btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
@@ -146,12 +111,15 @@ const schema = {
         <input type="file" accept="application/json,.json" class="hidden" data-file="json">
         <p class="mt-4 min-h-[20px] text-[13px] text-white/50" data-role="pdf-status"></p>
       </div>
-      <div class="hero-still mt-4 lg:hidden" aria-hidden="true">
-        <picture>
-          <source srcset="/img/product-m.avif" type="image/avif">
-          <img src="/img/product-m.webp" alt="" width="1680" height="1700" class="w-full" decoding="async" loading="lazy">
-        </picture>
-      </div>
+      <div class="hidden lg:block" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="bg-[#0a0b0e] text-white/60" data-role="acts">
+    <div class="mx-auto grid max-w-[1120px] gap-x-10 gap-y-6 border-t border-white/10 px-6 py-8 text-[14px] leading-relaxed sm:grid-cols-3">
+      <p class="m-0"><span class="text-white">Extraction.</span> The text a parser pulls out of your PDF, shown beside the page, so a broken layout is visible before it costs an application.</p>
+      <p class="m-0"><span class="text-white">Match.</span> Paste the posting and the terms it scores are marked. In the sample, six of seven required terms are present and Rust is named as missing.</p>
+      <p class="m-0"><span class="text-white">PDF.</span> The file you download keeps a real text layer, the one every screening system reads, and the JSON brings everything back next time.</p>
     </div>
   </section>
 
