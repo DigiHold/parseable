@@ -1,6 +1,6 @@
-# ATS Resume Checker
+# Parseable
 
-> A free, open source resume checker and builder. It reads a resume in the browser, compares it
+> Parseable is a free, open source ATS friendly resume checker and builder. It reads a resume in the browser, compares it
 > against a job posting, and exports a PDF that applicant tracking software parses correctly.
 > There is no account, no database and no server: everything runs in the visitor's own tab.
 
@@ -29,6 +29,6 @@
 ## Links
 
 - Tool: https://resume.nicolaslecocq.com/
-- Source: https://github.com/DigiHold/ats-resume-checker
+- Source: https://github.com/DigiHold/parseable
 - Author: Nicolas Lecocq, https://nicolaslecocq.com/
 - Licence: MIT

@@ -1,12 +1,12 @@
-# ATS Resume Checker
+# Parseable
 
-A free resume checker and builder that runs entirely in the browser. It reads the resume you already
+A free ATS friendly resume checker and builder that runs entirely in the browser. It reads the resume you already
 have, compares it against a job posting, shows you the plain text a parser extracts from your
 document, and prints a PDF that screening software reads correctly.
 
 **Live: [resume.nicolaslecocq.com](https://resume.nicolaslecocq.com/)**
 
-![ATS Resume Checker](public/og.png)
+![Parseable](public/og.png)
 
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-16181c)](LICENSE)
 [![Astro](https://img.shields.io/badge/Astro-5-16181c)](https://astro.build)
@@ -65,8 +65,8 @@ by reading `src/scripts/` or by opening the network tab.
 ## Running it locally
 
 ```bash
-git clone https://github.com/DigiHold/ats-resume-checker.git
-cd ats-resume-checker
+git clone https://github.com/DigiHold/parseable.git
+cd parseable
 npm install
 npm run dev          # http://localhost:4321
 ```

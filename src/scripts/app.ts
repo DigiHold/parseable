@@ -5,7 +5,7 @@ import { audit, type Audit } from './keywords';
 
 type StepId = 'import' | 'details' | 'template' | 'posting' | 'export';
 const STEPS: StepId[] = ['import', 'details', 'template', 'posting', 'export'];
-const KEY = 'ats-resume-checker/draft';
+const KEY = 'parseable/draft';
 
 let data: Resume = emptyResume();
 let step: StepId = 'import';
