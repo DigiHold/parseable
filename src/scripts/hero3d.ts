@@ -68,8 +68,9 @@ const PAPER_FRAG = /* glsl */ `
     float core = exp(-d * 420.0);
     float fall = exp(-d * 26.0);
     col += vec3(0.12, 0.12, 0.13) * fall;
-    // the paper darkens away from the blade
+    // the paper darkens away from the blade, and across its width away from the light
     col *= 0.86 + 0.14 * exp(-d * 2.2);
+    col *= 0.90 + 0.10 * (1.0 - vUv.x) + 0.04 * vUv.y;
     col += vec3(0.45, 0.62, 1.0) * core * 0.9;
 
     // shading from the bend, a hair darker where the paper turns away
@@ -207,8 +208,8 @@ export async function mountHero(host: HTMLElement): Promise<void> {
 
   // the blade of light, emissive, bloomed by the composer
   const bladeMat = new THREE.MeshBasicMaterial({ toneMapped: false });
-  bladeMat.color.setRGB(2.2, 3.0, 5.0);
-  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.16, 0.012), bladeMat);
+  bladeMat.color.setRGB(1.6, 2.1, 3.4);
+  const blade = new THREE.Mesh(new THREE.PlaneGeometry(2.02, 0.010), bladeMat);
   blade.position.z = 0.09;
   const spillTex = (() => {
     const [c, g] = canvas(512, 512); g.clearRect(0, 0, 512, 512);
@@ -233,7 +234,7 @@ export async function mountHero(host: HTMLElement): Promise<void> {
   host.replaceChildren(renderer.domElement);
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.45, 0.5, 1.05);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.85, 1.05);
   composer.addPass(bloom);
   const grain = new ShaderPass(GRAIN_SHADER);
   composer.addPass(grain);

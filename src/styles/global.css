@@ -67,7 +67,7 @@
    as HTML strings at runtime, out of reach of Tailwind's scanner. */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[4px] border border-transparent
+    @apply inline-flex items-center justify-center gap-2 rounded-none border border-transparent
            px-5 py-3 font-ui text-[15.5px] font-semibold leading-none cursor-pointer
            no-underline transition-[background-color,border-color,color,transform,box-shadow] duration-200 select-none;
   }
