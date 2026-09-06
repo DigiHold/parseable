@@ -9,17 +9,6 @@ export function mountSite(): void {
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  // FAQ: an index on the left drives one answer on the right. On small screens
-  // the index is hidden and every answer stacks, so nothing depends on this.
-  const qs = document.querySelectorAll<HTMLButtonElement>('[data-faq-q]');
-  const as = document.querySelectorAll<HTMLElement>('[data-faq-a]');
-  const pick = (i: number) => {
-    qs.forEach((q, k) => q.setAttribute('aria-selected', String(k === i)));
-    as.forEach((a, k) => a.classList.toggle('is-active', k === i));
-  };
-  qs.forEach((q, i) => q.addEventListener('click', () => pick(i)));
-  if (qs.length) pick(0);
-
   // How it works: the fragment on the right follows the step being read.
   const steps = document.querySelectorAll<HTMLElement>('[data-how-step]');
   const frags = document.querySelectorAll<HTMLElement>('[data-how-frag]');

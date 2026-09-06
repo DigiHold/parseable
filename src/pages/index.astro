@@ -186,7 +186,7 @@ const schema = {
   <!-- hero: a real sheet of paper, and the beam that reads it -->
   <section class="hero overflow-hidden">
     <div class="dropzone mx-auto grid max-w-[1240px] items-start gap-12 px-6 pb-14 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:pb-20 lg:pt-10" data-drop="pdf">
-      <div class="max-w-[560px] lg:pt-6">
+      <div class="max-w-[560px]">
         <h1 class="mb-6 max-w-[12ch] text-[clamp(42px,5.5vw,72px)]" style="text-wrap:balance">Get past the software and in front of a person</h1>
         <p class="mb-9 max-w-[44ch] text-[17px] leading-[1.6] text-ink-2 sm:text-[18px]">
           Software reads your resume before a human does. <span class="hidden sm:inline">Drop yours in, paste the job posting, and
@@ -262,8 +262,8 @@ const schema = {
   </section>
 
   <!-- what the machine read from a two column resume, at full width -->
-  <section class="border-t border-rule">
-    <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-24">
+  <section>
+    <div class="mx-auto max-w-[1240px] px-6 pb-20 pt-6 lg:pb-24 lg:pt-8">
       <h2 class="mb-4 max-w-[20ch] text-[clamp(32px,4.2vw,50px)]">What the software read from a two column resume</h2>
       <p class="mb-12 max-w-[60ch] text-[18px] text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, and the three places where the application dies are marked.</p>
       <div class="read">
@@ -286,21 +286,21 @@ French                    <i>requirements</i>, and monitoring the specs.
 English</pre>
         <ol>
           <li>
-            <span class="num" aria-hidden="true"></span>
+            <span class="num">1</span>
             <div>
               <h3>The layout breaks the extractor</h3>
               <p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p>
             </div>
           </li>
           <li>
-            <span class="num" aria-hidden="true"></span>
+            <span class="num">2</span>
             <div>
               <h3>The words do not match the posting</h3>
               <p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p>
             </div>
           </li>
           <li>
-            <span class="num" aria-hidden="true"></span>
+            <span class="num">3</span>
             <div>
               <h3>Nobody tells you which one it was</h3>
               <p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p>
@@ -312,7 +312,7 @@ English</pre>
   </section>
 
   <!-- how it works: the steps on the left, the real interface following on the right -->
-  <section id="how" class="scroll-mt-[72px] border-t border-rule">
+  <section id="how" class="scroll-mt-[72px]">
     <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-24">
       <h2 class="mb-12 max-w-[18ch] text-[clamp(32px,4.2vw,50px)]">Four steps, about ten minutes the first time</h2>
       <div class="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
@@ -338,26 +338,16 @@ English</pre>
         <div class="lg:sticky lg:top-[96px]">
           <div class="frag-frame" aria-hidden="true">
             <div class="frag" data-how-frag="0">
-              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div></div>
+              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div><div class="demo-line" style="top:14%"></div></div>
             </div>
             <div class="frag" data-how-frag="1">
               <div class="demo" style="--scan:0%"><div class="demo-read demo-read-full"><pre set:html={demoReadFull}></pre></div></div>
             </div>
             <div class="frag" data-how-frag="2">
-              <div class="rounded-xl border border-rule bg-paper p-6">
-                <div class="flex items-baseline gap-2.5"><b class="font-display text-[40px] font-normal leading-none tracking-[-0.02em]">83%</b><span class="text-[14px] text-ink-2">of the 6 required terms, 5 matched</span></div>
-                <div class="my-3 mb-5 h-1 overflow-hidden rounded-full bg-rule"><i class="block h-full w-[83%] rounded-full bg-primary"></i></div>
-                <div class="flex flex-wrap gap-1.5">
-                  <span class="chip chip-miss">Terraform</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Python</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Go</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Kubernetes</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">Docker</span><span class="chip" style="background:#e8eefc;color:#1d4ed8">PostgreSQL</span>
-                </div>
-              </div>
+              <div class="demo" style="--scan:0%"><div class="demo-read demo-read-full"><pre set:html={demoReadFull}></pre></div><div class="absolute left-9 right-9 bottom-8 flex items-baseline gap-2.5 border-t border-rule bg-paper pt-4"><b class="font-display text-[34px] font-normal leading-none tracking-[-0.02em]">83%</b><span class="text-[13px] text-ink-2">of the 6 required terms matched. Terraform is missing.</span></div></div>
             </div>
             <div class="frag" data-how-frag="3">
-              <div class="rounded-xl border border-rule bg-paper p-6">
-                <span class="btn btn-primary mb-3 w-full">Download PDF</span>
-                <span class="btn btn-ghost mb-5 w-full">Export JSON</span>
-                <p class="m-0 text-[14px] text-ink-2">The PDF keeps a real text layer, the one every parser reads. The JSON brings everything back next time, photo included.</p>
-              </div>
+              <div class="demo" style="--scan:100%"><div class="demo-sheet"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div><div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 border-t border-rule bg-paper px-9 py-5"><span class="text-[13px] text-ink-2">MarieDubois_Resume.pdf, 1 page, real text layer</span><span class="btn btn-primary btn-sm">Download PDF</span></div></div>
             </div>
           </div>
         </div>
@@ -366,12 +356,12 @@ English</pre>
   </section>
 
   <!-- questions: an index, one answer at a time -->
-  <section id="faq" class="scroll-mt-[72px] border-t border-rule">
+  <section id="faq" class="scroll-mt-[72px]">
     <div class="mx-auto max-w-[1240px] px-6 py-20 lg:py-28">
       <div class="mb-12 max-w-[640px]">
         <h2 class="text-[clamp(32px,4.2vw,50px)]">What people ask before they trust a resume checker</h2>
       </div>
-      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-16">
+      <div class="max-w-[760px]">
         <ol class="faq-index">
           {faq.map((f, i) => (
             <li><button type="button" data-faq-q aria-selected={i === 0 ? 'true' : 'false'}>{f.q}</button></li>

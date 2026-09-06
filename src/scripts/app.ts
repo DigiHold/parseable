@@ -392,10 +392,12 @@ function bootstrap() {
     }
 
 
-    const view = hit('[data-view]')?.dataset.view;
+    // Only the two tab buttons switch the view. The body carries data-view as well,
+    // so a bare [data-view] match would swallow every click on the page after the first switch.
+    const view = hit('button[role="tab"][data-view]')?.dataset.view;
     if (view) {
       document.body.dataset.view = view;
-      document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-selected', String((b as HTMLElement).dataset.view === view)));
+      document.querySelectorAll('button[role="tab"][data-view]').forEach((b) => b.setAttribute('aria-selected', String((b as HTMLElement).dataset.view === view)));
       return;
     }
 

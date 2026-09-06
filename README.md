@@ -116,6 +116,20 @@ explains the small component layer in `global.css`, while static markup uses uti
 pdf.js is loaded through a dynamic import, so the 400 KB library is fetched only when someone
 actually drops a PDF in. The initial page ships around 32 KB of JavaScript.
 
+## Testing
+
+Every control in the tool is exercised end to end with Playwright, against a preview or against
+production, using a real resume:
+
+```bash
+npm run build && npm run preview &
+npm run test:e2e -- http://localhost:4321/ path/to/your-resume.pdf
+```
+
+It imports the PDF, zooms, switches views, edits fields, adds, moves and removes rows, switches
+templates, toggles the photo, runs an audit and adds a missing term, exports the JSON and imports it
+back into a fresh tab, reloads, fills the print root, and drops a file on the hero.
+
 ## Contributing
 
 Issues and pull requests are welcome. Two things to know before you open one:
