@@ -21,7 +21,7 @@ const faq = [
   },
   {
     q: 'Does this ATS friendly resume checker store my data?',
-    a: 'No. There is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
+    a: 'Nothing is stored, because there is no database, no account and no server that receives your file. Your resume, your photo and the job posting you paste are held in the browser tab and disappear when you close it. That is also why the JSON export exists: it is the only copy, so download it if you want to come back later.',
   },
   {
     q: 'Should I put white keywords on my resume to get past the AI?',
@@ -41,11 +41,11 @@ const faq = [
   },
   {
     q: 'Can I check a resume I already have against a job description?',
-    a: 'Yes. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
+    a: 'Yes, and that is what the posting step is for. Drop your current resume in as a PDF and the text is extracted in your browser, then sorted into fields for you to correct, which takes a couple of minutes on most files. Paste the job description into the posting step and the checker lists every required term the posting asks for, marks the ones your resume already contains, and shows a match rate. You decide which of the missing terms are genuinely true of you before any of them is added.',
   },
   {
     q: 'Is it really free, and can I run it myself?',
-    a: 'Yes to both. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
+    a: 'It is free and you can run your own copy. The code is MIT licensed on GitHub, there is nothing to pay for and nothing to sign up to. Since the whole thing is a static page with no backend, you can clone the repository and host your own copy anywhere that serves files.',
   },
 ];
 
@@ -285,9 +285,18 @@ const schema = {
 <footer class="border-t border-rule bg-paper py-[34px] text-sm text-ink-2">
   <div class="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-7 gap-y-3.5 px-5">
     <p class="inline-flex flex-wrap items-center gap-[.35rem] m-0">Made with love in <svg class="inline-block h-[15px] w-[15px] rounded-full align-middle" viewBox="0 0 512 512" role="img" aria-label="France"><circle cx="256" cy="256" fill="#fff" r="256"></circle><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"></path><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"></path></svg> by <a class="inline-flex items-center gap-[.4rem] text-fg-2 transition-colors duration-200 ease-soft hover:text-accent-text [&>img]:w-[1.35rem] [&>img]:h-[1.35rem] [&>img]:rounded-full [&>img]:object-cover [&>img]:border [&>img]:border-line-2" href="https://nicolaslecocq.com/" rel="noopener noreferrer" target="_blank"><img src="/nicolas.avif" width="24" height="24" alt="" loading="lazy" decoding="async">Nicolas Lecocq</a></p>
-    <nav class="ml-auto flex flex-wrap gap-x-6 gap-y-2">
+    <nav class="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
       <a href="https://github.com/DigiHold/ats-resume-checker" rel="noopener" target="_blank">Source on GitHub</a>
       <a href="https://github.com/DigiHold/ats-resume-checker/blob/main/LICENSE" rel="noopener" target="_blank">MIT licence</a>
+      <span class="flex items-center gap-3">
+        <span class="text-ink-3">Follow me on</span>
+        <a href="https://x.com/NicolasLecocqHQ" rel="noopener me" target="_blank" aria-label="Nicolas Lecocq on X" class="transition-colors hover:text-ink">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/lecocq-nicolas/" rel="noopener me" target="_blank" aria-label="Nicolas Lecocq on LinkedIn" class="transition-colors hover:text-ink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13M7.12 20.45H3.55V9h3.57zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0"/></svg>
+        </a>
+      </span>
     </nav>
   </div>
 </footer>

@@ -64,7 +64,7 @@ function panelDetails(): string {
   return `
     <div class="p-5">
       <h2 class="text-[19px] mb-1">Your details</h2>
-      <p class="text-[13.5px] text-ink-2 mb-4">Check every field. Extraction from a PDF is never perfect, and a wrong date is worse than a missing one.</p>
+      <p class="text-[13.5px] text-ink-2 mb-4">Check every field before you continue, because extraction from a PDF is never perfect, and a wrong date is worse than a missing one.</p>
 
       <div class="field"><label for="f-name">Full name</label><input id="f-name" data-bind="basics.name" value="${esc(b.name)}" autocomplete="name"></div>
       <div class="field"><label for="f-title">Job title</label><input id="f-title" data-bind="basics.title" value="${esc(b.title)}" placeholder="Full Stack Developer">
@@ -77,7 +77,7 @@ function panelDetails(): string {
 
       <div class="field"><label for="f-links">Links</label>
         <input id="f-links" data-bind="links" value="${esc(b.links.map((l) => l.url).join(', '))}" placeholder="github.com/you, yoursite.com">
-        <p class="sub">Separated by commas. They print as plain text so a parser can read them.</p></div>
+        <p class="sub">Separated by commas, and they print as plain text so a parser can read them.</p></div>
 
       <div class="field"><label for="f-sum">Professional summary</label>
         <textarea id="f-sum" data-bind="basics.summary" rows="5" placeholder="Three or four sentences. This is where the posting's most important terms belong.">${esc(b.summary)}</textarea>
@@ -136,7 +136,7 @@ function panelDetails(): string {
           </div>
           <div class="field mb-0"><label>Detail (optional)</label><input data-bind="education.${i}.detail" value="${esc(e.detail)}"></div>
         </div>`).join(''))}
-      <p class="mt-[-6px] mb-4 text-[12.5px] text-ink-3">No degree? Leave this empty. An absent section reads better than one that announces the gap.</p>
+      <p class="mt-[-6px] mb-4 text-[12.5px] text-ink-3">No degree? Leave this empty, because an absent section reads better than one that announces the gap.</p>
 
       <div class="field"><label for="f-lang">Languages</label><input id="f-lang" data-bind="languages" value="${esc(data.languages)}" placeholder="English (native), German (B2)"></div>
     </div>`;
@@ -224,7 +224,7 @@ function renderAudit(a: Audit): string {
       ? `<div class="flex flex-wrap gap-1.5">${list.map((k) => k.found
           ? `<span class="chip chip-hit">${esc(k.term)}</span>`
           : `<button class="chip chip-miss" data-kw="${esc(k.term)}" title="Add to your skills, only if it is true of you">${esc(k.term)}</button>`).join('')}</div>`
-      : '<p class="text-[13px] text-ink-3">Nothing detected in this group.</p>';
+      : '<p class="text-[13px] text-ink-3">Nothing in this group was detected in the posting.</p>';
 
   return `
     <div class="mt-5 border-t border-rule pt-4">

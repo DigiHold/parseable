@@ -24,7 +24,7 @@ sidebar: the extractor reads the page in one pass and interleaves the columns, s
 ends up filed under your employer. The rejection email arrives before a person has read a line, and
 it never tells you which step failed.
 
-This tool shows you that step.
+This tool shows you the step that failed.
 
 ## What it does
 
@@ -111,7 +111,7 @@ Two notes on the choices, since they look inconsistent at first glance:
 
 The resume sheet is styled in plain CSS rather than Tailwind because its markup is generated as an
 HTML string at runtime, where Tailwind's scanner cannot see the class names. The same reasoning
-explains the small component layer in `global.css`. Static markup uses utilities directly.
+explains the small component layer in `global.css`, while static markup uses utilities directly.
 
 pdf.js is loaded through a dynamic import, so the 400 KB library is fetched only when someone
 actually drops a PDF in. The initial page ships around 32 KB of JavaScript.
