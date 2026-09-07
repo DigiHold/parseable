@@ -2,7 +2,7 @@ import type { Resume, TemplateId } from './types';
 import { emptyResume, normalise } from './types';
 import { renderSheet, renderParserText } from './render';
 import { audit, type Audit } from './keywords';
-import { tailor, guessTitle, describe, type TailorLog } from './tailor';
+import { tailor, guessTitle, cleanTitle, describe, type TailorLog } from './tailor';
 
 type StepId = 'details' | 'template' | 'posting' | 'export';
 const STEPS: StepId[] = ['details', 'template', 'posting', 'export'];
@@ -436,7 +436,7 @@ function bootstrap() {
       const items = row.items.split(',').map((s) => s.trim()).filter(Boolean);
       if (!items.some((s) => s.toLowerCase() === kw.toLowerCase())) items.push(kw);
       row.items = items.join(', ');
-      lastAudit = audit(posting, renderParserText($('#sheet') as HTMLElement), postingTitle);
+      lastAudit = audit(posting, renderParserText($('#sheet') as HTMLElement), cleanTitle(postingTitle));
       render();
       return;
     }
@@ -455,18 +455,18 @@ function bootstrap() {
       download(`${stem}_resume.json`, JSON.stringify(data, null, 2), 'application/json');
     }
     if (action === 'use-title') {
-      const wanted = lastAudit?.title?.wanted ?? postingTitle.trim();
+      const wanted = lastAudit?.title?.wanted ?? cleanTitle(postingTitle);
       if (!wanted) return;
       data.basics.title = wanted;
       renderPreview();
       const sheet = $('#sheet');
-      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), cleanTitle(postingTitle));
       save(); render(); return;
     }
     if (action === 'run-audit') {
       const sheet = $('#sheet');
       if (!sheet || !posting.trim()) return;
-      lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      lastAudit = audit(posting, renderParserText(sheet), cleanTitle(postingTitle));
       render();
     }
     if (action === 'tailor') {
@@ -475,7 +475,7 @@ function bootstrap() {
       beforeTailor = beforeTailor ?? JSON.stringify(data);
       tailorLog = tailor(data, lastAudit);
       renderPreview();
-      lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      lastAudit = audit(posting, renderParserText(sheet), cleanTitle(postingTitle));
       save(); render(); return;
     }
     if (action === 'undo-tailor') {
@@ -484,7 +484,7 @@ function bootstrap() {
       beforeTailor = null; tailorLog = null;
       renderPreview();
       const sheet = $('#sheet');
-      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), cleanTitle(postingTitle));
       save(); render(); return;
     }
   });

@@ -17,11 +17,30 @@ export interface TailorLog { title: boolean; skillGroups: number; skillItems: nu
 
 const ROLE_WORD = /\b(engineer|developer|designer|manager|lead|architect|analyst|scientist|consultant|specialist|director|head|intern|administrator|technician|marketer|writer|recruiter|accountant|officer|coordinator|assistant|ingénieur|développeur|développeuse|chef|responsable|concepteur|conceptrice|analyste|stagiaire|alternant|alternante)\b/i;
 
-/** The first line of a posting is its title on nearly every job board, minus the tag after a dash, a pipe or a bracket. */
+/* What job boards bolt onto a title and a resume should never repeat: contract, place, gender markers, urgency. */
+const TAG_WORD = /\b(remote|hybrid|on[- ]?site|full[- ]?time|part[- ]?time|permanent|contract|contractor|freelance|temporary|internship|apprenticeship|cdi|cdd|alternance|stage|t[ée]l[ée]travail|temps plein|temps partiel|urgent|new|immediate start|asap|h\/f|f\/h|m\/f|f\/m|m\/w\/d|w\/m\/d|x\/f\/m|d\/f\/m|job|position|role|opening|vacancy|wanted|needed|hiring|poste|offre|emploi)\b/gi;
+const PLACE_WORD = /\b(europe|emea|eu|uk|usa|us|france|switzerland|suisse|belgium|belgique|germany|allemagne|spain|espagne|italy|italie|portugal|netherlands|pays-bas|ireland|irlande|poland|pologne|austria|luxembourg|canada|quebec|paris|lyon|marseille|toulouse|bordeaux|nantes|lille|nice|montpellier|strasbourg|rennes|grenoble|london|berlin|munich|hamburg|amsterdam|rotterdam|madrid|barcelona|lisbon|lisbonne|dublin|zurich|geneva|gen[èe]ve|lausanne|bern|basel|brussels|bruxelles|milan|rome|warsaw|vienna|montreal|toronto|new york|nyc|sf|san francisco|austin|seattle|cet|cest|gmt|utc|est|pst)\b/gi;
+
+/**
+ * Turns "Full Stack Developer (France) - Remote H/F" into "Full Stack Developer".
+ * Brackets go first, then the title keeps only its first segment that names a
+ * role, then the board's tags and places are stripped from that segment.
+ */
+export function cleanTitle(raw: string): string {
+  let t = raw.replace(/^\s*(job\s+title|title|poste|intitul[ée])\s*:\s*/i, '').replace(/\s*[(\[{][^)\]}]*[)\]}]/g, ' ').trim();
+  const segments = t.split(/\s+(?:-|–|—|\||\/|@|at|chez|pour|for)\s+|\s*,\s*|\s*:\s*/i).map((x) => x.trim()).filter(Boolean);
+  t = segments.find((x) => ROLE_WORD.test(x)) ?? segments[0] ?? '';
+  t = t.replace(TAG_WORD, ' ').replace(PLACE_WORD, ' ').replace(/\b\d+\s*(k|€|\$|£)\b|[€$£]\s*\d+k?/gi, ' ');
+  t = t.replace(/\s+/g, ' ').replace(/^[\s,;:\-–—/|]+|[\s,;:\-–—/|]+$/g, '').trim();
+  return t.length >= 3 ? t : raw.trim();
+}
+
+/** The first line of a posting is its title on nearly every job board. */
 export function guessTitle(posting: string): string {
   const first = posting.split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? '';
-  const clean = first.replace(/\s+[|–—-]\s+.*$/, '').replace(/\s*[(\[].*$/, '').replace(/[:,;]\s*$/, '').trim();
-  return clean.length >= 4 && clean.length <= 60 && !/[.!?]$/.test(clean) && ROLE_WORD.test(clean) ? clean : '';
+  if (!first || first.length > 90 || /[.!?]$/.test(first)) return '';
+  const clean = cleanTitle(first);
+  return clean.length >= 4 && clean.length <= 60 && ROLE_WORD.test(clean) ? clean : '';
 }
 
 const hits = (text: string, terms: string[]): number => {

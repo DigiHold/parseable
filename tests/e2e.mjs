@@ -95,6 +95,10 @@ await page.click('[data-action="tailor"]'); await page.waitForTimeout(300);
 check('tailoring reports what it changed', (await page.locator('[data-action="undo-tailor"]').count()) === 1);
 await page.click('[data-action="undo-tailor"]'); await page.waitForTimeout(300);
 check('undo brings the tailor button back', (await page.locator('[data-action="tailor"]').count()) === 1);
+// a board's title tags never reach the resume
+await page.fill('[data-role="posting-title"]', 'Full Stack Developer (France) - Remote H/F'); await page.click('[data-action="run-audit"]'); await page.waitForTimeout(300);
+const verdict = await page.locator('#panels').innerText();
+check('the title is cleaned of place and tags', verdict.includes('"Full Stack Developer"') && !/France|Remote|H\/F/.test(verdict.split('required terms')[0]), verdict.match(/"[^"]+"/)?.[0]);
 const missing = page.locator('button.chip-miss').first();
 const missingTerm = await missing.innerText();
 await missing.click(); await page.waitForTimeout(200);
