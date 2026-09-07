@@ -230,7 +230,7 @@ function renderAudit(a: Audit): string {
       ${tailorLog
         ? `<div class="notice mt-4"><strong>Tailored to this posting</strong>${esc(describe(tailorLog))} Nothing was reworded, added or removed.<div class="mt-2"><button class="btn btn-ghost btn-sm" data-action="undo-tailor">Undo</button></div></div>`
         : `<button class="btn btn-primary mt-4 w-full" data-action="tailor">Tailor my resume to this posting</button>
-           <p class="mt-2 text-[12.5px] text-ink-3">It moves the skills and bullets the posting scores to the front of their lists, and that is all it does. Nothing is reworded, added or removed, no degree or skill you did not write can appear, and one click undoes it.</p>`}
+           <p class="mt-2 text-[12.5px] text-ink-3">It takes the posting's job title as yours, and moves the skills and bullets it scores to the front of their lists. Nothing else changes: no degree, employer, date or skill you did not write can appear, and one click undoes it.</p>`}
     </div>`;
 }
 
