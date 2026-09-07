@@ -276,49 +276,76 @@ body[data-view='parser'] .zoomctl { display: none; }
   .tool-form { overflow-y: auto; border-right: 1px solid var(--color-rule); }
   .tool-view { display: flex; flex-direction: column; min-height: 0; }
   .tool-view .stage { flex: 1; min-height: 0; max-height: none; }
+  .tool-view .stage { display: flex; flex-direction: column; align-items: safe center; }
+  .tool-view .parser-out { width: 100%; }
+  #scale .sheet { flex: none; }
 }
 @media (max-width: 1023px) { .tool-form { border-bottom: 1px solid var(--color-rule); } }
 
 /* ---------- the header turns solid once the page moves under it ---------- */
 .site-head.is-scrolled { background: #efefec; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+.site-head.is-dark a, .site-head.is-dark button { color: #fff; }
+.site-head.is-dark nav a { color: rgba(255,255,255,.72); }
+.site-head.is-dark nav a:hover { color: #fff; }
+.site-head.is-dark button { text-decoration-color: rgba(255,255,255,.4); }
+.site-head.is-dark.is-scrolled { background: rgba(11,12,16,.84); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
 
-/* ---------- the hero object: the whole sheet, flat, at reading size ---------- */
-.hero-object { --hk: .857; position: relative; margin: 56px auto 0; max-width: 680px; }
-.hero-copy h1 { font-family: var(--font-serif); }
-.hero-copy .btn { border-radius: 0; }
-.hero-caption { margin: 14px 0 0; text-align: right; font: 400 12px/1.4 var(--font-mono); color: var(--color-ink-3); }
-.hero-caption button { cursor: pointer; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--color-edge); }
-.hero-caption button:hover { color: var(--color-ink); text-decoration-color: currentColor; }
-.hero-object .scene { max-width: none; width: 100%; aspect-ratio: auto; height: auto; margin: 0; perspective: none; overflow: visible; border-radius: 0; transition: --scan .22s ease-out; }
+/* ---------- the hero stage: a dark room, the sheet in it, a light reading it ---------- */
+.hero-stage { position: relative; overflow: hidden; background: #0b0c10; color: #fff; padding: 136px 0 88px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 56px; align-items: start; }
+.hero-copy { padding-top: 24px; }
+.hero-copy h1 { font-family: var(--font-serif); font-weight: 500; font-size: clamp(40px, 5vw, 72px); line-height: 1; letter-spacing: -.02em; margin: 0 0 28px; color: #fff; }
+.hero-sub { font-size: 18px; line-height: 1.55; color: #b4b8c3; max-width: 40ch; margin: 0 0 32px; }
+.hero-cta { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.hero-cta .btn { border-radius: 0; }
+.hero-link { cursor: pointer; border: 0; background: none; padding: 0; font: 500 15px/1 var(--font-ui); color: #fff; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: rgba(255,255,255,.35); }
+.hero-link:hover { text-decoration-color: #fff; }
+.hero-status { margin: 16px 0 0; font-size: 13px; color: #8e93a1; }
+
+.hero-object { --hk: .72; position: relative; }
+.hero-object .scene { --scan: 0%; position: relative; width: 100%; max-width: none; aspect-ratio: auto; height: auto; margin: 0; perspective: 1500px; perspective-origin: 30% 40%; transition: --scan .22s ease-out; animation: none; overflow: visible; }
 .hero-object .obj {
-  --rx: 0deg; --ry: 0deg; position: relative; inset: auto; transform: none; transform-style: flat; border-radius: 0;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.18);
+  --rx: 4deg; --ry: -16deg; position: relative; inset: auto; width: calc(210mm * var(--hk)); margin: 0 0 0 auto; border-radius: 0;
+  transform-style: preserve-3d; transform: rotateY(var(--ry)) rotateX(var(--rx)); transition: transform .5s var(--ease-soft);
+  box-shadow: -40px 70px 90px -30px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.06);
 }
 .hero-object .face { border-radius: 0; background-image: none; background: #fff; }
 /* the machine reads top down: what it has read sits above the seam in its own face */
 .hero-object .face-human { position: relative; clip-path: inset(var(--scan) 0 0 0); }
 .hero-object .face-machine { clip-path: inset(0 0 calc(100% - var(--scan)) 0); }
-.hero-object .face .sheet { transform: none; zoom: var(--hk); padding: 12mm 13mm; min-height: 0; }
+.hero-object .face .sheet { position: relative; transform: none; zoom: var(--hk); padding: 12mm 13mm; min-height: 0; }
 .hero-object .sheet, .hero-object .sheet * { font-family: var(--font-serif); }
 .hero-object .sheet .s-name, .hero-object .sheet .s-item-title, .hero-object .sheet .s-skill b { font-weight: 500; }
 .hero-object .sheet h2 { font-weight: 500; letter-spacing: .06em; }
-.hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { font-family: var(--font-mono) !important; color: #111 !important; }
+.hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { font-family: var(--font-mono) !important; color: #2b3550 !important; }
 .hero-object .lit { background: none !important; color: inherit !important; padding: 0; margin: 0; border-radius: 0; }
-.hero-object .spill, .hero-object .floor, .hero-object .light, .hero-object .edge { display: none; }
-.hero-object .blade { left: -28px; right: -28px; height: 1px; background: var(--color-ink); box-shadow: none; overflow: visible; }
-.blade-count { position: absolute; left: 100%; top: -6px; margin-left: 12px; font: 400 11px/1 var(--font-mono); color: var(--color-ink-3); white-space: nowrap; }
+/* light on the paper: bright beside the line, falling off toward both ends */
+.hero-object .light {
+  display: block; position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: multiply;
+  background: linear-gradient(to bottom, rgba(0,0,0,.14) 0%, rgba(0,0,0,.14) calc(var(--scan) - 45%), rgba(0,0,0,0) calc(var(--scan) - 8%), rgba(0,0,0,0) calc(var(--scan) + 8%), rgba(0,0,0,.14) calc(var(--scan) + 45%), rgba(0,0,0,.14) 100%);
+}
+.hero-object .light::after { content: ''; position: absolute; inset: 0; mix-blend-mode: screen; background: radial-gradient(120% 56px at 50% var(--scan), rgba(214,226,255,.6), rgba(214,226,255,0) 100%); }
+.hero-object .blade { left: -26px; right: -26px; top: var(--scan); height: 2px; z-index: 4; background: #f3f6ff; box-shadow: 0 0 6px 1px rgba(205,218,255,.95), 0 0 26px 6px rgba(140,168,255,.35); overflow: visible; }
+.blade-count { position: absolute; right: 100%; top: -5px; margin-right: 14px; font: 400 11px/1 var(--font-mono); color: #aab4d2; white-space: nowrap; text-align: right; }
+.hero-object .edge { display: block; position: absolute; top: 0; bottom: 0; left: 100%; width: 3px; transform-origin: left center; transform: rotateY(90deg); background: linear-gradient(to bottom, #e6e6e6, #c9c9c9); }
+.hero-object .floor {
+  display: block; position: absolute; left: 6%; right: 0; top: 100%; height: 34%; margin-top: 6px; pointer-events: none; opacity: 1;
+  transform: none; -webkit-mask-image: none; mask-image: none; filter: blur(10px);
+  background: linear-gradient(to bottom, rgba(190,205,255,.16), rgba(190,205,255,0) 80%);
+}
+.hero-object .spill { display: none; }
+@media (max-width: 1023px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-object .obj { --ry: -10deg; --rx: 3deg; margin: 0 auto; }
+}
 @media (max-width: 640px) {
-  .hero-object { --hk: .48; margin-top: 40px; }
-  .hero-object .face .sheet { width: 100%; padding: 6mm 6mm; }
+  .hero-stage { padding: 112px 0 64px; }
+  .hero-object { --hk: .42; }
+  .hero-object .obj { --ry: -6deg; --rx: 2deg; }
+  .hero-object .face .sheet { padding: 8mm 8mm; }
   .hero-object .blade { left: -12px; right: -12px; }
   .blade-count { display: none; }
 }
-@media (min-width: 641px) and (max-width: 1023px) { .hero-object { --hk: .82; } }
-
-/* ---------- the framed stage ---------- */
-.stage { position: relative; overflow: hidden; border-radius: 24px; background: #08090c; box-shadow: 0 40px 100px -40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.06); }
-.stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 70% 40%, rgba(40,60,120,.18), transparent 70%); }
-.stage .scene { z-index: 1; }
 
 /* ---------- reveals ---------- */
 .js [data-reveal] { opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease-soft), transform .7s var(--ease-soft); }

@@ -17,66 +17,103 @@ export function mountSite(): void {
     window.setTimeout(() => revealed.forEach((el) => el.classList.add('is-in')), 1500);
   }
 
-  // The sheet on the stage turns toward the pointer, a little.
+  // The sheet on the stage turns toward the pointer, a little, and toward the reader as the stage leaves.
   const obj = document.querySelector<HTMLElement>('.scene .obj');
+  let baseRy = -16; const baseRx = 4; let tiltX = 0; let tiltY = 0;
+  const wide = () => window.innerWidth > 1023;
+  const pose = () => {
+    if (!obj || !wide()) return;
+    obj.style.setProperty('--ry', `${(baseRy + tiltY).toFixed(2)}deg`);
+    obj.style.setProperty('--rx', `${(baseRx + tiltX).toFixed(2)}deg`);
+  };
   if (obj && !reduce && window.matchMedia('(hover: hover)').matches) {
-    const scene = obj.parentElement as HTMLElement;
     window.addEventListener('pointermove', (e) => {
-      const r = scene.getBoundingClientRect();
-      const mx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      const my = ((e.clientY - r.top) / r.height) * 2 - 1;
-      obj.style.transform = `translate(${mx * 6}px, ${my * 4}px)`;
+      tiltY = ((e.clientX / window.innerWidth) * 2 - 1) * 3;
+      tiltX = -((e.clientY / window.innerHeight) * 2 - 1) * 2;
+      pose();
     }, { passive: true });
   }
 
-  // The stage answers the scroll: the seam walks down the sheet one line at a time,
-  // and only ever rests in the gap between two lines, so no glyph is ever cut in half.
+  // The light reads the sheet one line at a time and only ever rests in the gap between two lines.
+  // On load it drops onto the page and reads the header; the scroll hands it the rest.
   const stage = document.querySelector<HTMLElement>('[data-stage]');
   const sceneEl = document.querySelector<HTMLElement>('.scene');
-  if (stage && sceneEl && !reduce) {
-    gsap.registerPlugin(ScrollTrigger);
+  if (stage && sceneEl) {
     sceneEl.style.animation = 'none';
-    const face = sceneEl.querySelector<HTMLElement>('.face-human');
+    const sheet = sceneEl.querySelector<HTMLElement>('.face-human .sheet');
+    const count = sceneEl.querySelector<HTMLElement>('[data-role="lines-read"]');
     let gaps: number[] = [0, 100];
+    const topIn = (el: HTMLElement, root: HTMLElement) => {
+      let y = 0; let n: HTMLElement | null = el;
+      while (n && n !== root) { y += n.offsetTop; n = n.offsetParent as HTMLElement | null; }
+      return y;
+    };
     const measure = () => {
-      if (!face) return;
-      const fr = face.getBoundingClientRect();
-      const rows = Array.from(face.querySelectorAll<HTMLElement>('h1, h2, p, li'))
-        .map((el) => el.getBoundingClientRect()).filter((r) => r.height > 0)
-        .sort((a, b) => a.top - b.top);
-      const out: number[] = [];
-      let prevBottom = fr.top;
+      if (!sheet) return;
+      const H = sheet.offsetHeight; if (!H) return;
+      const rows = Array.from(sheet.querySelectorAll<HTMLElement>('h1, h2, p, li'))
+        .map((el) => { const top = topIn(el, sheet); return { top, bottom: top + el.offsetHeight }; })
+        .filter((r) => r.bottom > r.top).sort((a, b) => a.top - b.top);
+      const out: number[] = []; let prevBottom = 0;
       for (const r of rows) {
         if (r.top < prevBottom - 1) { prevBottom = Math.max(prevBottom, r.bottom); continue; }
-        out.push((((prevBottom + r.top) / 2 - fr.top) / fr.height) * 100);
-        prevBottom = r.bottom;
+        out.push(((prevBottom + r.top) / 2 / H) * 100); prevBottom = r.bottom;
       }
-      out.push(((prevBottom + 6 - fr.top) / fr.height) * 100);
+      out.push(((prevBottom + 6) / H) * 100);
       if (out.length > 1) gaps = out;
     };
-    // On load the machine has already read the header; the scroll hands it the rest.
     const REST = 3;
-    const count = sceneEl.querySelector<HTMLElement>('[data-role="lines-read"]');
+    const setAt = (i: number) => {
+      sceneEl.style.setProperty('--scan', `${gaps[i].toFixed(2)}%`);
+      if (count) count.textContent = `${i} of ${gaps.length - 1} lines read`;
+    };
     const vars = { p: 0 };
     const apply = () => {
       const last = gaps.length - 1;
-      const i = last > REST ? REST + Math.round(vars.p * (last - REST)) : Math.round(vars.p * last);
-      sceneEl.style.setProperty('--scan', `${gaps[i].toFixed(2)}%`);
-      if (count) count.textContent = `${i} of ${last} lines read`;
+      setAt(last > REST ? REST + Math.round(vars.p * (last - REST)) : Math.round(vars.p * last));
     };
-    measure(); apply();
-    document.fonts?.ready.then(() => { measure(); apply(); });
+    measure();
     window.addEventListener('resize', () => { measure(); apply(); }, { passive: true });
-    gsap.to(vars, { p: 1, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 45%', end: 'bottom 45%', scrub: 0.5 } });
-    gsap.utils.toArray<HTMLElement>('.notes-row li, .steps-row li').forEach((el, i) => {
-      gsap.from(el, { y: 18, opacity: 0, duration: .7, ease: 'power2.out', delay: (i % 4) * 0.08, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-    });
+    const ready: Promise<unknown> = document.fonts ? document.fonts.ready : Promise.resolve();
+    if (reduce) {
+      apply(); ready.then(() => { measure(); apply(); });
+    } else {
+      setAt(0);
+      ready.then(() => {
+        measure(); setAt(0);
+        sceneEl.style.transition = '--scan 1.1s cubic-bezier(.2,.7,.2,1)';
+        let i = 0;
+        const step = () => { i += 1; setAt(Math.min(i, REST)); if (i < REST) window.setTimeout(step, 340); };
+        window.setTimeout(step, 250);
+        window.setTimeout(() => {
+          sceneEl.style.transition = '';
+          gsap.registerPlugin(ScrollTrigger);
+          // Wide screens hold the stage for one screen of scroll while the light reads; phones read on the way past.
+          const rot = { t: 0 };
+          const turn = () => { baseRy = -16 + 11 * rot.t; pose(); };
+          if (wide()) {
+            const tl = gsap.timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: '+=640', pin: true, scrub: 0.5 } });
+            tl.to(vars, { p: 1, ease: 'none', onUpdate: apply }, 0).to(rot, { t: 1, ease: 'none', onUpdate: turn }, 0);
+          } else {
+            gsap.to(vars, { p: 1, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 60%', end: 'bottom 40%', scrub: 0.5 } });
+          }
+          gsap.utils.toArray<HTMLElement>('.notes-row li, .steps-row li').forEach((el, k) => {
+            gsap.from(el, { y: 18, opacity: 0, duration: .7, ease: 'power2.out', delay: (k % 4) * 0.08, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+          });
+        }, 250 + 340 * REST + 400);
+      });
+    }
   }
 
-  // The header is glass only once the page has moved under it.
+  // The header is light on the dark stage, then turns solid and dark on the page below it.
   const head = document.querySelector<HTMLElement>('[data-head]');
   if (head) {
-    const onScroll = () => head.classList.toggle('is-scrolled', window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const box = stage && stage.parentElement && stage.parentElement.classList.contains('pin-spacer') ? stage.parentElement : stage;
+      head.classList.toggle('is-dark', box ? y < box.offsetTop + box.offsetHeight - 64 : false);
+      head.classList.toggle('is-scrolled', y > 24);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
   }

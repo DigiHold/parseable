@@ -136,7 +136,7 @@ const schema = {
 </head>
 <body>
 
-<header class="site-head fixed inset-x-0 top-0 z-40 transition-colors duration-300" data-head>
+<header class="site-head is-dark fixed inset-x-0 top-0 z-40 transition-colors duration-300" data-head>
   <div class="mx-auto grid h-16 max-w-[1180px] grid-cols-[1fr_auto_1fr] items-center px-6">
     <a href="/" class="font-ui text-[16px] font-semibold tracking-[-0.01em] text-ink no-underline">Parseable</a>
     <nav class="hidden items-center gap-7 text-[14px] md:flex">
@@ -151,32 +151,31 @@ const schema = {
 
 <main class="dropzone" data-drop="pdf">
   <!-- the hero: the resume itself, large and flat, read by a blade of light -->
-  <section class="hero-light mx-auto max-w-[1180px] px-6 pt-24 sm:pt-28" data-stage>
-    <div class="hero-copy mx-auto max-w-[720px] text-center">
-      <h1 class="mb-6 font-medium leading-[1.0] tracking-[-0.02em] text-[clamp(40px,5.6vw,80px)]"><span class="block sm:whitespace-nowrap">Get past the software</span><span class="block sm:whitespace-nowrap">and in front of a person</span></h1>
-      <p class="mx-auto mb-7 text-[18px] leading-[1.55] text-ink-2"><span class="sm:block">A free ATS friendly resume checker that runs in your browser,</span> <span class="sm:block">and shows you what the software reads.</span></p>
-      <div class="flex flex-col items-center gap-3">
-        <button class="btn btn-primary btn-xl w-full rounded-none sm:w-auto" data-action="pick-pdf">Upload your resume</button>
-        <p class="m-0 font-mono text-[12px] text-ink-3">A PDF file, and it never leaves your browser.</p>
-      </div>
-      <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
-      <input type="file" accept="application/json,.json" class="hidden" data-file="json">
-      <p class="mt-3 text-[13px] text-ink-3 empty:hidden" data-role="pdf-status"></p>
-    </div>
-
-    <div class="hero-object" aria-label="A sample resume: above the line, the text a screening system has already read from it">
-      <div class="scene">
-        <div class="spill" aria-hidden="true"></div>
-        <div class="obj">
-          <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
-          <div class="face face-machine" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
-          <div class="light" aria-hidden="true"></div>
-          <div class="blade" aria-hidden="true"><span class="blade-count" data-role="lines-read"></span></div>
-          <div class="edge" aria-hidden="true"></div>
+  <section class="hero-stage" data-stage>
+    <div class="hero-grid mx-auto max-w-[1180px] px-6">
+      <div class="hero-copy">
+        <h1><span class="block">Get past the software</span><span class="block">and in front of a person</span></h1>
+        <p class="hero-sub">A free ATS friendly resume checker. It reads your PDF the way screening software does, in your browser, and shows you what came out.</p>
+        <div class="hero-cta">
+          <button class="btn btn-light btn-xl" data-action="pick-pdf">Upload your resume</button>
+          <button type="button" class="hero-link" data-action="sample">Open the sample</button>
         </div>
-        <div class="floor" aria-hidden="true"></div>
+        <input type="file" accept="application/pdf" class="hidden" data-file="pdf">
+        <input type="file" accept="application/json,.json" class="hidden" data-file="json">
+        <p class="hero-status empty:hidden" data-role="pdf-status"></p>
       </div>
-      <p class="hero-caption"><button type="button" data-action="sample">Open this sample in the tool</button></p>
+      <div class="hero-object" aria-label="A sample resume on a dark desk with a line of light reading it; above the line, the text the screening software has already taken from it">
+        <div class="scene">
+          <div class="obj">
+            <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
+            <div class="face face-machine" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
+            <div class="light" aria-hidden="true"></div>
+            <div class="blade" aria-hidden="true"><span class="blade-count" data-role="lines-read"></span></div>
+            <div class="edge" aria-hidden="true"></div>
+          </div>
+          <div class="floor" aria-hidden="true"></div>
+        </div>
+      </div>
     </div>
   </section>
 
