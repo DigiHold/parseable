@@ -193,10 +193,10 @@ body[data-view='parser'] .zoomctl { display: none; }
 @property --scan { syntax: '<percentage>'; inherits: true; initial-value: 52%; }
 .scene {
   --scan: 52%;
-  position: relative; width: 100%; max-width: 440px; margin: 0 auto; aspect-ratio: 210 / 262;
+  position: relative; width: 100%; max-width: 400px; margin: 0 auto; aspect-ratio: 210 / 262;
   perspective: 1500px; perspective-origin: 30% 45%;
 }
-@media (min-width: 1024px) { .scene { margin: 0 0 0 auto; max-width: 440px; transform: none; } }
+@media (min-width: 1024px) { .scene { margin: 0 auto; max-width: 400px; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
   .scene { animation: scan 14s cubic-bezier(.45, 0, .2, 1) infinite; }
   @keyframes scan {
@@ -204,22 +204,22 @@ body[data-view='parser'] .zoomctl { display: none; }
   }
 }
 .obj {
-  --rx: 2deg; --ry: -11deg;
+  --rx: 2deg; --ry: -8deg;
   position: absolute; inset: 0; transform-style: preserve-3d;
   transform: rotateY(var(--ry)) rotateX(var(--rx)) rotateZ(0.6deg);
   transition: transform .9s var(--ease-soft);
   box-shadow:
-    -34px 60px 80px -18px rgba(0, 0, 0, .8),
-    -6px 10px 24px -8px rgba(0, 0, 0, .55),
-    1px 0 0 0 #d6d4cf;
+    -34px 70px 80px -18px rgba(0, 0, 0, .85),
+    -6px 12px 24px -8px rgba(0, 0, 0, .6),
+    2px 0 0 0 #dad8d3, 4px 2px 0 0 #b9b7b2;
 }
 .face {
-  position: absolute; inset: 0; overflow: hidden; background: #fbfbf9;
+  position: absolute; inset: 0; overflow: hidden; background: #ffffff; backface-visibility: hidden;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .face .sheet {
   width: 210mm; min-height: 0; box-shadow: none; background: transparent; --s-accent: #17181c;
-  transform: scale(var(--k, .554)); transform-origin: top left; padding: 15mm 15mm; -webkit-font-smoothing: antialiased;
+  transform: scale(var(--k, .504)); transform-origin: top left; padding: 15mm 15mm; -webkit-font-smoothing: antialiased;
 }
 .face .sheet p, .face .sheet li { white-space: nowrap; }
 .face-human { clip-path: inset(0 0 calc(100% - var(--scan)) 0); z-index: 2; }
@@ -245,7 +245,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 }
 .light::after {
   content: ''; position: absolute; inset: 0; mix-blend-mode: screen;
-  background: radial-gradient(140% 34px at 50% var(--scan), rgba(215,225,245,.6), rgba(215,225,245,0) 100%);
+  background: radial-gradient(140% 90px at 50% var(--scan), rgba(220,230,250,.75), rgba(220,230,250,0) 100%);
 }
 .blade {
   position: absolute; left: 0; right: 0; top: var(--scan); height: 2px; z-index: 4; pointer-events: none;
@@ -255,7 +255,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .floor {
   position: absolute; left: 8%; right: -6%; top: 100%; height: 34%; pointer-events: none;
   background: linear-gradient(to bottom, rgba(120,140,190,.16), rgba(120,140,190,0));
-  transform: rotateY(-17deg) scaleY(-1) translateY(2px); filter: blur(14px); opacity: .7;
+  transform: rotateY(-8deg) scaleY(-1) translateY(2px); filter: blur(16px); opacity: .9;
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent 80%); mask-image: linear-gradient(to bottom, #000, transparent 80%);
 }
 .spill {
@@ -264,7 +264,7 @@ body[data-view='parser'] .zoomctl { display: none; }
   filter: blur(20px);
 }
 @media (prefers-reduced-motion: reduce) { .hero-copy > * { animation: none; } .scene { animation: none; } }
-@media (max-width: 640px) { .scene { max-width: 100%; aspect-ratio: 210 / 150; transform: none; } .face .sheet { --k: .44; } .obj { --ry: -6deg; --rx: 2deg; } .scene .face { overflow: hidden; } }
+@media (max-width: 640px) { .scene { max-width: 250px; aspect-ratio: 210 / 262; transform: none; } .face .sheet { --k: .315; } .obj { --ry: -6deg; --rx: 2deg; } }
 
 /* ---------- the tool, one framed panel at viewport height ---------- */
 .tool { border: 1px solid var(--color-rule); }
@@ -302,7 +302,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .panel pre i { font-style: normal; color: #fff; background: rgba(120,160,255,.22); box-shadow: 0 0 0 3px rgba(120,160,255,.22); border-radius: 2px; }
 .mk { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--color-ink); color: #fff; font: 500 11px/1 var(--font-mono); vertical-align: middle; box-shadow: none; }
 .label { font: 400 12.5px/1 var(--font-mono); color: var(--color-ink-3); letter-spacing: .02em; text-transform: uppercase; }
-.panel pre i.mk { background: #fff; color: #08090c; box-shadow: none; padding: 0; margin-left: 2px; }
+.panel pre i.mk { background: #fff; color: #08090c; box-shadow: none; padding: 0; margin-left: 4px; border-radius: 50%; width: 20px; height: 20px; }
 .shot { margin: 0; border: 1px solid rgba(0,0,0,.08); border-radius: 20px; overflow: hidden; background: #fff; box-shadow: 0 20px 60px -30px rgba(0,0,0,.3); transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft); }
 .shot:hover { transform: translateY(-4px); box-shadow: 0 30px 70px -30px rgba(0,0,0,.35); }
 .shot img { display: block; width: 100%; height: auto; }
