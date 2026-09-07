@@ -276,6 +276,9 @@ body[data-view='parser'] .zoomctl { display: none; }
 }
 @media (max-width: 1023px) { .tool-form { border-bottom: 1px solid var(--color-rule); } }
 
+/* ---------- the header turns solid once the page moves under it ---------- */
+.site-head.is-scrolled { background: rgba(244,244,242,.88); backdrop-filter: blur(12px); box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+
 /* ---------- the framed stage ---------- */
 .stage { position: relative; overflow: hidden; border-radius: 28px; background: #08090c; box-shadow: 0 40px 100px -40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.06); }
 .stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 70% 40%, rgba(40,60,120,.18), transparent 70%); }
