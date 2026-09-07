@@ -29,18 +29,40 @@ export function mountSite(): void {
     }, { passive: true });
   }
 
-  // The stage answers the scroll: the blade sweeps the page as the reader moves,
-  // and the sheet turns to face the reader as the stage leaves the viewport.
+  // The stage answers the scroll: the seam walks down the sheet one line at a time,
+  // and only ever rests in the gap between two lines, so no glyph is ever cut in half.
   const stage = document.querySelector<HTMLElement>('[data-stage]');
   const sceneEl = document.querySelector<HTMLElement>('.scene');
   if (stage && sceneEl && !reduce) {
     gsap.registerPlugin(ScrollTrigger);
     sceneEl.style.animation = 'none';
-    const vars = { scan: 30 };
-    const apply = () => sceneEl.style.setProperty('--scan', `${vars.scan}%`);
-    apply();
-    gsap.to(vars, { scan: 92, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 80%', end: 'bottom 30%', scrub: 0.6 } });
-    const objEl = sceneEl.querySelector<HTMLElement>('.obj');
+    const face = sceneEl.querySelector<HTMLElement>('.face-human');
+    let gaps: number[] = [0, 100];
+    const measure = () => {
+      if (!face) return;
+      const fr = face.getBoundingClientRect();
+      const rows = Array.from(face.querySelectorAll<HTMLElement>('h1, h2, p, li'))
+        .map((el) => el.getBoundingClientRect()).filter((r) => r.height > 0)
+        .sort((a, b) => a.top - b.top);
+      const out: number[] = [];
+      let prevBottom = fr.top;
+      for (const r of rows) {
+        if (r.top < prevBottom - 1) { prevBottom = Math.max(prevBottom, r.bottom); continue; }
+        out.push((((prevBottom + r.top) / 2 - fr.top) / fr.height) * 100);
+        prevBottom = r.bottom;
+      }
+      out.push(((prevBottom + 6 - fr.top) / fr.height) * 100);
+      if (out.length > 1) gaps = out;
+    };
+    const vars = { p: 0 };
+    const apply = () => {
+      const i = Math.round(vars.p * (gaps.length - 1));
+      sceneEl.style.setProperty('--scan', `${gaps[i].toFixed(2)}%`);
+    };
+    measure(); apply();
+    document.fonts?.ready.then(() => { measure(); apply(); });
+    window.addEventListener('resize', () => { measure(); apply(); }, { passive: true });
+    gsap.to(vars, { p: 1, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 45%', end: 'bottom 45%', scrub: 0.5 } });
     gsap.utils.toArray<HTMLElement>('.notes-row li, .steps-row li').forEach((el, i) => {
       gsap.from(el, { y: 18, opacity: 0, duration: .7, ease: 'power2.out', delay: (i % 4) * 0.08, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     });
