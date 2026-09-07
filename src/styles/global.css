@@ -54,7 +54,7 @@
 
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body { @apply m-0 bg-[#f4f4f2] text-ink font-sans text-[17px] leading-relaxed antialiased; }
+  body { @apply m-0 bg-[#efefec] text-ink font-sans text-[17px] leading-relaxed antialiased; }
   a { text-decoration-thickness: 1px; text-underline-offset: 4px; }
   h1, h2 { @apply font-display font-semibold leading-[1.02] tracking-[-0.03em] m-0; text-wrap: balance; }
   h3, h4 { @apply font-ui font-semibold leading-tight tracking-[-0.015em] m-0; }
@@ -280,34 +280,38 @@ body[data-view='parser'] .zoomctl { display: none; }
 @media (max-width: 1023px) { .tool-form { border-bottom: 1px solid var(--color-rule); } }
 
 /* ---------- the header turns solid once the page moves under it ---------- */
-.site-head.is-scrolled { background: #f4f4f2; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+.site-head.is-scrolled { background: #efefec; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
 
 /* ---------- the hero object: the whole sheet, flat, at reading size ---------- */
 .hero-object { --hk: .857; position: relative; margin: 56px auto 0; max-width: 680px; }
-.hero-caption { margin: 0 0 10px; text-align: right; font-size: 13px; line-height: 1.4; color: var(--color-ink-3); }
+.hero-copy h1 { font-family: var(--font-serif); }
+.hero-copy .btn { border-radius: 0; }
+.hero-caption { margin: 14px 0 0; text-align: right; font: 400 12px/1.4 var(--font-mono); color: var(--color-ink-3); }
 .hero-caption button { cursor: pointer; border: 0; background: none; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--color-edge); }
 .hero-caption button:hover { color: var(--color-ink); text-decoration-color: currentColor; }
 .hero-object .scene { max-width: none; width: 100%; aspect-ratio: auto; height: auto; margin: 0; perspective: none; overflow: visible; border-radius: 0; transition: --scan .22s ease-out; }
 .hero-object .obj {
   --rx: 0deg; --ry: 0deg; position: relative; inset: auto; transform: none; transform-style: flat; border-radius: 0;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.12), 0 24px 48px -32px rgba(0,0,0,.25);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.18);
 }
 .hero-object .face { border-radius: 0; background-image: none; background: #fff; }
 /* the machine reads top down: what it has read sits above the seam in its own face */
 .hero-object .face-human { position: relative; clip-path: inset(var(--scan) 0 0 0); }
 .hero-object .face-machine { clip-path: inset(0 0 calc(100% - var(--scan)) 0); }
-.hero-object .face .sheet { transform: none; zoom: var(--hk); padding: 12mm 13mm; min-height: 297mm; }
+.hero-object .face .sheet { transform: none; zoom: var(--hk); padding: 12mm 13mm; min-height: 0; }
 .hero-object .sheet, .hero-object .sheet * { font-family: var(--font-serif); }
 .hero-object .sheet .s-name, .hero-object .sheet .s-item-title, .hero-object .sheet .s-skill b { font-weight: 500; }
 .hero-object .sheet h2 { font-weight: 500; letter-spacing: .06em; }
 .hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { font-family: var(--font-mono) !important; color: #111 !important; }
 .hero-object .lit { background: none !important; color: inherit !important; padding: 0; margin: 0; border-radius: 0; }
 .hero-object .spill, .hero-object .floor, .hero-object .light, .hero-object .edge { display: none; }
-.hero-object .blade { left: -28px; right: -28px; height: 1px; background: var(--color-ink); box-shadow: none; }
+.hero-object .blade { left: -28px; right: -28px; height: 1px; background: var(--color-ink); box-shadow: none; overflow: visible; }
+.blade-count { position: absolute; left: 100%; top: -6px; margin-left: 12px; font: 400 11px/1 var(--font-mono); color: var(--color-ink-3); white-space: nowrap; }
 @media (max-width: 640px) {
   .hero-object { --hk: .48; margin-top: 40px; }
   .hero-object .face .sheet { width: 100%; padding: 6mm 6mm; }
   .hero-object .blade { left: -12px; right: -12px; }
+  .blade-count { display: none; }
 }
 @media (min-width: 641px) and (max-width: 1023px) { .hero-object { --hk: .82; } }
 

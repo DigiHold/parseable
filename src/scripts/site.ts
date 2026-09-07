@@ -54,10 +54,15 @@ export function mountSite(): void {
       out.push(((prevBottom + 6 - fr.top) / fr.height) * 100);
       if (out.length > 1) gaps = out;
     };
+    // On load the machine has already read the header; the scroll hands it the rest.
+    const REST = 3;
+    const count = sceneEl.querySelector<HTMLElement>('[data-role="lines-read"]');
     const vars = { p: 0 };
     const apply = () => {
-      const i = Math.round(vars.p * (gaps.length - 1));
+      const last = gaps.length - 1;
+      const i = last > REST ? REST + Math.round(vars.p * (last - REST)) : Math.round(vars.p * last);
       sceneEl.style.setProperty('--scan', `${gaps[i].toFixed(2)}%`);
+      if (count) count.textContent = `${i} of ${last} lines read`;
     };
     measure(); apply();
     document.fonts?.ready.then(() => { measure(); apply(); });
