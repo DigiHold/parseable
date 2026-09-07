@@ -70,7 +70,7 @@ const PHRASE_PATTERNS = [
 const STOP_TAIL = /\b(and|or|with|the|a|an|to|in|of|for|is|are|such as|including|etc|our|your|their)\b\s*$/i;
 
 
-const norm = (s: string) =>
+export const norm = (s: string) =>
   s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ');
 
 /* One requirement must count once. A posting that says "Kubernetes" and a resume
@@ -86,7 +86,7 @@ const CANON = new Map<string, string>();
 for (const group of CANON_GROUPS) for (const form of group) CANON.set(norm(form), group[0]);
 const canonical = (term: string) => CANON.get(norm(term)) ?? term;
 
-function present(term: string, haystack: string): boolean {
+export function present(term: string, haystack: string): boolean {
   const forms = [term, ...(ALIASES[term] || [])];
   return forms.some((f) => {
     const p = norm(f).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+');

@@ -86,6 +86,15 @@ check('a posting title that is missing is reported', (await page.locator('[data-
 await page.click('[data-action="use-title"]'); await page.waitForTimeout(300);
 check('the posting title becomes the resume title', (await page.locator('#sheet').innerText()).includes('Platform Engineer'));
 check('the title then reads as matched', (await page.locator('[data-action="use-title"]').count()) === 0);
+// the title is read from the posting's first line, and tailoring is one undoable click
+await page.fill('[data-role="posting-title"]', '');
+await page.fill('[data-role="posting"]', 'Platform Engineer (Remote)\nRequirements\n- Strong experience with Docker and Kubernetes\n- Must have Zig'); await page.waitForTimeout(200);
+check('the job title is read from the posting', (await page.locator('[data-role="posting-title"]').inputValue()) === 'Platform Engineer');
+await page.click('[data-action="run-audit"]'); await page.waitForTimeout(300);
+await page.click('[data-action="tailor"]'); await page.waitForTimeout(300);
+check('tailoring reports what it changed', (await page.locator('[data-action="undo-tailor"]').count()) === 1);
+await page.click('[data-action="undo-tailor"]'); await page.waitForTimeout(300);
+check('undo brings the tailor button back', (await page.locator('[data-action="tailor"]').count()) === 1);
 const missing = page.locator('button.chip-miss').first();
 const missingTerm = await missing.innerText();
 await missing.click(); await page.waitForTimeout(200);

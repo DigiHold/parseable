@@ -2,6 +2,7 @@ import type { Resume, TemplateId } from './types';
 import { emptyResume, normalise } from './types';
 import { renderSheet, renderParserText } from './render';
 import { audit, type Audit } from './keywords';
+import { tailor, guessTitle, describe, type TailorLog } from './tailor';
 
 type StepId = 'details' | 'template' | 'posting' | 'export';
 const STEPS: StepId[] = ['details', 'template', 'posting', 'export'];
@@ -16,6 +17,8 @@ let step: StepId = 'details';
 let started = false;
 let posting = '';
 let postingTitle = '';
+let tailorLog: TailorLog | null = null;
+let beforeTailor: string | null = null;
 let lastAudit: Audit | null = null;
 let zoom = 0.66;
 
@@ -223,7 +226,11 @@ function renderAudit(a: Audit): string {
       ${a.requiredPct < 80 ? `<div class="notice"><strong>Below the usual 80% mark</strong>Place the missing terms where they are honestly true, in your summary, your skills or a real bullet. A term you cannot place honestly stays missing, and that is a genuine gap rather than a formatting problem.</div>` : ''}
       <div class="mb-4"><h3 class="mb-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-ink-2">Required</h3>${chips(req)}</div>
       <div class="mb-2"><h3 class="mb-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-ink-2">Preferred (${a.preferredHit}/${a.preferredTotal})</h3>${chips(pref)}</div>
-      <p class="text-[12.5px] text-ink-3">Your skill groups have been reordered so the ones this posting asks about come first. Nothing was reworded and nothing was added. Click a missing term to put it in, and only do that when it is genuinely true of you, because it will be the first thing an interviewer asks about.</p>
+      <p class="text-[12.5px] text-ink-3">Click a missing term to put it in, and only do that when it is genuinely true of you, because it will be the first thing an interviewer asks about.</p>
+      ${tailorLog
+        ? `<div class="notice mt-4"><strong>Tailored to this posting</strong>${esc(describe(tailorLog))} Nothing was reworded, added or removed.<div class="mt-2"><button class="btn btn-ghost btn-sm" data-action="undo-tailor">Undo</button></div></div>`
+        : `<button class="btn btn-primary mt-4 w-full" data-action="tailor">Tailor my resume to this posting</button>
+           <p class="mt-2 text-[12.5px] text-ink-3">It takes the posting's title when yours differs, and moves the skills and bullets it scores to the front of their lists. Nothing is reworded, added or removed, and one click undoes it.</p>`}
     </div>`;
 }
 
@@ -339,25 +346,6 @@ function print() {
 
 function goto(id: StepId) { step = id; started = true; render(); $('#workspace')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 
-/**
- * Puts the skill groups this posting cares about at the top, ordered by how many
- * of its required terms each group carries. Placement is the second thing a
- * requisition scores after presence, and reordering rows the person wrote
- * themselves invents nothing: no wording changes, no skill is added or removed.
- */
-function tailorSkillOrder(a: Audit) {
-  const wanted = a.keywords.filter((k) => k.required && k.found).map((k) => k.term.toLowerCase());
-  if (!wanted.length) return;
-  const weight = (row: { label: string; items: string }) => {
-    const hay = `${row.label} ${row.items}`.toLowerCase();
-    return wanted.filter((t) => hay.includes(t)).length;
-  };
-  data.skills = data.skills
-    .map((row, i) => ({ row, i, w: weight(row) }))
-    .sort((x, y) => y.w - x.w || x.i - y.i)
-    .map((x) => x.row);
-}
-
 /* ------------------------------------------------------------------ wiring */
 
 function bootstrap() {
@@ -366,7 +354,14 @@ function bootstrap() {
 
   document.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement | HTMLTextAreaElement;
-    if (el.dataset.role === 'posting') { posting = el.value; save(); return; }
+    if (el.dataset.role === 'posting') {
+      posting = el.value;
+      if (!postingTitle.trim()) {
+        const guess = guessTitle(posting);
+        if (guess) { postingTitle = guess; const f = $<HTMLInputElement>('#f-post-title'); if (f) f.value = guess; }
+      }
+      save(); return;
+    }
     if (el.dataset.role === 'posting-title') { postingTitle = el.value; save(); return; }
     const path = el.dataset.bind;
     if (!path) return;
@@ -472,8 +467,25 @@ function bootstrap() {
       const sheet = $('#sheet');
       if (!sheet || !posting.trim()) return;
       lastAudit = audit(posting, renderParserText(sheet), postingTitle);
-      tailorSkillOrder(lastAudit);
       render();
+    }
+    if (action === 'tailor') {
+      const sheet = $('#sheet');
+      if (!sheet || !lastAudit) return;
+      beforeTailor = beforeTailor ?? JSON.stringify(data);
+      tailorLog = tailor(data, lastAudit);
+      renderPreview();
+      lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      save(); render(); return;
+    }
+    if (action === 'undo-tailor') {
+      if (!beforeTailor) return;
+      data = normalise(JSON.parse(beforeTailor));
+      beforeTailor = null; tailorLog = null;
+      renderPreview();
+      const sheet = $('#sheet');
+      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      save(); render(); return;
     }
   });
 
