@@ -44,6 +44,7 @@
 }
 
 @font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/plex-1.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/plex-mono-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-2.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-3.woff2') format('woff2'); font-weight: 500; font-display: swap; }
 @font-face { font-family: 'IBM Plex Sans'; src: url('/fonts/plex-4.woff2') format('woff2'); font-weight: 600; font-display: swap; }

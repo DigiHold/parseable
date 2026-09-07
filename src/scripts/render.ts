@@ -8,10 +8,11 @@ const has = (s: string) => s.trim().length > 0;
 /** Renders the sheet. Section order is the order an ATS reads, so it is also the order that scores. */
 export function renderSheet(r: Resume): string {
   const b = r.basics;
+  const sep = r.settings.template === 'editorial' || r.settings.template === 'portrait' ? '\u00b7' : '|';
   const contact = [b.email, b.phone, b.location, ...b.links.map((l) => l.label || l.url)]
     .filter(has)
     .map((x) => `<span>${esc(x)}</span>`)
-    .join('<span class="sep">|</span>');
+    .join(`<span class="sep">${sep}</span>`);
 
   const photo = r.settings.showPhoto && b.photo
     ? `<img class="s-photo" src="${b.photo}" alt="${esc(b.name)}">`

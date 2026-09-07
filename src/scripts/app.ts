@@ -136,11 +136,11 @@ function panelTemplate(): string {
   const tpls: Array<{ id: TemplateId; name: string; desc: string }> = [
     { id: 'classic', name: 'Classic', desc: 'Helvetica under a firm rule, the shape most recruiters expect.' },
     { id: 'editorial', name: 'Editorial', desc: 'Plex Serif with an oxblood accent, it reads like a printed book.' },
-    { id: 'signal', name: 'Signal', desc: 'A big sans name with orange marks, made to be noticed.' },
+    { id: 'signal', name: 'Signal', desc: 'A very large name and orange headings, made to be noticed.' },
     { id: 'mono', name: 'Mono', desc: 'Plex Mono with a blue accent, plain and exact for engineers.' },
-    { id: 'portrait', name: 'Portrait', desc: 'Centred serif with gold hairlines, made for a photo.' },
-    { id: 'open', name: 'Open', desc: 'More air and a green accent, for a shorter career.' },
-    { id: 'compact', name: 'Compact', desc: 'Dense and achromatic, for a long career held on one page.' },
+    { id: 'portrait', name: 'Portrait', desc: 'A centred serif header built around a photo.' },
+    { id: 'open', name: 'Open', desc: 'Plex Sans with air and a green accent, for a shorter career.' },
+    { id: 'compact', name: 'Ledger', desc: 'Dates in their own column, a rule above each section, for a long career.' },
   ];
   const mini = renderSheet(data);
   const b = data.basics;
