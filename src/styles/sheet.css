@@ -39,6 +39,8 @@
 .s-role { font-size: 10.8pt; color: var(--s-mut); font-weight: 500; margin: 0 0 6px; }
 .s-contact { font-size: 8.9pt; color: #45403a; margin: 0; }
 .s-contact .sep { color: var(--s-accent); padding: 0 5px; }
+.s-contact > span { white-space: nowrap; }
+.s-contact .sep { white-space: normal; }
 
 .sheet h2 {
   font-size: 9.6pt; text-transform: uppercase; font-weight: 700;
@@ -76,6 +78,7 @@
 .sheet[data-tpl="compact"] .s-item-org { padding-left: 24mm; font-style: normal; color: var(--s-mut); margin-bottom: 2px; }
 .sheet[data-tpl="compact"] ul { padding-left: calc(24mm + 12px); }
 .sheet[data-tpl="compact"] .s-env { padding-left: 24mm; }
+.sheet[data-tpl="compact"] .s-summary, .sheet[data-tpl="compact"] .s-skill, .sheet[data-tpl="compact"] section > p { padding-left: 24mm; }
 .sheet[data-tpl="compact"] li::marker { color: #8a8a8a; }
 
 /* -- template: open. Plex Sans, air, a green accent, one rule under the name and nothing else. -- */
@@ -88,16 +91,16 @@
   font-family: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   padding: 16mm 17mm;
 }
-.sheet[data-tpl="open"] .s-head { border-bottom: 1px solid var(--s-accent); padding-bottom: 12px; margin-bottom: 18px; }
-.sheet[data-tpl="open"] .s-name { font-size: 26pt; font-weight: 500; letter-spacing: -.5px; }
-.sheet[data-tpl="open"] .s-role { font-size: 11.4pt; color: var(--s-accent); font-weight: 500; }
+.sheet[data-tpl="open"] .s-head { border-bottom: none; padding-bottom: 0; margin-bottom: 20px; }
+.sheet[data-tpl="open"] .s-name { font-size: 26pt; font-weight: 600; letter-spacing: -.5px; }
+.sheet[data-tpl="open"] .s-role { font-size: 11.4pt; color: var(--s-mut); font-weight: 400; }
 .sheet[data-tpl="open"] .s-contact .sep { color: var(--s-rule); }
-.sheet[data-tpl="open"] h2 { font-size: 11pt; font-weight: 500; text-transform: none; border-bottom: none; color: var(--s-ink); margin: 20px 0 7px; padding-bottom: 0; }
+.sheet[data-tpl="open"] h2 { font-size: 11.5pt; font-weight: 600; text-transform: none; border-bottom: none; color: var(--s-accent); margin: 20px 0 7px; padding-bottom: 0; }
 .sheet[data-tpl="open"] .s-item { margin-bottom: 13px; }
 .sheet[data-tpl="open"] .s-item-title { font-weight: 600; }
-.sheet[data-tpl="open"] .s-item-dates { color: var(--s-accent); font-weight: 500; }
+.sheet[data-tpl="open"] .s-item-dates { color: var(--s-mut); font-weight: 400; }
 .sheet[data-tpl="open"] .s-item-org { font-style: normal; color: var(--s-mut); }
-.sheet[data-tpl="open"] li::marker { color: var(--s-accent); }
+.sheet[data-tpl="open"] li::marker { color: var(--s-mut); }
 
 /* -- template: editorial. Plex Serif throughout, an oxblood accent, the page of a printed book. -- */
 .sheet[data-tpl="editorial"] {
@@ -114,10 +117,11 @@
 .sheet[data-tpl="editorial"] .s-role { font-size: 11.5pt; font-weight: 400; font-style: italic; color: var(--s-accent); }
 .sheet[data-tpl="editorial"] .s-contact { font-size: 9pt; }
 .sheet[data-tpl="editorial"] .s-contact .sep { color: var(--s-accent); padding: 0 6px; }
-.sheet[data-tpl="editorial"] h2 { font-size: 12pt; font-weight: 500; text-transform: none; color: var(--s-ink); border-bottom: none; margin: 20px 0 6px; padding-bottom: 0; }
+.sheet[data-tpl="editorial"] h2 { font-size: 12.5pt; font-weight: 700; text-transform: none; color: var(--s-ink); border-bottom: none; margin: 20px 0 6px; padding-bottom: 0; }
 .sheet[data-tpl="editorial"] .s-item { margin-bottom: 12px; }
-.sheet[data-tpl="editorial"] .s-item-title { font-size: 10.6pt; font-weight: 700; }
-.sheet[data-tpl="editorial"] .s-item-dates { font-weight: 400; font-style: italic; color: var(--s-ink); }
+.sheet[data-tpl="editorial"] .s-item-head { flex-direction: column; align-items: flex-start; gap: 0; }
+.sheet[data-tpl="editorial"] .s-item-title { font-size: 10.6pt; font-weight: 500; }
+.sheet[data-tpl="editorial"] .s-item-dates { font-weight: 400; font-size: 9pt; color: var(--s-mut); margin: 1px 0 1px; }
 .sheet[data-tpl="editorial"] .s-item-org { font-style: italic; color: var(--s-accent); }
 .sheet[data-tpl="editorial"] li::marker { color: var(--s-accent); }
 
@@ -129,13 +133,13 @@
   --s-fs: 8.9pt;
   --s-lh: 1.5;
   font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
-  padding: 14mm 15mm;
+  padding: 16mm 18mm;
 }
-.sheet[data-tpl="mono"] .s-head { border-bottom: 1px solid var(--s-ink); padding-bottom: 9px; margin-bottom: 14px; }
+.sheet[data-tpl="mono"] .s-head { border-bottom: none; padding-bottom: 0; margin-bottom: 16px; }
 .sheet[data-tpl="mono"] .s-name { font-size: 19pt; font-weight: 600; letter-spacing: 0; }
 .sheet[data-tpl="mono"] .s-role { font-weight: 400; color: var(--s-ink); font-size: 10.2pt; }
-.sheet[data-tpl="mono"] .s-contact { font-size: 8.4pt; color: var(--s-mut); }
-.sheet[data-tpl="mono"] h2 { font-size: 9pt; font-weight: 600; color: var(--s-accent); border-bottom: 1px solid var(--s-rule); margin: 16px 0 7px; }
+.sheet[data-tpl="mono"] .s-contact { font-size: 7.9pt; color: var(--s-mut); }
+.sheet[data-tpl="mono"] h2 { font-size: 9.2pt; font-weight: 600; color: var(--s-accent); border-bottom: none; padding-bottom: 0; margin: 16px 0 6px; }
 .sheet[data-tpl="mono"] .s-item-title { font-size: 9.4pt; font-weight: 600; }
 .sheet[data-tpl="mono"] .s-item-org { font-style: normal; color: var(--s-mut); }
 .sheet[data-tpl="mono"] .s-item-dates { font-weight: 400; color: var(--s-mut); }
@@ -154,15 +158,16 @@
   padding: 15mm 16mm;
 }
 .sheet[data-tpl="signal"] .s-head { border-bottom: none; padding-bottom: 0; margin-bottom: 18px; }
-.sheet[data-tpl="signal"] .s-name { font-size: 36pt; font-weight: 600; letter-spacing: -1.2px; line-height: .98; margin-bottom: 6px; }
+.sheet[data-tpl="signal"] .s-name { font-size: 28pt; font-weight: 600; letter-spacing: -.9px; line-height: 1; margin-bottom: 5px; }
 .sheet[data-tpl="signal"] .s-role { font-size: 12pt; font-weight: 500; color: var(--s-ink); margin-bottom: 8px; }
 .sheet[data-tpl="signal"] .s-contact { color: var(--s-mut); }
-.sheet[data-tpl="signal"] .s-contact .sep { color: var(--s-accent); }
+.sheet[data-tpl="signal"] .s-contact .sep { color: #b9b9b9; }
 .sheet[data-tpl="signal"] h2 { font-size: 10pt; font-weight: 600; color: var(--s-accent); border-bottom: none; padding-bottom: 0; margin: 18px 0 6px; }
-.sheet[data-tpl="signal"] .s-item-title { font-weight: 600; font-size: 10.6pt; }
-.sheet[data-tpl="signal"] .s-item-dates { color: var(--s-ink); font-weight: 500; }
-.sheet[data-tpl="signal"] .s-item-org { font-style: normal; font-weight: 500; color: var(--s-mut); }
-.sheet[data-tpl="signal"] li::marker { color: var(--s-accent); }
+.sheet[data-tpl="signal"] .s-item { display: flex; flex-direction: column; }
+.sheet[data-tpl="signal"] .s-item-org { order: -1; font-style: normal; font-weight: 600; color: var(--s-ink); font-size: 10.6pt; margin: 0; }
+.sheet[data-tpl="signal"] .s-item-title { font-weight: 400; font-size: 10pt; color: var(--s-ink); }
+.sheet[data-tpl="signal"] .s-item-dates { color: var(--s-mut); font-weight: 400; }
+.sheet[data-tpl="signal"] li::marker { color: var(--s-mut); }
 
 /* -- template: portrait. A centred header around the photo, then a quiet serif page. -- */
 .sheet[data-tpl="portrait"] {
@@ -177,11 +182,11 @@
 .sheet[data-tpl="portrait"] .s-head { flex-direction: column; align-items: center; text-align: center; gap: 10px; border-bottom: 1px solid var(--s-ink); padding-bottom: 14px; margin-bottom: 18px; }
 .sheet[data-tpl="portrait"] .s-head-txt { width: 100%; }
 .sheet[data-tpl="portrait"] .s-photo { order: -1; width: 30mm; height: 30mm; border-radius: 50%; }
-.sheet[data-tpl="portrait"] .s-name { font-size: 24pt; font-weight: 700; }
+.sheet[data-tpl="portrait"] .s-name { font-size: 30pt; font-weight: 700; letter-spacing: -.4px; }
 .sheet[data-tpl="portrait"] .s-role { font-style: italic; font-weight: 400; color: var(--s-accent); font-size: 11pt; }
 .sheet[data-tpl="portrait"] .s-contact .sep { color: var(--s-accent); padding: 0 6px; }
-.sheet[data-tpl="portrait"] h2 { font-size: 9.2pt; font-weight: 500; color: var(--s-ink); border-bottom: 1px solid var(--s-rule); margin: 18px 0 7px; }
-.sheet[data-tpl="portrait"] .s-item-title { font-weight: 700; }
+.sheet[data-tpl="portrait"] h2 { font-size: 10pt; font-weight: 700; color: var(--s-ink); border-bottom: none; padding-bottom: 0; margin: 18px 0 6px; }
+.sheet[data-tpl="portrait"] .s-item-title { font-weight: 500; }
 .sheet[data-tpl="portrait"] .s-item-dates { font-weight: 400; font-style: italic; color: var(--s-ink); }
 .sheet[data-tpl="portrait"] .s-item-org { font-style: italic; color: var(--s-mut); }
 .sheet[data-tpl="portrait"] li::marker { color: var(--s-accent); }
