@@ -4,14 +4,16 @@
  * Everything here is a reorder of what the person wrote: skill groups, the terms
  * inside them and the bullets of each role move so the ones the posting scores
  * come first, because placement is the second thing a requisition scores after
- * presence. The only text that changes is the job title, and only to the one the
- * posting uses. Nothing is added, nothing is removed, and one snapshot undoes it.
+ * presence. No text changes at all: not a word is added, reworded or removed, no
+ * degree, employer or skill appears that the person did not write, and the job
+ * title only changes when the person clicks the button that says so. One snapshot
+ * undoes the reorder.
  */
 import type { Resume } from './types';
 import type { Audit } from './keywords';
 import { norm, present } from './keywords';
 
-export interface TailorLog { title: boolean; skillGroups: number; skillItems: number; bullets: number; }
+export interface TailorLog { skillGroups: number; skillItems: number; bullets: number; }
 
 const ROLE_WORD = /\b(engineer|developer|designer|manager|lead|architect|analyst|scientist|consultant|specialist|director|head|intern|administrator|technician|marketer|writer|recruiter|accountant|officer|coordinator|assistant|ingénieur|développeur|développeuse|chef|responsable|concepteur|conceptrice|analyste|stagiaire|alternant|alternante)\b/i;
 
@@ -36,12 +38,7 @@ export function tailor(data: Resume, a: Audit): TailorLog {
   const required = a.keywords.filter((k) => k.required).map((k) => k.term);
   const all = a.keywords.map((k) => k.term);
   const weight = (text: string) => hits(text, required) * 10 + hits(text, all);
-  const log: TailorLog = { title: false, skillGroups: 0, skillItems: 0, bullets: 0 };
-
-  if (a.title && !a.title.exact && norm(data.basics.title) !== norm(a.title.wanted)) {
-    data.basics.title = a.title.wanted;
-    log.title = true;
-  }
+  const log: TailorLog = { skillGroups: 0, skillItems: 0, bullets: 0 };
 
   const groupsBefore = data.skills.map((row) => `${row.label}|${row.items}`);
   data.skills = byWeight(data.skills, (row) => weight(`${row.label} ${row.items}`));
@@ -65,7 +62,6 @@ export function tailor(data: Resume, a: Audit): TailorLog {
 /** One line per change, written for the person, not for a log file. */
 export function describe(log: TailorLog): string {
   const out: string[] = [];
-  if (log.title) out.push('Your job title now reads as the posting writes it.');
   if (log.skillGroups) out.push(`${log.skillGroups} skill group${log.skillGroups > 1 ? 's' : ''} moved up so the ones it scores come first.`);
   if (log.skillItems) out.push(`Inside ${log.skillItems} group${log.skillItems > 1 ? 's' : ''} the scored terms now lead the list.`);
   if (log.bullets) out.push(`In ${log.bullets} role${log.bullets > 1 ? 's' : ''} the bullets carrying its terms now come first.`);
