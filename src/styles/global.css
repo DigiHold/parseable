@@ -349,7 +349,7 @@ footer { overflow: hidden; }
 .notes-col h3 { font-size: 16px; margin: 0 0 6px; }
 .notes-col p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--color-ink-2); }
 .feature { display: grid; gap: 28px; align-items: center; margin-bottom: 56px; }
-@media (min-width: 1024px) { .feature { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr); gap: 56px; } .feature-flip .shot { order: 2; } }
+@media (min-width: 1024px) { .feature { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr); gap: 56px; } .feature-flip { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); } .feature-flip .shot { order: 2; } }
 .feature-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .feature-steps li { display: grid; grid-template-columns: 22px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid rgba(0,0,0,.08); }
 .feature-steps h3 { font-size: 17px; margin: 0 0 6px; }
