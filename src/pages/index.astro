@@ -13,10 +13,11 @@ const demoSheet = `
 <section><h2>Professional Summary</h2><p class="s-summary">Backend engineer with nine years on payment systems in <b class="lit">Python</b> and <b class="lit">Go</b>.</p><p class="s-summary">Led a monolith to services migration at four thousand requests per second.</p></section>
 <section><h2>Skills</h2><p class="s-skill"><b>Languages:</b> <b class="lit">Python</b>, <b class="lit">Go</b>, SQL, TypeScript</p><p class="s-skill"><b>Infrastructure:</b> <b class="lit">Kubernetes</b>, <b class="lit">Docker</b>, <b class="lit">PostgreSQL</b>, Terraform, AWS</p><p class="s-skill"><b>Practices:</b> <b class="lit">CI/CD</b>, on call, incident reviews, technical writing</p></section>
 <section><h2>Experience</h2>
-<div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in <b class="lit">Go</b> and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li><li>Wrote the incident review process the whole platform team now follows.</li></ul></div>
+<div class="s-item"><div class="s-item-head"><p class="s-item-title">Senior Backend Engineer</p><span class="s-item-dates">2021 - 2026</span></div><p class="s-item-org">Payfit, Paris</p><ul><li>Rebuilt the billing service in <b class="lit">Go</b> and cut p99 latency from 800ms to 90ms.</li><li>Mentored four engineers through the migration and ran the on call rotation.</li><li>Wrote the incident review process the whole platform team now follows.</li></ul><p class="s-env"><b>Environment:</b> Go, Python, PostgreSQL, Kubernetes, AWS</p></div>
 <div class="s-item"><div class="s-item-head"><p class="s-item-title">Backend Engineer</p><span class="s-item-dates">2017 - 2021</span></div><p class="s-item-org">Doctolib, Paris</p><ul><li>Shipped the appointment reminder pipeline, sending two million messages a day.</li><li>Moved the search index to a managed cluster with zero downtime.</li></ul></div>
 </section>
-<section><h2>Education</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">MSc Computer Science</p><span class="s-item-dates">2015 - 2017</span></div><p class="s-item-org">INSA Lyon</p></div></section>`;
+<section><h2>Education</h2><div class="s-item"><div class="s-item-head"><p class="s-item-title">MSc Computer Science</p><span class="s-item-dates">2015 - 2017</span></div><p class="s-item-org">INSA Lyon</p></div></section>
+<section><h2>Languages</h2><p>French (native), English (professional)</p></section>`;
 
 const faq = [
   {
@@ -166,12 +167,14 @@ const schema = {
       </div>
       <div class="hero-object" aria-label="A sample resume on a dark desk with a line of light reading it; above the line, the text the screening software has already taken from it">
         <div class="scene">
+          <div class="spill" aria-hidden="true"></div>
           <div class="ground" aria-hidden="true"></div>
           <div class="obj">
+            <span class="obj-count" data-role="lines-read"></span>
             <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
             <div class="face face-machine" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
             <div class="light" aria-hidden="true"></div>
-            <div class="blade" aria-hidden="true"><span class="blade-count" data-role="lines-read"></span></div>
+            <div class="blade" aria-hidden="true"></div>
             <div class="edge" aria-hidden="true"></div>
             <div class="mirror" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
           </div>
