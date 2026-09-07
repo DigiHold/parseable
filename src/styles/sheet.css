@@ -9,7 +9,7 @@
 .sheet {
   --s-ink: #16130f;
   --s-mut: #5c564e;
-  --s-rule: #e2ddd4;
+  --s-rule: #c9c4bc;
   --s-accent: #16130f;
   --s-fs: 9.6pt;
   --s-lh: 1.42;
@@ -32,7 +32,7 @@
 .sheet li::marker { color: var(--s-accent); }
 .sheet a { color: inherit; text-decoration: none; }
 
-.s-head { border-bottom: 2px solid var(--s-accent); padding-bottom: 7px; margin-bottom: 13px; display: flex; gap: 14px; align-items: flex-start; }
+.s-head { border-bottom: 1px solid #6b6b6b; padding-bottom: 7px; margin-bottom: 13px; display: flex; gap: 14px; align-items: flex-start; }
 .s-head-txt { flex: 1; min-width: 0; }
 .s-photo { width: 26mm; height: 32mm; object-fit: cover; border-radius: 2px; flex: none; }
 .s-name { font-size: 21pt; font-weight: 700; letter-spacing: -.4px; margin: 0 0 2px; line-height: 1.08; }
@@ -60,7 +60,7 @@
 /* -- template: compact. A ledger: dates in their own column, a rule above each section. -- */
 .sheet[data-tpl="compact"] {
   --s-accent: #16130f;
-  --s-rule: #16130f;
+  --s-rule: #8f8b85;
   --s-mut: #55524d;
   --s-fs: 9.1pt;
   --s-lh: 1.36;
@@ -83,7 +83,7 @@
 
 /* -- template: open. Plex Sans, air, a green accent, one rule under the name and nothing else. -- */
 .sheet[data-tpl="open"] {
-  --s-accent: #1f6f52;
+  --s-accent: #1e5c45;
   --s-rule: #e4e6e3;
   --s-mut: #5a615c;
   --s-fs: 10pt;
@@ -119,15 +119,14 @@
 .sheet[data-tpl="editorial"] .s-contact .sep { color: var(--s-accent); padding: 0 6px; }
 .sheet[data-tpl="editorial"] h2 { font-size: 12.5pt; font-weight: 700; text-transform: none; color: var(--s-ink); border-bottom: none; margin: 20px 0 6px; padding-bottom: 0; }
 .sheet[data-tpl="editorial"] .s-item { margin-bottom: 12px; }
-.sheet[data-tpl="editorial"] .s-item-head { flex-direction: column; align-items: flex-start; gap: 0; }
 .sheet[data-tpl="editorial"] .s-item-title { font-size: 10.6pt; font-weight: 500; }
-.sheet[data-tpl="editorial"] .s-item-dates { font-weight: 400; font-size: 9pt; color: var(--s-mut); margin: 1px 0 1px; }
+.sheet[data-tpl="editorial"] .s-item-dates { font-weight: 400; font-size: 9pt; color: var(--s-mut); font-variant-numeric: tabular-nums; }
 .sheet[data-tpl="editorial"] .s-item-org { font-style: italic; color: var(--s-accent); }
 .sheet[data-tpl="editorial"] li::marker { color: var(--s-accent); }
 
 /* -- template: mono. Plex Mono, bold where it matters, blue only on the headings. -- */
 .sheet[data-tpl="mono"] {
-  --s-accent: #1f5fbf;
+  --s-accent: #3a4a6b;
   --s-rule: #d9dce3;
   --s-mut: #5f6672;
   --s-fs: 8.9pt;
@@ -145,11 +144,12 @@
 .sheet[data-tpl="mono"] .s-item-dates { font-weight: 400; color: var(--s-mut); }
 .sheet[data-tpl="mono"] .s-skill b, .sheet[data-tpl="mono"] .s-env b { font-weight: 600; }
 .sheet[data-tpl="mono"] ul { padding-left: 14px; }
+.sheet[data-tpl="mono"] .s-summary, .sheet[data-tpl="mono"] li, .sheet[data-tpl="mono"] .s-skill, .sheet[data-tpl="mono"] section > p { font-family: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9.6pt; }
 .sheet[data-tpl="mono"] li::marker { color: var(--s-mut); }
 
 /* -- template: signal. A very large name, orange headings, no rules, no bars. -- */
 .sheet[data-tpl="signal"] {
-  --s-accent: #d9480f;
+  --s-accent: #b5451b;
   --s-rule: #ececec;
   --s-mut: #5c5c5c;
   --s-fs: 9.8pt;

@@ -135,11 +135,11 @@ function moveButtons(key: string, i: number, len: number): string {
 function panelTemplate(): string {
   const tpls: Array<{ id: TemplateId; name: string; desc: string }> = [
     { id: 'classic', name: 'Classic', desc: 'Helvetica under a firm rule, the shape most recruiters expect.' },
-    { id: 'editorial', name: 'Editorial', desc: 'Plex Serif with an oxblood accent and the dates under each title.' },
+    { id: 'editorial', name: 'Editorial', desc: 'Plex Serif with an oxblood accent, it reads like a printed book.' },
     { id: 'signal', name: 'Signal', desc: 'A large name, orange headings, and the employer named first.' },
-    { id: 'mono', name: 'Mono', desc: 'Plex Mono with a blue accent, plain and exact for engineers.' },
+    { id: 'mono', name: 'Mono', desc: 'Plex Mono for the data lines, Plex Sans for the prose, for engineers.' },
     { id: 'portrait', name: 'Portrait', desc: 'A centred serif header built around a photo.' },
-    { id: 'open', name: 'Open', desc: 'Plex Sans with air and a green accent, for a shorter career.' },
+    { id: 'open', name: 'Open', desc: 'For a first job: education and projects come before experience.' },
     { id: 'compact', name: 'Ledger', desc: 'Dates in their own column, a rule above each section, for a long career.' },
   ];
   const mini = renderSheet(data);

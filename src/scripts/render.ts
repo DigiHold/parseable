@@ -5,7 +5,7 @@ const esc = (s: string) =>
 
 const has = (s: string) => s.trim().length > 0;
 
-/** Renders the sheet. Section order is the order an ATS reads, so it is also the order that scores. */
+/** Renders the sheet as one column of standard sections, in the order the template asks for. */
 export function renderSheet(r: Resume): string {
   const b = r.basics;
   const sep = r.settings.template === 'editorial' || r.settings.template === 'portrait' ? '\u00b7' : '|';
@@ -18,48 +18,53 @@ export function renderSheet(r: Resume): string {
     ? `<img class="s-photo" src="${b.photo}" alt="${esc(b.name)}">`
     : '';
 
-  const out: string[] = [];
-  out.push(`<header class="s-head"><div class="s-head-txt">
+  const part: Record<string, string> = {};
+  part.head = (`<header class="s-head"><div class="s-head-txt">
     <h1 class="s-name">${esc(b.name || 'Your name')}</h1>
     ${has(b.title) ? `<p class="s-role">${esc(b.title)}</p>` : ''}
     ${contact ? `<p class="s-contact">${contact}</p>` : ''}
   </div>${photo}</header>`);
 
   if (has(b.summary)) {
-    out.push(`<section><h2>Professional Summary</h2><p class="s-summary">${esc(b.summary)}</p></section>`);
+    part.summary = `<section><h2>Professional Summary</h2><p class="s-summary">${esc(b.summary)}</p></section>`;
   }
 
   const skills = r.skills.filter((s) => has(s.items));
   if (skills.length) {
-    out.push(`<section><h2>Skills</h2>${skills
+    part.skills = `<section><h2>Skills</h2>${skills
       .map((s) => `<p class="s-skill">${has(s.label) ? `<b>${esc(s.label)}:</b> ` : ''}${esc(s.items)}</p>`)
-      .join('')}</section>`);
+      .join('')}</section>`;
   }
 
   const exp = r.experience.filter((e) => has(e.title) || has(e.org));
   if (exp.length) {
-    out.push(`<section><h2>Experience</h2>${exp.map(item).join('')}</section>`);
+    part.experience = `<section><h2>Experience</h2>${exp.map(item).join('')}</section>`;
   }
 
   const proj = r.projects.filter((p) => has(p.name));
   if (proj.length) {
-    out.push(`<section><h2>Selected Projects</h2>${proj
+    part.projects = `<section><h2>Selected Projects</h2>${proj
       .map((p) => item({ title: p.name, org: p.subtitle, dates: p.meta, bullets: p.bullets, env: p.env }))
-      .join('')}</section>`);
+      .join('')}</section>`;
   }
 
   const edu = r.education.filter((e) => has(e.degree) || has(e.school));
   if (edu.length) {
-    out.push(`<section><h2>Education</h2>${edu
+    part.education = `<section><h2>Education</h2>${edu
       .map((e) => item({ title: e.degree, org: e.school, dates: e.dates, bullets: has(e.detail) ? [e.detail] : [], env: '' }))
-      .join('')}</section>`);
+      .join('')}</section>`;
   }
 
   if (has(r.languages)) {
-    out.push(`<section><h2>Languages</h2><p>${esc(r.languages)}</p></section>`);
+    part.languages = `<section><h2>Languages</h2><p>${esc(r.languages)}</p></section>`;
   }
 
-  return out.join('');
+  // Section order is the order an ATS reads, so it is also the order that scores. The
+  // first job template leads with education and projects, because that is the evidence it has.
+  const order = r.settings.template === 'open'
+    ? ['head', 'summary', 'education', 'projects', 'skills', 'experience', 'languages']
+    : ['head', 'summary', 'skills', 'experience', 'projects', 'education', 'languages'];
+  return order.map((k) => part[k] ?? '').join('');
 }
 
 function item(e: { title: string; org: string; dates: string; bullets: string[]; env: string }): string {
