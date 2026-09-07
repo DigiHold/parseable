@@ -502,6 +502,7 @@ async function loadPdf(file: File) {
     }
     data = textToResume(text);
     demo = false;
+    status('Read in your browser, and every field below came from that file.');
     goto('details');
   } catch (err) {
     status('That file could not be read. Try exporting it again as a PDF, or start blank.');
