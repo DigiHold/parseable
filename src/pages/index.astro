@@ -152,10 +152,10 @@ const schema = {
   <!-- the stage: a dark framed scene on a light page -->
   <section class="mx-auto max-w-[1180px] px-6 pt-24 sm:pt-28">
     <div class="stage" data-stage>
-      <div class="relative grid grid-cols-1 items-center gap-10 px-7 py-12 sm:px-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10 lg:px-16 lg:py-14">
+      <div class="relative grid grid-cols-1 items-center gap-8 px-6 py-10 sm:px-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:px-16 lg:py-14">
         <div class="hero-copy relative z-10">
-          <h1 class="mb-6 max-w-[22ch] text-[clamp(32px,3.5vw,50px)] text-white"><span class="block sm:whitespace-nowrap">Get past the software</span><span class="block sm:whitespace-nowrap">and in front of a person</span></h1>
-          <p class="mb-8 max-w-[40ch] text-[17px] leading-[1.55] text-white/60">A free ATS friendly resume checker that runs in your browser. Software reads your resume before a human does, so check yours against the posting and download a PDF it reads correctly.</p>
+          <h1 class="mb-5 max-w-[22ch] text-[clamp(30px,3.5vw,50px)] text-white" style="text-wrap:balance">Get past the software and in front of a person</h1>
+          <p class="mb-7 max-w-[40ch] text-[16px] leading-[1.55] text-white/60 sm:text-[17px]">A free ATS friendly resume checker that runs in your browser. Software reads your resume before a human does, so check yours against the posting and download a PDF it reads correctly.</p>
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
             <button class="btn btn-light btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
             <p class="m-0 text-center text-[15px] text-white/60 sm:text-left">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-white/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-[#9cc4ff] hover:decoration-[#9cc4ff]" data-action="sample">try it with a sample</button></p>
@@ -164,7 +164,7 @@ const schema = {
           <input type="file" accept="application/json,.json" class="hidden" data-file="json">
           <p class="mt-4 min-h-[20px] text-[13px] text-white/40" data-role="pdf-status"></p>
         </div>
-      <div class="scene" aria-label="A resume, and below the blade of light the text a screening system extracts from it">
+      <div class="scene order-first lg:order-none" aria-label="A resume, and below the blade of light the text a screening system extracts from it">
         <div class="spill" aria-hidden="true"></div>
         <div class="obj">
           <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
@@ -237,9 +237,10 @@ const schema = {
         <h2 class="max-w-[16ch] text-[clamp(28px,3vw,40px)]">What the software read from a two column resume</h2>
         <p class="m-0 max-w-[48ch] self-end text-[17px] leading-relaxed text-ink-2">The extractor reads a page in one pass and interleaves the columns. This is its output for a real resume with a skills sidebar, and the three places where the application dies are marked on it.</p>
       </div>
-      <div class="panel" data-reveal>
-        <div class="panel-bar"><span>extracted text</span><span class="ml-auto">pdftotext, one pass</span></div>
-        <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:gap-10" data-reveal>
+        <div class="panel">
+          <div class="panel-bar"><span>extracted text</span><span class="ml-auto">pdftotext, one pass</span></div>
+          <pre aria-label="Text extracted by a parser">NICOLAS LECOCQ
 Full Stack Developer
 
 <s>Skills</s>                    <s>Experience</s>
@@ -256,12 +257,13 @@ SQL                       invoicing.
 <s>Language</s>                  <i>client relations to understand their</i>
 French                    <i>requirements</i>, and monitoring the specs. <i class="mk">3</i>
 English</pre>
+        </div>
+        <ol class="notes-col">
+          <li><span class="mk">1</span><div><h3>The layout breaks the extractor</h3><p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p></div></li>
+          <li><span class="mk">2</span><div><h3>The words do not match the posting</h3><p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p></div></li>
+          <li><span class="mk">3</span><div><h3>Nobody tells you which one it was</h3><p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p></div></li>
+        </ol>
       </div>
-      <ol class="notes-row" data-reveal>
-        <li><span class="mk">1</span><h3>The layout breaks the extractor</h3><p>"WordPress" and "Founder" land on one line, so the parser files the job title under the skills column and the employer under nothing at all.</p></li>
-        <li><span class="mk">2</span><h3>The words do not match the posting</h3><p>The posting asked for "stakeholder management". The resume says "client follow up" and "client relations", so that requirement scores zero, whatever the work was.</p></li>
-        <li><span class="mk">3</span><h3>Nobody tells you which one it was</h3><p>The rejection email is the same in both cases, so most people rewrite the cover letter and send the same unreadable file again.</p></li>
-      </ol>
     </div>
   </section>
 
@@ -272,24 +274,20 @@ English</pre>
         <h2 class="max-w-[16ch] text-[clamp(28px,3vw,40px)]">Four steps, about ten minutes the first time</h2>
         <p class="m-0 max-w-[48ch] self-end text-[17px] leading-relaxed text-ink-2">After that, import your JSON and a new application takes a minute, because only the job posting changes. Everything runs in the tab, nothing is uploaded.</p>
       </div>
-      <ol class="steps-grid" data-reveal>
-        <li>
-          <figure class="shot"><picture><source srcset="/img/shot-form.avif" type="image/avif"><img src="/img/shot-form.webp" alt="The tool with a resume loaded, the fields on the left and the page on the right" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
-          <span class="mk">1</span><h3>Bring what you have</h3><p>Drop in your current resume as a PDF and the text is pulled out in your browser, sorted into fields you then correct.</p>
-        </li>
-        <li>
-          <figure class="shot"><picture><source srcset="/img/shot-parser.avif" type="image/avif"><img src="/img/shot-parser.webp" alt="The plain text a parser extracts from the resume, shown beside the form" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
-          <span class="mk">2</span><h3>See what the machine reads</h3><p>The parser view shows your document as plain extracted text, the way the employer's software receives it.</p>
-        </li>
-        <li>
-          <figure class="shot"><picture><source srcset="/img/shot-match.avif" type="image/avif"><img src="/img/shot-match.webp" alt="The match rate against a pasted job posting, with matched and missing terms listed" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
-          <span class="mk">3</span><h3>Answer the actual posting</h3><p>Paste the job description and see which required terms your resume already contains, and which are missing.</p>
-        </li>
-        <li>
-          <figure class="shot"><picture><source srcset="/img/shot-download.avif" type="image/avif"><img src="/img/shot-download.webp" alt="The download step, with the PDF and the JSON export" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
-          <span class="mk">4</span><h3>Download and keep the JSON</h3><p>Print to a PDF that keeps a real text layer, then export the JSON so the next application takes a minute.</p>
-        </li>
-      </ol>
+      <div class="feature" data-reveal>
+        <figure class="shot"><picture><source srcset="/img/shot-parser.avif" type="image/avif"><img src="/img/shot-parser.webp" alt="The tool with a resume loaded: the fields on the left, and on the right the plain text a parser extracts from the page" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
+        <ol class="feature-steps">
+          <li><span class="mk">1</span><div><h3>Bring what you have</h3><p>Drop in your current resume as a PDF and the text is pulled out in your browser, sorted into fields you then correct. Starting from nothing works too.</p></div></li>
+          <li><span class="mk">2</span><div><h3>See what the machine reads</h3><p>The parser view shows your document as plain extracted text, the way the employer's software receives it. Anything wrong there is wrong on their screen.</p></div></li>
+        </ol>
+      </div>
+      <div class="feature feature-flip" data-reveal>
+        <figure class="shot"><picture><source srcset="/img/shot-match.avif" type="image/avif"><img src="/img/shot-match.webp" alt="The match against a pasted job posting: the rate, the matched terms and the missing ones" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
+        <ol class="feature-steps" start="3">
+          <li><span class="mk">3</span><div><h3>Answer the actual posting</h3><p>Paste the job description and see which required terms your resume already contains, and which are missing. You decide which missing ones are true of you.</p></div></li>
+          <li><span class="mk">4</span><div><h3>Download and keep the JSON</h3><p>Print to a PDF that keeps a real text layer, then export the JSON so the next application only costs you the posting step.</p></div></li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -320,10 +318,11 @@ English</pre>
   <!-- closing -->
   <section class="mx-auto max-w-[1180px] px-6 pb-8">
     <div class="closing" data-reveal>
-      <h2 class="mx-auto mb-8 max-w-[24ch] text-[clamp(26px,3vw,40px)] text-white">Software reads it first, so make sure it reads it right.</h2>
+      <p class="label mb-5">One more thing before you apply</p>
+      <h2 class="mx-auto mb-8 max-w-[22ch] text-[clamp(28px,3.6vw,48px)]">Software reads it first, so make sure it reads it right.</h2>
       <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-x-5">
-        <button class="btn btn-light btn-xl" data-action="pick-pdf">Upload your resume</button>
-        <p class="m-0 text-[15px] text-white/60">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-white/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-[#9cc4ff]" data-action="sample">try it with a sample</button></p>
+        <button class="btn btn-primary btn-xl" data-action="pick-pdf">Upload your resume</button>
+        <p class="m-0 text-[15px] text-ink-2">or <button class="cursor-pointer border-0 bg-transparent p-0 text-[inherit] text-ink underline decoration-edge underline-offset-4 hover:decoration-ink" data-action="sample">try it with a sample</button></p>
       </div>
     </div>
   </section>
