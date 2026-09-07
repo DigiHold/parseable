@@ -36,7 +36,7 @@ export function mountSite(): void {
   if (stage && sceneEl && !reduce) {
     gsap.registerPlugin(ScrollTrigger);
     sceneEl.style.animation = 'none';
-    const vars = { scan: 38 };
+    const vars = { scan: 30 };
     const apply = () => sceneEl.style.setProperty('--scan', `${vars.scan}%`);
     apply();
     gsap.to(vars, { scan: 92, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 80%', end: 'bottom 30%', scrub: 0.6 } });

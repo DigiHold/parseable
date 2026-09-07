@@ -67,7 +67,7 @@
    as HTML strings at runtime, out of reach of Tailwind's scanner. */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent
+    @apply inline-flex items-center justify-center gap-2 rounded-[4px] border border-transparent
            px-5 py-3 font-ui text-[15.5px] font-semibold leading-none cursor-pointer
            no-underline transition-[background-color,border-color,color,transform,box-shadow] duration-200 select-none;
   }
@@ -280,25 +280,25 @@ body[data-view='parser'] .zoomctl { display: none; }
 .site-head.is-scrolled { background: #f4f4f2; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
 
 /* ---------- the hero object: the sheet, flat and large, on the page ---------- */
-.hero-object { position: relative; margin: 64px auto 0; max-width: 820px; }
+.hero-object { position: relative; margin: 36px auto 0; max-width: 820px; }
 .hero-object::before {
   content: ''; position: absolute; left: 50%; top: 4%; width: 120%; height: 100%; transform: translateX(-50%);
   background: radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.05), rgba(0,0,0,0) 70%); pointer-events: none;
 }
 .hero-object .scene {
   max-width: none; width: 100%; aspect-ratio: 210 / 160; margin: 0; perspective: none; overflow: hidden;
-  border-radius: 12px 12px 0 0;
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  border-radius: 0;
 }
-.hero-object .obj { --rx: 0deg; --ry: 0deg; transform: none; box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 40px 90px -30px rgba(0,0,0,.35), 0 12px 30px -16px rgba(0,0,0,.2); border-radius: 12px 12px 0 0; }
-.hero-object .face { border-radius: 12px 12px 0 0; background-image: none; background: #fff; }
+.hero-object .obj { --rx: 0deg; --ry: 0deg; transform: none; box-shadow: 0 0 0 1px rgba(0,0,0,.14), 0 30px 70px -30px rgba(0,0,0,.3); border-radius: 0; }
+.hero-object .face { border-radius: 0; background-image: none; background: #fff; }
+.hero-object .sheet, .hero-object .sheet * { font-family: var(--font-ui); }
+.hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { font-family: var(--font-mono) !important; }
 .hero-object .face .sheet { --k: 1.03; }
 .hero-object .spill, .hero-object .floor { display: none; }
-.hero-object .blade { background: #c9d8f5; box-shadow: 0 0 6px 2px rgba(200,215,245,.9), 0 0 30px 8px rgba(150,175,225,.35); }
+.hero-object .blade { height: 1px; background: #8fb0ff; box-shadow: 0 0 4px 1px rgba(143,176,255,.9), 0 0 8px 2px rgba(143,176,255,.4); }
 .hero-object .light { background: linear-gradient(to bottom, rgba(0,0,0,.025) 0%, rgba(0,0,0,.025) calc(var(--scan) - 30%), rgba(0,0,0,0) calc(var(--scan) - 5%), rgba(0,0,0,0) calc(var(--scan) + 5%), rgba(0,0,0,.025) calc(var(--scan) + 30%), rgba(0,0,0,.025) 100%); }
-.hero-object .light::after { background: radial-gradient(140% 70px at 50% var(--scan), rgba(220,230,250,.8), rgba(220,230,250,0) 100%); }
-.hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { color: #6b6f78 !important; }
+.hero-object .light::after { background: radial-gradient(140% 22px at 50% var(--scan), rgba(200,218,255,.55), rgba(200,218,255,0) 100%); }
+.hero-object .face-machine .sheet, .hero-object .face-machine .sheet * { color: #111 !important; }
 @media (max-width: 640px) { .hero-object { margin-top: 40px; } .hero-object .scene { aspect-ratio: 210 / 200; } .hero-object .face .sheet { --k: .44; } }
 @media (min-width: 641px) and (max-width: 1023px) { .hero-object .face .sheet { --k: .82; } }
 
