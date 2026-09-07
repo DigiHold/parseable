@@ -291,10 +291,10 @@ body[data-view='parser'] .zoomctl { display: none; }
 .site-head.is-dark.is-scrolled { background: rgba(11,12,16,.84); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
 
 /* ---------- the hero stage: a dark room, the sheet in it, a light reading it ---------- */
-.hero-stage { position: relative; overflow: hidden; background: #0b0c10; color: #fff; padding: 136px 0 88px; }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 56px; align-items: start; }
-.hero-copy { padding-top: 24px; }
-.hero-copy h1 { font-family: var(--font-serif); font-weight: 500; font-size: clamp(40px, 5vw, 72px); line-height: 1; letter-spacing: -.02em; margin: 0 0 28px; color: #fff; }
+.hero-stage { position: relative; overflow: hidden; background: linear-gradient(to bottom, #0b0c10 0%, #0b0c10 55%, #14151b 100%); color: #fff; padding: 136px 0 96px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 64px; align-items: start; }
+.hero-copy { padding-top: 0; }
+.hero-copy h1 { font-family: var(--font-serif); font-weight: 500; font-size: clamp(36px, 3.4vw, 48px); line-height: 1.04; letter-spacing: -.015em; margin: 0 0 24px; color: #fff; }
 .hero-sub { font-size: 18px; line-height: 1.55; color: #b4b8c3; max-width: 40ch; margin: 0 0 32px; }
 .hero-cta { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .hero-cta .btn { border-radius: 0; }
@@ -302,11 +302,11 @@ body[data-view='parser'] .zoomctl { display: none; }
 .hero-link:hover { text-decoration-color: #fff; }
 .hero-status { margin: 16px 0 0; font-size: 13px; color: #8e93a1; }
 
-.hero-object { --hk: .72; position: relative; }
+.hero-object { --hk: .6; position: relative; margin-top: 4px; }
 .hero-object .scene { --scan: 0%; position: relative; width: 100%; max-width: none; aspect-ratio: auto; height: auto; margin: 0; perspective: 1500px; perspective-origin: 30% 40%; transition: --scan .22s ease-out; animation: none; overflow: visible; }
 .hero-object .obj {
-  --rx: 4deg; --ry: -16deg; position: relative; inset: auto; width: calc(210mm * var(--hk)); margin: 0 0 0 auto; border-radius: 0;
-  transform-style: preserve-3d; transform: rotateY(var(--ry)) rotateX(var(--rx)); transition: transform .5s var(--ease-soft);
+  --rx: 4deg; --ry: -16deg; position: relative; inset: auto; width: calc(210mm * var(--hk)); margin: 0 0 0 auto; border-radius: 0; will-change: transform;
+  transform-style: preserve-3d; transform: rotateY(var(--ry)) rotateX(var(--rx)) translateZ(0); transition: transform .5s var(--ease-soft);
   box-shadow: -40px 70px 90px -30px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.06);
 }
 .hero-object .face { border-radius: 0; background-image: none; background: #fff; }
@@ -322,21 +322,29 @@ body[data-view='parser'] .zoomctl { display: none; }
 /* light on the paper: bright beside the line, falling off toward both ends */
 .hero-object .light {
   display: block; position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: multiply;
-  background: linear-gradient(to bottom, rgba(0,0,0,.14) 0%, rgba(0,0,0,.14) calc(var(--scan) - 45%), rgba(0,0,0,0) calc(var(--scan) - 8%), rgba(0,0,0,0) calc(var(--scan) + 8%), rgba(0,0,0,.14) calc(var(--scan) + 45%), rgba(0,0,0,.14) 100%);
+  background: linear-gradient(to bottom, rgba(16,24,48,.16) 0%, rgba(16,24,48,.16) calc(var(--scan) - 45%), rgba(16,24,48,0) calc(var(--scan) - 8%), rgba(16,24,48,0) calc(var(--scan) + 8%), rgba(16,24,48,.16) calc(var(--scan) + 45%), rgba(16,24,48,.16) 100%);
 }
-.hero-object .light::after { content: ''; position: absolute; inset: 0; mix-blend-mode: screen; background: radial-gradient(120% 56px at 50% var(--scan), rgba(214,226,255,.6), rgba(214,226,255,0) 100%); }
-.hero-object .blade { left: -26px; right: -26px; top: var(--scan); height: 2px; z-index: 4; background: #f3f6ff; box-shadow: 0 0 6px 1px rgba(205,218,255,.95), 0 0 26px 6px rgba(140,168,255,.35); overflow: visible; }
-.blade-count { position: absolute; right: 100%; top: -5px; margin-right: 14px; font: 400 11px/1 var(--font-mono); color: #aab4d2; white-space: nowrap; text-align: right; }
+.hero-object .light::after { content: ''; position: absolute; inset: 0; mix-blend-mode: screen; background: radial-gradient(120% 44px at 50% var(--scan), rgba(214,226,255,.5), rgba(214,226,255,0) 100%); }
+.hero-object .blade { left: 0; right: 0; top: var(--scan); height: 2px; z-index: 4; background: #f3f6ff; box-shadow: 0 0 4px 1px rgba(205,218,255,.9), 0 0 14px 3px rgba(150,175,255,.35); overflow: visible; }
+.blade-count { position: absolute; right: 100%; top: -4px; margin-right: 12px; font: 400 10.5px/1 var(--font-mono); color: #8f9bc2; white-space: nowrap; text-align: right; }
 .hero-object .edge { display: block; position: absolute; top: 0; bottom: 0; left: 100%; width: 3px; transform-origin: left center; transform: rotateY(90deg); background: linear-gradient(to bottom, #e6e6e6, #c9c9c9); }
-.hero-object .floor {
-  display: block; position: absolute; left: 6%; right: 0; top: 100%; height: 34%; margin-top: 6px; pointer-events: none; opacity: 1;
-  transform: none; -webkit-mask-image: none; mask-image: none; filter: blur(10px);
-  background: linear-gradient(to bottom, rgba(190,205,255,.16), rgba(190,205,255,0) 80%);
+/* the room: a floor that recedes from the foot of the sheet, and the sheet's own reflection in it */
+.hero-object .ground {
+  position: absolute; left: -70%; right: -70%; top: 100%; height: 900px; transform-origin: 50% 0; transform: rotateX(90deg); pointer-events: none;
+  background: radial-gradient(50% 45% at 50% 0%, rgba(200,214,255,.11), rgba(200,214,255,0) 100%);
 }
+.hero-object .mirror {
+  position: absolute; left: 0; right: 0; top: 100%; height: 100%; overflow: hidden; background: #fff; transform-origin: 50% 0; transform: rotateX(180deg);
+  opacity: .14; filter: blur(2px); pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0) 50%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0) 50%);
+}
+.hero-object .mirror .sheet { zoom: var(--hk); padding: 12mm 13mm; min-height: 0; transform: none; }
+.hero-object .floor { display: none; }
 .hero-object .spill { display: none; }
 @media (max-width: 1023px) {
   .hero-grid { grid-template-columns: 1fr; gap: 40px; }
   .hero-object .obj { --ry: -10deg; --rx: 3deg; margin: 0 auto; }
+  .hero-object .mirror { display: none; }
 }
 @media (max-width: 640px) {
   .hero-stage { padding: 112px 0 64px; }

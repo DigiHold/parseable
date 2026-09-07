@@ -166,14 +166,15 @@ const schema = {
       </div>
       <div class="hero-object" aria-label="A sample resume on a dark desk with a line of light reading it; above the line, the text the screening software has already taken from it">
         <div class="scene">
+          <div class="ground" aria-hidden="true"></div>
           <div class="obj">
             <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
             <div class="face face-machine" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
             <div class="light" aria-hidden="true"></div>
             <div class="blade" aria-hidden="true"><span class="blade-count" data-role="lines-read"></span></div>
             <div class="edge" aria-hidden="true"></div>
+            <div class="mirror" aria-hidden="true"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
           </div>
-          <div class="floor" aria-hidden="true"></div>
         </div>
       </div>
     </div>
