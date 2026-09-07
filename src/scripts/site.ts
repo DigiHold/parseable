@@ -37,10 +37,10 @@ export function mountSite(): void {
   if (stage && sceneEl && !reduce) {
     gsap.registerPlugin(ScrollTrigger);
     sceneEl.style.animation = 'none';
-    const vars = { scan: 30 };
+    const vars = { scan: 55 };
     const apply = () => sceneEl.style.setProperty('--scan', `${vars.scan}%`);
     apply();
-    gsap.to(vars, { scan: 96, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: stage, start: 'top 60%', end: 'bottom 20%', scrub: 0.6 } });
+    gsap.to(vars, { scan: 96, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: stage, start: 'top top', end: 'bottom 30%', scrub: 0.6 } });
     const objEl = sceneEl.querySelector<HTMLElement>('.obj');
     if (objEl) gsap.to(objEl, { '--ry': '-4deg', '--rx': '0deg', ease: 'none', scrollTrigger: { trigger: stage, start: 'top top', end: 'bottom 30%', scrub: 0.8 } });
     gsap.utils.toArray<HTMLElement>('.notes-row li, .steps-row li').forEach((el, i) => {

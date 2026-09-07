@@ -67,7 +67,7 @@
    as HTML strings at runtime, out of reach of Tailwind's scanner. */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-none border border-transparent
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent
            px-5 py-3 font-ui text-[15.5px] font-semibold leading-none cursor-pointer
            no-underline transition-[background-color,border-color,color,transform,box-shadow] duration-200 select-none;
   }
@@ -211,7 +211,7 @@ body[data-view='parser'] .zoomctl { display: none; }
   box-shadow:
     -34px 70px 80px -18px rgba(0, 0, 0, .85),
     -6px 12px 24px -8px rgba(0, 0, 0, .6),
-    2px 0 0 0 #dad8d3, 4px 2px 0 0 #b9b7b2;
+    1px 0 0 0 #e4e2dd;
 }
 .face {
   position: absolute; inset: 0; overflow: hidden; background: #ffffff; backface-visibility: hidden;
@@ -227,14 +227,14 @@ body[data-view='parser'] .zoomctl { display: none; }
 /* the machine's reading: one face, one weight, the same geometry, the posting's terms lit */
 .face-machine .sheet, .face-machine .sheet * {
   font-family: var(--font-mono) !important; font-weight: 400 !important; font-style: normal !important;
-  color: #1f2126 !important; letter-spacing: -.01em;
+  color: #5a5d66 !important; letter-spacing: -.01em;
 }
 .face-machine .sheet .s-name { font-size: 12pt; margin: 0 0 2px; line-height: 1.08; padding-top: 12pt; }
 .face-machine .sheet .s-role { font-size: 10.8pt; }
 .face-machine .sheet h2 { border-bottom-color: transparent; }
 .face-machine .sheet .s-head { border-bottom-color: transparent; }
 .face-machine .sheet li::marker { color: transparent; }
-.face-machine .sheet .lit { background: #cfe0ff; color: #1d4ed8 !important; border-radius: 2px; padding: 0 2px; margin: 0 -2px; }
+.face-machine .sheet .lit { background: #dbe6fb; color: #1d4ed8 !important; border-radius: 2px; padding: 0 2px; margin: 0 -2px; }
 .face-human .sheet .lit { font-weight: inherit; }
 /* light on the paper: bright beside the blade, falling off, darker on the far side */
 .light {
@@ -264,7 +264,7 @@ body[data-view='parser'] .zoomctl { display: none; }
   filter: blur(20px);
 }
 @media (prefers-reduced-motion: reduce) { .hero-copy > * { animation: none; } .scene { animation: none; } }
-@media (max-width: 640px) { .scene { max-width: 250px; aspect-ratio: 210 / 262; transform: none; } .face .sheet { --k: .315; } .obj { --ry: -6deg; --rx: 2deg; } }
+@media (max-width: 640px) { .scene { max-width: 230px; aspect-ratio: 210 / 262; transform: none; margin-top: 8px; } .face .sheet { --k: .29; } .obj { --ry: 0deg; --rx: 0deg; } }
 
 /* ---------- the tool, one framed panel at viewport height ---------- */
 .tool { border: 1px solid var(--color-rule); }
@@ -280,7 +280,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .site-head.is-scrolled { background: #f4f4f2; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
 
 /* ---------- the framed stage ---------- */
-.stage { position: relative; overflow: hidden; border-radius: 28px; background: #08090c; box-shadow: 0 40px 100px -40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.06); }
+.stage { position: relative; overflow: hidden; border-radius: 24px; background: #08090c; box-shadow: 0 40px 100px -40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.06); }
 .stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 70% 40%, rgba(40,60,120,.18), transparent 70%); }
 .stage .scene { z-index: 1; }
 
@@ -293,7 +293,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 #workspace .tool { background: #fff; border-radius: 20px; border-color: rgba(0,0,0,.08); }
 
 /* ---------- panels and product shots ---------- */
-.panel { border: 1px solid rgba(0,0,0,.08); background: #fff; border-radius: 20px; overflow: hidden; padding: 14px; }
+.panel { border: 1px solid rgba(0,0,0,.08); background: #fff; border-radius: 24px; overflow: hidden; padding: 14px; }
 .panel pre { border-radius: 12px; background: #0e1015; }
 .panel-bar { display: flex; gap: 12px; padding: 6px 8px 14px; font: 400 12px/1 var(--font-mono); color: var(--color-ink-3); letter-spacing: .02em; }
 .panel pre { margin: 0; padding: 30px 34px; color: #cfd3da; font: 400 13px/1.85 var(--font-mono); white-space: pre; overflow-x: auto; }
@@ -303,7 +303,7 @@ body[data-view='parser'] .zoomctl { display: none; }
 .mk { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--color-ink); color: #fff; font: 500 11px/1 var(--font-mono); vertical-align: middle; box-shadow: none; }
 .label { font: 400 12.5px/1 var(--font-mono); color: var(--color-ink-3); letter-spacing: .02em; text-transform: uppercase; }
 .panel pre i.mk { background: #fff; color: #08090c; box-shadow: none; padding: 0; margin-left: 4px; border-radius: 50%; width: 20px; height: 20px; }
-.shot { margin: 0; border: 1px solid rgba(0,0,0,.08); border-radius: 20px; overflow: hidden; background: #fff; box-shadow: 0 20px 60px -30px rgba(0,0,0,.3); transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft); }
+.shot { margin: 0; border: 1px solid rgba(0,0,0,.12); border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 24px 60px -24px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.06); transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft); }
 .shot:hover { transform: translateY(-4px); box-shadow: 0 30px 70px -30px rgba(0,0,0,.35); }
 .shot img { display: block; width: 100%; height: auto; }
 .shot figcaption { padding: 12px 16px; border-top: 1px solid rgba(0,0,0,.06); font-size: 13px; color: var(--color-ink-2); }
@@ -348,12 +348,13 @@ footer { overflow: hidden; }
 .notes-col li:last-child { border-bottom: 1px solid rgba(0,0,0,.08); }
 .notes-col h3 { font-size: 16px; margin: 0 0 6px; }
 .notes-col p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--color-ink-2); }
-.feature { display: grid; gap: 28px; align-items: center; margin-bottom: 56px; }
+.feature { display: grid; gap: 28px; align-items: center; margin-bottom: 64px; }
+.feature:last-child { margin-bottom: 0; }
 @media (min-width: 1024px) { .feature { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr); gap: 56px; } .feature-flip { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); } .feature-flip .shot { order: 2; } }
 .feature-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .feature-steps li { display: grid; grid-template-columns: 22px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid rgba(0,0,0,.08); }
-.feature-steps h3 { font-size: 17px; margin: 0 0 6px; }
-.feature-steps p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--color-ink-2); }
+.feature-steps h3 { font-size: 18px; margin: 0 0 6px; }
+.feature-steps p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--color-ink-2); }
 
 /* ---------- the failure notes beside the extraction ---------- */
 .notes { list-style: none; margin: 0; padding: 0; }

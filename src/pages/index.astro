@@ -144,7 +144,7 @@ const schema = {
       <a href="#faq" class="text-ink-2 no-underline transition-colors hover:text-ink">Questions</a>
       <a href="https://github.com/DigiHold/parseable" rel="noopener" target="_blank" class="text-ink-2 no-underline transition-colors hover:text-ink">Source</a>
     </nav>
-    <div class="flex justify-end"><button class="btn btn-primary btn-sm" data-action="pick-pdf">Upload your resume</button></div>
+    <div class="flex justify-end"><button class="cursor-pointer border-0 bg-transparent p-0 text-[14px] font-medium text-ink underline decoration-edge underline-offset-4 hover:decoration-ink" data-action="pick-pdf">Upload your resume</button></div>
   </div>
 </header>
 
@@ -154,7 +154,7 @@ const schema = {
     <div class="stage" data-stage>
       <div class="relative grid grid-cols-1 items-center gap-8 px-6 py-8 sm:px-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12 lg:px-16 lg:py-14">
         <div class="hero-copy relative z-10">
-          <h1 class="mb-5 max-w-[15ch] text-[clamp(34px,4.4vw,64px)] text-white" style="text-wrap:balance">Get past the software and in front of a person</h1>
+          <h1 class="mb-5 text-[clamp(32px,3.7vw,54px)] text-white"><span class="block sm:whitespace-nowrap">Get past the software</span><span class="block sm:whitespace-nowrap">and in front of a person</span></h1>
           <p class="mb-7 max-w-[40ch] text-[16px] leading-[1.55] text-white/60 sm:text-[17px]">A free ATS friendly resume checker that runs in your browser. Software reads your resume before a human does, so check yours against the posting and download a PDF it reads correctly.</p>
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-x-5">
             <button class="btn btn-light btn-xl w-full sm:w-auto" data-action="pick-pdf">Upload your resume</button>
@@ -164,7 +164,7 @@ const schema = {
           <input type="file" accept="application/json,.json" class="hidden" data-file="json">
           <p class="mt-4 min-h-[20px] text-[13px] text-white/40" data-role="pdf-status"></p>
         </div>
-      <div class="scene order-first lg:order-none" aria-label="A resume, and below the blade of light the text a screening system extracts from it">
+      <div class="scene" aria-label="A resume, and below the blade of light the text a screening system extracts from it">
         <div class="spill" aria-hidden="true"></div>
         <div class="obj">
           <div class="face face-human"><article class="sheet" data-tpl="classic" set:html={demoSheet}></article></div>
@@ -270,9 +270,9 @@ English</pre>
   <!-- how it works: the tool's own screens -->
   <section id="how" class="scroll-mt-[80px]">
     <div class="mx-auto max-w-[1180px] px-6 py-24">
-      <div class="mb-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16" data-reveal>
-        <h2 class="max-w-[16ch] text-[clamp(30px,3.2vw,44px)]">Four steps, about ten minutes the first time</h2>
-        <p class="m-0 max-w-[48ch] self-end text-[17px] leading-relaxed text-ink-2">After that, import your JSON and a new application takes a minute, because only the job posting changes. Everything runs in the tab, nothing is uploaded.</p>
+      <div class="mb-14" data-reveal>
+        <h2 class="mb-4 max-w-[28ch] text-[clamp(30px,3.2vw,44px)]">Four steps, about ten minutes the first time</h2>
+        <p class="m-0 max-w-[60ch] text-[17px] leading-relaxed text-ink-2">After that, import your JSON and a new application takes a minute, because only the job posting changes. Everything runs in the tab, nothing is uploaded.</p>
       </div>
       <div class="feature" data-reveal>
         <figure class="shot"><picture><source srcset="/img/shot-parser.avif" type="image/avif"><img src="/img/shot-parser.webp" alt="The tool with a resume loaded: the fields on the left, and on the right the plain text a parser extracts from the page" width="2264" height="1744" loading="lazy" decoding="async"></picture></figure>
@@ -293,10 +293,13 @@ English</pre>
 
   <!-- questions: title and a help card on the left, the answers on the right -->
   <section id="faq" class="scroll-mt-[80px]">
-    <div class="mx-auto grid max-w-[1180px] gap-10 px-6 py-24 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+    <div class="mx-auto max-w-[1180px] px-6 py-24">
+      <div class="mx-auto mb-12 max-w-[60ch] text-center" data-reveal>
+        <h2 class="mb-4 text-[clamp(30px,3.2vw,44px)]">Frequently asked questions</h2>
+        <p class="m-0 text-[17px] leading-relaxed text-ink-2">Short answers, and the reasons behind them. The one on white keywords is the one most people arrive with.</p>
+      </div>
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
       <div data-reveal>
-        <h2 class="mb-4 max-w-[14ch] text-[clamp(30px,3.2vw,44px)]">Frequently asked questions</h2>
-        <p class="mb-8 max-w-[40ch] text-[17px] leading-relaxed text-ink-2">Short answers, and the reasons behind them. The one on white keywords is the one most people arrive with.</p>
         <dl class="facts">
           <div><dt>Account</dt><dd>There is nothing to sign up to.</dd></div>
           <div><dt>Storage</dt><dd>Your file stays in the tab and is never sent.</dd></div>
