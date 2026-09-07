@@ -25,8 +25,7 @@ export function mountSite(): void {
       const r = scene.getBoundingClientRect();
       const mx = ((e.clientX - r.left) / r.width) * 2 - 1;
       const my = ((e.clientY - r.top) / r.height) * 2 - 1;
-      obj.style.setProperty('--ry', `${-17 + mx * 7}deg`);
-      obj.style.setProperty('--rx', `${3 - my * 4}deg`);
+      obj.style.transform = `translate(${mx * 6}px, ${my * 4}px)`;
     }, { passive: true });
   }
 
@@ -37,12 +36,11 @@ export function mountSite(): void {
   if (stage && sceneEl && !reduce) {
     gsap.registerPlugin(ScrollTrigger);
     sceneEl.style.animation = 'none';
-    const vars = { scan: 55 };
+    const vars = { scan: 38 };
     const apply = () => sceneEl.style.setProperty('--scan', `${vars.scan}%`);
     apply();
-    gsap.to(vars, { scan: 96, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: stage, start: 'top top', end: 'bottom 30%', scrub: 0.6 } });
+    gsap.to(vars, { scan: 92, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: sceneEl, start: 'top 80%', end: 'bottom 30%', scrub: 0.6 } });
     const objEl = sceneEl.querySelector<HTMLElement>('.obj');
-    if (objEl) gsap.to(objEl, { '--ry': '-4deg', '--rx': '0deg', ease: 'none', scrollTrigger: { trigger: stage, start: 'top top', end: 'bottom 30%', scrub: 0.8 } });
     gsap.utils.toArray<HTMLElement>('.notes-row li, .steps-row li').forEach((el, i) => {
       gsap.from(el, { y: 18, opacity: 0, duration: .7, ease: 'power2.out', delay: (i % 4) * 0.08, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     });

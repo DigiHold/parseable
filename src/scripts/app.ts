@@ -436,11 +436,7 @@ function bootstrap() {
     }
 
     const action = hit('[data-action]')?.dataset.action;
-    if (!action) {
-      const drop = hit('[data-drop="pdf"]');
-      if (drop) { $<HTMLInputElement>('[data-file="pdf"]')?.click(); }
-      return;
-    }
+    if (!action) return;
     if (action === 'blank') { data = emptyResume(); demo = false; goto('details'); }
     if (action === 'sample') { data = DEMO; demo = true; goto('details'); }
     if (action === 'pick-pdf') $<HTMLInputElement>('[data-file="pdf"]')?.click();
