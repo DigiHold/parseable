@@ -19,26 +19,39 @@ export interface Audit {
 
 /* Terms an ATS requisition actually scores. Precision beats coverage here:
    a noisy extractor sends people chasing keywords that were never required. */
-const DICTIONARY: string[] = [
-  // languages
-  'JavaScript','TypeScript','Python','Java','C#','C++','Go','Golang','Rust','PHP','Ruby','Swift','Kotlin','Scala','SQL','HTML','CSS','Bash','Shell','R','Perl','Elixir','Dart','Objective-C',
-  // frontend
-  'React','React Native','Next.js','Vue','Vue.js','Nuxt','Angular','Svelte','SvelteKit','Astro','Remix','Redux','Tailwind CSS','Tailwind','SASS','SCSS','Less','Webpack','Vite','Storybook','jQuery','Bootstrap','Material UI','shadcn/ui','Framer Motion','GSAP','Three.js','WebGL','Web Components','Accessibility','WCAG','Responsive design','Figma','Sketch','Adobe XD','Design systems',
-  // backend
-  'Node.js','Express','NestJS','Fastify','Django','Flask','FastAPI','Laravel','Symfony','Rails','Spring','Spring Boot','.NET','ASP.NET','GraphQL','REST','REST API','gRPC','WebSockets','Microservices','Serverless','Message queue','RabbitMQ','Kafka','Celery','Cron',
-  // data
-  'PostgreSQL','Postgres','MySQL','MariaDB','SQLite','MongoDB','Redis','Elasticsearch','DynamoDB','Cassandra','Snowflake','BigQuery','Redshift','Databricks','Prisma','Drizzle','SQLAlchemy','TypeORM','ETL','Data pipeline','Data modeling','Data warehouse','dbt','Airflow',
-  // cloud and ops
-  'AWS','Azure','GCP','Google Cloud','Cloudflare','Cloudflare Workers','Vercel','Netlify','Heroku','Docker','Kubernetes','K8s','Terraform','Ansible','Pulumi','CI/CD','GitHub Actions','GitLab CI','Jenkins','CircleCI','Linux','Nginx','systemd','Git','GitHub','GitLab','Bitbucket','Monitoring','Observability','Datadog','Grafana','Prometheus','Sentry','Load balancing','Caching','CDN',
-  // ai
-  'Machine learning','Deep learning','LLM','Large language models','Generative AI','Prompt engineering','RAG','Retrieval augmented generation','Vector database','Pinecone','Weaviate','Embeddings','Fine-tuning','OpenAI','Anthropic','Claude','GPT','Gemini','LangChain','LlamaIndex','Hugging Face','PyTorch','TensorFlow','scikit-learn','Pandas','NumPy','NLP','Computer vision','MLOps','Model evaluation','AI agents','Agentic','Tool use','MCP','Model Context Protocol','Automation','Workflow automation','n8n','Zapier','Make.com',
-  // product and practice
-  'Agile','Scrum','Kanban','Jira','Confluence','Notion','Linear','Test driven development','TDD','Unit testing','Integration testing','End to end testing','Jest','Vitest','Playwright','Cypress','Selenium','PyTest','Code review','Pair programming','Technical documentation','System design','Architecture','Scalability','Performance optimization','Security','OAuth','SSO','SAML','JWT','Authentication','Authorization','GDPR','SOC 2','Penetration testing','Encryption',
-  // business and marketing
-  'SEO','Technical SEO','SEM','Google Analytics','Google Search Console','Google Tag Manager','A/B testing','Conversion rate optimization','Content marketing','Email marketing','HubSpot','Salesforce','Stripe','Shopify','WordPress','WooCommerce','Webflow','Contentful','Sanity','Headless CMS','E-commerce','Analytics','Product management','Roadmap','Stakeholder management','Cross functional','Mentoring','Team leadership','Customer facing','Technical writing','Public speaking',
-  // ways of working
-  'Remote','Fully remote','Hybrid','Distributed team','Asynchronous','English','French','German','Spanish','Dutch','Italian','Portuguese','Startup','B2B','B2C','SaaS','Freelance','Consulting',
+/* Terms an ATS requisition actually scores, kept in the families a resume already uses,
+   so a term the tool places lands in the right group. Precision beats coverage here:
+   a noisy extractor sends people chasing keywords that were never required. */
+export const FAMILIES: Array<{ label: string; terms: string[] }> = [
+  { label: 'Languages', terms: [
+    'JavaScript','TypeScript','Python','Java','C#','C++','Go','Golang','Rust','PHP','Ruby','Swift','Kotlin','Scala','SQL','HTML','CSS','Bash','Shell','R','Perl','Elixir','Dart','Objective-C',
+  ] },
+  { label: 'Frontend', terms: [
+    'React','React Native','Next.js','Vue','Vue.js','Nuxt','Angular','Svelte','SvelteKit','Astro','Remix','Redux','Tailwind CSS','Tailwind','SASS','SCSS','Less','Webpack','Vite','Storybook','jQuery','Bootstrap','Material UI','shadcn/ui','Framer Motion','GSAP','Three.js','WebGL','Web Components','Accessibility','WCAG','Responsive design','Figma','Sketch','Adobe XD','Design systems',
+  ] },
+  { label: 'Backend', terms: [
+    'Node.js','Express','NestJS','Fastify','Django','Flask','FastAPI','Laravel','Symfony','Rails','Spring','Spring Boot','.NET','ASP.NET','GraphQL','REST','REST API','gRPC','WebSockets','Microservices','Serverless','Message queue','RabbitMQ','Kafka','Celery','Cron',
+  ] },
+  { label: 'Data', terms: [
+    'PostgreSQL','Postgres','MySQL','MariaDB','SQLite','MongoDB','Redis','Elasticsearch','DynamoDB','Cassandra','Snowflake','BigQuery','Redshift','Databricks','Prisma','Drizzle','SQLAlchemy','TypeORM','ETL','Data pipeline','Data modeling','Data warehouse','dbt','Airflow',
+  ] },
+  { label: 'Infrastructure', terms: [
+    'AWS','Azure','GCP','Google Cloud','Cloudflare','Cloudflare Workers','Vercel','Netlify','Heroku','Docker','Kubernetes','K8s','Terraform','Ansible','Pulumi','CI/CD','GitHub Actions','GitLab CI','Jenkins','CircleCI','Linux','Nginx','systemd','Git','GitHub','GitLab','Bitbucket','Monitoring','Observability','Datadog','Grafana','Prometheus','Sentry','Load balancing','Caching','CDN',
+  ] },
+  { label: 'AI and automation', terms: [
+    'Machine learning','Deep learning','LLM','Large language models','Generative AI','Prompt engineering','RAG','Retrieval augmented generation','Vector database','Pinecone','Weaviate','Embeddings','Fine-tuning','OpenAI','Anthropic','Claude','GPT','Gemini','LangChain','LlamaIndex','Hugging Face','PyTorch','TensorFlow','scikit-learn','Pandas','NumPy','NLP','Computer vision','MLOps','Model evaluation','AI agents','Agentic','Tool use','MCP','Model Context Protocol','Automation','Workflow automation','n8n','Zapier','Make.com',
+  ] },
+  { label: 'Practices', terms: [
+    'Agile','Scrum','Kanban','Jira','Confluence','Notion','Linear','Test driven development','TDD','Unit testing','Integration testing','End to end testing','Jest','Vitest','Playwright','Cypress','Selenium','PyTest','Code review','Pair programming','Technical documentation','System design','Architecture','Scalability','Performance optimization','Security','OAuth','SSO','SAML','JWT','Authentication','Authorization','GDPR','SOC 2','Penetration testing','Encryption',
+  ] },
+  { label: 'Business', terms: [
+    'SEO','Technical SEO','SEM','Google Analytics','Google Search Console','Google Tag Manager','A/B testing','Conversion rate optimization','Content marketing','Email marketing','HubSpot','Salesforce','Stripe','Shopify','WordPress','WooCommerce','Webflow','Contentful','Sanity','Headless CMS','E-commerce','Analytics','Product management','Roadmap','Stakeholder management','Cross functional','Mentoring','Team leadership','Customer facing','Technical writing','Public speaking',
+  ] },
+  { label: 'Ways of working', terms: [
+    'Remote','Fully remote','Hybrid','Distributed team','Asynchronous','English','French','German','Spanish','Dutch','Italian','Portuguese','Startup','B2B','B2C','SaaS','Freelance','Consulting',
+  ] },
 ];
+const DICTIONARY: string[] = FAMILIES.flatMap((f) => f.terms);
 
 /* Written differently in postings and in resumes. A hit on either form counts. */
 const ALIASES: Record<string, string[]> = {
@@ -62,9 +75,9 @@ const PREFERRED_CUE = /\b(nice to have|bonus|a plus|preferred|ideally|desirable|
 
 /* Phrases the posting names explicitly, caught even when they are not in the dictionary. */
 const PHRASE_PATTERNS = [
-  /\b(?:experience|expertise|proficiency|proficient|fluency|background|familiarity|knowledge)\s+(?:with|in|of|using)\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,38})/gi,
-  /\b(?:working|hands[- ]on)\s+knowledge\s+of\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,38})/gi,
-  /\bstrong\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,30}?)\s+skills\b/gi,
+  /\b(?:experience|expertise|proficiency|proficient|fluency|background|familiarity|knowledge)\s+(?:with|in|of|using)\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,38}\b)/gi,
+  /\b(?:working|hands[- ]on)\s+knowledge\s+of\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,38}\b)/gi,
+  /\bstrong\s+([A-Za-z][A-Za-z0-9+#.\/ -]{2,30}?\b)\s+skills\b/gi,
 ];
 
 const STOP_TAIL = /\b(and|or|with|the|a|an|to|in|of|for|is|are|such as|including|etc|our|your|their)\b\s*$/i;
@@ -82,6 +95,11 @@ const CANON_GROUPS: string[][] = [
   ['Large language models', 'LLM', 'LLMs'], ['Google Cloud', 'GCP'], ['Tailwind CSS', 'Tailwind'],
   ['Retrieval augmented generation', 'RAG'], ['Machine learning', 'ML'], ['Fully remote', 'Remote'],
 ];
+const FAMILY = new Map<string, string>();
+for (const f of FAMILIES) for (const t of f.terms) FAMILY.set(norm(t), f.label);
+/** The family a term belongs to, or an empty string when the posting invented the phrase. */
+export const familyOf = (term: string): string => FAMILY.get(norm(term)) ?? '';
+
 const CANON = new Map<string, string>();
 for (const group of CANON_GROUPS) for (const form of group) CANON.set(norm(form), group[0]);
 const canonical = (term: string) => CANON.get(norm(term)) ?? term;

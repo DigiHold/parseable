@@ -2,7 +2,7 @@ import type { Resume, TemplateId } from './types';
 import { emptyResume, normalise } from './types';
 import { renderSheet, renderParserText } from './render';
 import { audit, type Audit } from './keywords';
-import { tailor, guessTitle, cleanTitle, describe, type TailorLog } from './tailor';
+import { tailor, guessTitle, cleanTitle, describe, describeSkipped, type TailorLog } from './tailor';
 
 type StepId = 'details' | 'template' | 'posting' | 'export';
 const STEPS: StepId[] = ['details', 'template', 'posting', 'export'];
@@ -228,9 +228,11 @@ function renderAudit(a: Audit): string {
       <div class="mb-2"><h3 class="mb-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-ink-2">Preferred (${a.preferredHit}/${a.preferredTotal})</h3>${chips(pref)}</div>
       <p class="text-[12.5px] text-ink-3">Click a missing term to put it in, and only do that when it is genuinely true of you, because it will be the first thing an interviewer asks about.</p>
       ${tailorLog
-        ? `<div class="notice mt-4"><strong>Tailored to this posting</strong>${esc(describe(tailorLog))} Nothing was reworded, added or removed.<div class="mt-2"><button class="btn btn-ghost btn-sm" data-action="undo-tailor">Undo</button></div></div>`
+        ? `<div class="notice mt-4"><strong>Tailored to this posting</strong>${esc(describe(tailorLog))}${
+            tailorLog.added.length ? ' Read them once and delete any that is not true of you, because it will be the first thing an interviewer asks about.' : ''
+          }${tailorLog.skipped.length ? ` ${esc(describeSkipped(tailorLog))}` : ''}<div class="mt-2"><button class="btn btn-ghost btn-sm" data-action="undo-tailor">Undo</button></div></div>`
         : `<button class="btn btn-primary mt-4 w-full" data-action="tailor">Tailor my resume to this posting</button>
-           <p class="mt-2 text-[12.5px] text-ink-3">It takes the posting's job title as yours, and moves the skills and bullets it scores to the front of their lists. Nothing else changes: no degree, employer, date or skill you did not write can appear, and one click undoes it.</p>`}
+           <p class="mt-2 text-[12.5px] text-ink-3">It takes the posting's job title as yours, puts the terms it scores into your skills and moves them to the front. A degree, a school, an employer or a number of years is never written for you, so anything of that kind stays missing. One click undoes it.</p>`}
     </div>`;
 }
 

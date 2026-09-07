@@ -88,11 +88,15 @@ check('the posting title becomes the resume title', (await page.locator('#sheet'
 check('the title then reads as matched', (await page.locator('[data-action="use-title"]').count()) === 0);
 // the title is read from the posting's first line, and tailoring is one undoable click
 await page.fill('[data-role="posting-title"]', '');
-await page.fill('[data-role="posting"]', 'Platform Engineer (Remote)\nRequirements\n- Strong experience with Docker and Kubernetes\n- Must have Zig'); await page.waitForTimeout(200);
+await page.fill('[data-role="posting"]', 'Platform Engineer (Remote)\nRequirements\n- Strong experience with Docker and Kubernetes\n- Proven experience with Rust\n- A degree in computer science is required'); await page.waitForTimeout(200);
 check('the job title is read from the posting', (await page.locator('[data-role="posting-title"]').inputValue()) === 'Platform Engineer');
 await page.click('[data-action="run-audit"]'); await page.waitForTimeout(300);
 await page.click('[data-action="tailor"]'); await page.waitForTimeout(300);
 check('tailoring reports what it changed', (await page.locator('[data-action="undo-tailor"]').count()) === 1);
+const tailored = await page.locator('#panels').innerText();
+check('tailoring reaches 100% on skill terms', /100%/.test(tailored), tailored.match(/\d+% of the \d+ required/)?.[0]);
+check('a missing term the posting scores reaches the sheet', (await page.locator('#sheet').innerText()).includes('Rust'));
+check('no degree is written into the resume', !/\bdegree\b/i.test(await page.locator('#sheet').innerText()));
 await page.click('[data-action="undo-tailor"]'); await page.waitForTimeout(300);
 check('undo brings the tailor button back', (await page.locator('[data-action="tailor"]').count()) === 1);
 // a board's title tags never reach the resume
