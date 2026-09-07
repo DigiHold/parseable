@@ -13,6 +13,11 @@ export const FULL_WIDTH = '\u0001';
 /** Marks a wide horizontal gap, which is how a right aligned column reads in a text layer. */
 export const GAP = '\u0002';
 
+/** Marks the line set in the largest type on the first page, which is the name on almost every resume. */
+export const NAME = '\u0003';
+
+type Item = { str: string; x: number; y: number; w: number; size: number };
+
 export async function extractPdfText(file: File): Promise<string> {
   const pdfjs = await import('pdfjs-dist');
   const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
@@ -22,60 +27,110 @@ export async function extractPdfText(file: File): Promise<string> {
   const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
   const doc = await task.promise;
   const pages: string[] = [];
+  let biggest = 0;
 
   for (let n = 1; n <= doc.numPages; n++) {
-    const content = await (await doc.getPage(n)).getTextContent();
-    let line = '';
-    let lastY: number | null = null;
-    const lines: string[] = [];
-    const ends: number[] = [];
+    const page = await doc.getPage(n);
+    const pageW = page.getViewport({ scale: 1 }).width;
+    const content = await page.getTextContent();
+    const items: Item[] = (content.items as any[])
+      .filter((it) => typeof it.str === 'string' && it.str.trim())
+      .map((it) => ({
+        str: it.str as string,
+        x: it.transform[4] as number,
+        y: it.transform[5] as number,
+        w: typeof it.width === 'number' ? it.width : 0,
+        size: Math.max(Math.abs(it.transform[0] as number), Math.abs(it.transform[3] as number)) || 10,
+      }));
+    if (n === 1) biggest = Math.max(0, ...items.filter((it) => it.str.trim().length > 1).map((it) => it.size));
 
-    let lastEndX: number | null = null;
-    for (const raw of content.items as any[]) {
-      if (typeof raw.str !== 'string') continue;
-      const y = Math.round(raw.transform[5]);
-      const x = raw.transform[4] as number;
+    // A sidebar is a second column. Reading the page top to bottom in one pass would
+    // interleave the two, so the columns are found first and read one after the other,
+    // the one holding the name first. That is what a careful reader does with the page.
+    const columns = splitColumns(items, pageW);
+    const named = columns.findIndex((col) => col.some((it) => it.size >= biggest - 0.5 && n === 1));
+    if (named > 0) columns.unshift(...columns.splice(named, 1));
 
-      if (lastY !== null && Math.abs(y - lastY) > 2) {
-        lines.push(line.trim());
-        ends.push(lastEndX ?? 0);
-        line = '';
-        lastEndX = null;
-      }
-      // Runs carry no spaces of their own, so a horizontal gap is the only signal.
-      if (lastEndX !== null) {
-        const gap = x - lastEndX;
-        // Some producers report item widths accurately and some do not. Where they do,
-        // a wide gap is a right aligned column and marking it makes the split exact.
-        if (gap > 14) line += GAP;
-        else if (gap > 1 && !/\s$/.test(line) && !/^\s/.test(raw.str)) line += ' ';
-      }
-      line += raw.str;
-
-      lastEndX = x + (typeof raw.width === 'number' ? raw.width : 0);
-      if (raw.hasEOL) { lines.push(line.trim()); ends.push(lastEndX ?? 0); line = ''; lastEndX = null; }
-      lastY = y;
+    const text: string[] = [];
+    for (const col of columns) {
+      const lines = toLines(col);
+      const ends = lines.map((ln) => Math.max(...ln.map((it) => it.x + it.w)));
+      const rightEdge = Math.max(...ends, 0) * 0.94;
+      lines.forEach((ln, i) => {
+        let out = '';
+        let lastEnd: number | null = null;
+        for (const it of ln) {
+          if (lastEnd !== null) {
+            const gap = it.x - lastEnd;
+            // Some producers report item widths accurately and some do not. Where they do,
+            // a wide gap is a right aligned column and marking it makes the split exact.
+            if (gap > 14) out += GAP;
+            else if (gap > 1 && !/\s$/.test(out) && !/^\s/.test(it.str)) out += ' ';
+          }
+          out += it.str;
+          lastEnd = it.x + it.w;
+        }
+        out = out.trim();
+        if (!out) return;
+        const size = Math.max(...ln.map((it) => it.size));
+        const isName = n === 1 && size >= biggest - 0.5 && out.length < 42 && !/\d/.test(out) && !EMAIL.test(out);
+        // A line that reaches the right margin was cut by the margin, not by the writer.
+        // FULL_WIDTH marks it so the wrap can be undone once the lines are back together.
+        text.push((isName ? NAME : '') + out + (ends[i] >= rightEdge && ln.length > 0 ? FULL_WIDTH : ''));
+      });
     }
-    if (line.trim()) { lines.push(line.trim()); ends.push(lastEndX ?? 0); }
-
-    // A line that reaches the right margin was cut by the margin, not by the writer.
-    // FULL_WIDTH marks it so the wrap can be undone once the lines are back together.
-    const rightEdge = Math.max(...ends, 0) * 0.94;
-    pages.push(
-      lines
-        .map((l, i) => (l && ends[i] >= rightEdge ? l + FULL_WIDTH : l))
-        .filter((l) => l.replace(FULL_WIDTH, '').length > 0)
-        .join('\n')
-    );
+    pages.push(text.join('\n'));
   }
   await task.destroy();
   return pages.join('\n\n');
 }
 
+/** Groups items into visual lines, top to bottom, left to right. */
+function toLines(items: Item[]): Item[][] {
+  const sorted = [...items].sort((a, b) => b.y - a.y || a.x - b.x);
+  const lines: Item[][] = [];
+  for (const it of sorted) {
+    const cur = lines[lines.length - 1];
+    const ref = cur?.[0];
+    if (ref && Math.abs(ref.y - it.y) <= Math.max(2.5, Math.min(ref.size, it.size) * 0.4)) cur.push(it);
+    else lines.push([it]);
+  }
+  return lines.map((ln) => ln.sort((a, b) => a.x - b.x));
+}
+
+/**
+ * Finds a vertical gutter no text crosses, with real content on both sides, and
+ * splits the page there. A resume has at most two columns, so one gutter is enough.
+ */
+function splitColumns(items: Item[], pageW: number): Item[][] {
+  if (items.length < 12) return [items];
+  const bins = new Uint16Array(Math.ceil(pageW) + 1);
+  for (const it of items) {
+    const from = Math.max(0, Math.floor(it.x));
+    const to = Math.min(bins.length - 1, Math.ceil(it.x + Math.max(it.w, it.size * 0.5)));
+    for (let x = from; x <= to; x++) bins[x]++;
+  }
+  let best: { at: number; width: number } | null = null;
+  let run = 0;
+  for (let x = Math.floor(pageW * 0.2); x < pageW * 0.7; x++) {
+    if (bins[x] === 0) run++;
+    else {
+      if (run >= 6 && (!best || run > best.width)) best = { at: x - run / 2, width: run };
+      run = 0;
+    }
+  }
+  if (!best) return [items];
+  const left = items.filter((it) => it.x < best!.at);
+  const right = items.filter((it) => it.x >= best!.at);
+  const share = Math.min(left.length, right.length) / items.length;
+  if (share < 0.12) return [items];
+  return [left, right];
+}
+
 /* Section headings, English and French, as they are actually written on resumes. */
 const HEADINGS: Array<[keyof SectionMap, RegExp]> = [
   ['summary', /^(professional\s+summary|summary|profile|about(\s+me)?|objective|profil|à\s+propos)\b/i],
-  ['skills', /^(technical\s+skills|core\s+skills|skills?|technologies|tech\s+stack|competenc|compétences)\b/i],
+  ['skills', /^(technical\s+skills|core\s+skills|professional\s+skills|soft\s+skills|key\s+skills|hard\s+skills|skills?|expertise|tools?|technologies|tech\s+stack|competenc|compétences|outils|logiciels)\b/i],
   ['experience', /^(work\s+experience|professional\s+experience|experience|employment|career|expérience)\b/i],
   ['projects', /^(selected\s+projects|projects?|portfolio|projets?|réalisations)\b/i],
   ['education', /^(education|academic|qualifications|formation|études)\b/i],
@@ -87,6 +142,9 @@ type SectionMap = Record<'summary' | 'skills' | 'experience' | 'projects' | 'edu
 const DATE_RANGE =
   /((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc)[a-zé.]*\s*)?(19|20)\d{2}\s*(?:[-–—]|to|à|jusqu|until)\s*((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zé.]*\s*)?((19|20)\d{2}|present|current|today|now|aujourd'hui|aujourd|présent|actuel)/i;
 const BULLET = /^\s*[•▪◦●·*\-–—]\s+/;
+/** A heading is short, opens with a capital and never ends a sentence, so a wrapped word never passes for one. */
+const looksLikeHeading = (line: string): boolean =>
+  line.length < 46 && /^[A-ZÀ-Ý]/.test(line) && !/[.,;]$/.test(line) && HEADINGS.some(([, re]) => re.test(line));
 const EMAIL = /[\w.+-]+@[\w-]+\.[\w.]{2,}/;
 const PHONE = /(\+\d{1,3}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,6}\d{2,4}/;
 const URL = /\b((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.(?:com|net|org|io|dev|ai|co|me|fr|ch|app|xyz)(?:\/[\w./-]*)?)\b/i;
@@ -105,7 +163,7 @@ function joinWrapped(lines: string[]): string[] {
     const line = raw;
     const prev = out[out.length - 1];
     const bare = line.replace(FULL_WIDTH, '');
-    const isHeading = bare.length < 46 && HEADINGS.some(([, re]) => re.test(bare));
+    const isHeading = looksLikeHeading(bare);
     // "Backend: Node.js, ..." opens a new row even when the line above ran to the margin.
     const LABEL_ROW = /^[A-Za-zÀ-ÿ&/ ]{2,28}\s?:\s\S/;
     const starts =
@@ -130,6 +188,9 @@ function joinWrapped(lines: string[]): string[] {
   return out.map((l) => l.replace(new RegExp(FULL_WIDTH, 'g'), '').trim());
 }
 
+const isPhoneLine = (l: string): boolean => !DATE_RANGE.test(l) && l.length < 40 && PHONE.test(l) && (l.match(/\d/g) || []).length >= 8 && (l.match(/[a-z]/gi) || []).length < 6;
+const isLinkLine = (l: string): boolean => l.length < 70 && URL.test(l) && l.replace(URL, '').replace(/[|•·\s]/g, '').length < 12;
+
 /** Turns extracted text into a resume the person then corrects. */
 export function textToResume(text: string): Resume {
   const r = emptyResume();
@@ -138,11 +199,24 @@ export function textToResume(text: string): Resume {
 
   const sections: SectionMap = { head: [], summary: [], skills: [], experience: [], projects: [], education: [], languages: [], certifications: [] };
   let current: keyof SectionMap = 'head';
+  // Several skills blocks ("Professional skills", "Tools") each keep their own label.
+  const skillGroups: Array<{ label: string; lines: string[] }> = [];
+  const nameLine = lines.find((l) => l.startsWith(NAME))?.slice(1) ?? '';
+  const titleLine = nameLine ? lines[lines.findIndex((l) => l.startsWith(NAME)) + 1] ?? '' : '';
 
-  for (const line of lines) {
+  for (const raw of lines) {
+    const line = raw.replace(NAME, '');
     if (!line) continue;
-    const heading = line.length < 46 && HEADINGS.find(([, re]) => re.test(line));
-    if (heading) { current = heading[0]; continue; }
+    if (nameLine && (line === nameLine || line === titleLine)) continue;
+    // Contact lines belong to the head wherever the layout put them.
+    if (line.length < 70 && (EMAIL.test(line) || isPhoneLine(line) || isLinkLine(line))) { sections.head.push(line); continue; }
+    const heading = looksLikeHeading(line) ? HEADINGS.find(([, re]) => re.test(line)) : undefined;
+    if (heading) {
+      current = heading[0];
+      if (current === 'skills') skillGroups.push({ label: /^skills?$/i.test(line) ? '' : line.replace(/\s*:\s*$/, ''), lines: [] });
+      continue;
+    }
+    if (current === 'skills' && skillGroups.length) skillGroups[skillGroups.length - 1].lines.push(line);
     sections[current].push(line);
   }
 
@@ -152,13 +226,13 @@ export function textToResume(text: string): Resume {
 
   // A contact line is usually one row of fragments split by pipes or bullets, so the
   // phone and the location sit beside the email rather than on lines of their own.
+  // On a two column resume they can sit anywhere, so every short line is a candidate.
   const fragments = lines
-    .slice(0, 14)
-    .flatMap((l) => l.split(/\s*[|•·]\s*|\s{3,}/))
+    .flatMap((l) => l.replace(NAME, '').split(/\s*[|•·]\s*|\s{3,}/))
     .map((f) => f.trim())
     .filter(Boolean);
 
-  const phoneFrag = fragments.find((f) => !EMAIL.test(f) && PHONE.test(f) && (f.match(/\d/g) || []).length >= 8);
+  const phoneFrag = fragments.find((f) => !EMAIL.test(f) && !DATE_RANGE.test(f) && f.length < 40 && PHONE.test(f) && (f.match(/\d/g) || []).length >= 8);
   r.basics.phone = phoneFrag ? (phoneFrag.match(PHONE)?.[0].trim() ?? '') : '';
 
   const seen = new Set<string>();
@@ -171,32 +245,46 @@ export function textToResume(text: string): Resume {
     }
   }
 
-  // ---- name and title: the first plausible name line, then the line under it
-  const nameLine = sections.head.find(
-    (l) => /^[A-ZÀ-Ý][\w'’.-]+(\s+[A-ZÀ-Ý][\w'’.-]+){1,3}$/.test(l) && !EMAIL.test(l) && !/\d/.test(l) && l.length < 42
-  );
+  // ---- name and title: the line set in the largest type, then the line under it;
+  // failing that, the first plausible name line in the head of the document.
   if (nameLine) {
-    r.basics.name = nameLine;
-    const after = sections.head[sections.head.indexOf(nameLine) + 1];
-    if (after && after.length < 64 && !EMAIL.test(after) && !/\d{4}/.test(after)) r.basics.title = after;
+    r.basics.name = nameLine.replace(/\s+/g, ' ').trim();
+    if (titleLine && titleLine.length < 64 && !EMAIL.test(titleLine) && !/\d{4}/.test(titleLine) && !HEADINGS.some(([, re]) => re.test(titleLine))) r.basics.title = titleLine;
+  } else {
+    const guess = sections.head.find(
+      (l) => /^[A-ZÀ-Ý][\w'’.-]+(\s+[A-ZÀ-Ý][\w'’.-]+){1,3}$/.test(l) && !EMAIL.test(l) && !/\d/.test(l) && l.length < 42
+    );
+    if (guess) {
+      r.basics.name = guess;
+      const after = sections.head[sections.head.indexOf(guess) + 1];
+      if (after && after.length < 64 && !EMAIL.test(after) && !/\d{4}/.test(after)) r.basics.title = after;
+    }
   }
   const PLACE = /\b(remote|hybrid|onsite|france|switzerland|belgium|germany|spain|italy|portugal|netherlands|ireland|poland|paris|lyon|marseille|london|berlin|munich|amsterdam|madrid|barcelona|lisbon|dublin|zurich|geneva|lausanne|brussels|milan|warsaw|suisse|belgique|allemagne|espagne|cet|cest|gmt|utc)\b/i;
-  const loc = fragments.find((f) => PLACE.test(f) && f.length < 60 && !EMAIL.test(f) && f !== r.basics.title);
+  // The location sits with the contact details: in the head, or on the lines around the email and phone.
+  const contactAt = lines.findIndex((l) => EMAIL.test(l) || isPhoneLine(l));
+  const near = [...sections.head, ...(contactAt >= 0 ? lines.slice(Math.max(0, contactAt - 3), contactAt + 4) : [])]
+    .flatMap((l) => l.replace(NAME, '').split(/\s*[|•·]\s*|\s{3,}/)).map((f) => f.trim()).filter(Boolean);
+  const loc = near.find((f) => PLACE.test(f) && f.length < 48 && !EMAIL.test(f) && !DATE_RANGE.test(f) && !/\b(SA|SAS|SARL|Ltd|Inc|GmbH|AG|LLC)\b/.test(f) && f !== r.basics.title && f !== r.basics.name);
   if (loc) r.basics.location = loc;
 
   // ---- summary
   r.basics.summary = sections.summary.join(' ').replace(BULLET, '').trim();
 
-  // ---- skills, keeping any "Label: a, b, c" shape the original used
-  r.skills = sections.skills
-    .map((l): SkillRow => {
-      const m = l.match(/^([A-Za-zÀ-ÿ&/ ]{2,28}):\s*(.+)$/);
-      return m ? { label: m[1].trim(), items: m[2].trim() } : { label: '', items: l.replace(BULLET, '').trim() };
-    })
-    .filter((s) => s.items.length > 1);
-  if (r.skills.length > 1 && r.skills.every((s) => !s.label) && r.skills.every((s) => s.items.split(',').length < 2)) {
-    r.skills = [{ label: 'Skills', items: r.skills.map((s) => s.items).join(', ') }];
-  }
+  // ---- skills: one row per block the resume had, keeping any "Label: a, b, c" shape
+  const groups = skillGroups.length ? skillGroups : [{ label: '', lines: sections.skills }];
+  r.skills = groups.flatMap((g): SkillRow[] => {
+    const rows = g.lines
+      .map((l): SkillRow => {
+        const m = l.match(/^([A-Za-zÀ-ÿ&/ ]{2,28}):\s*(.+)$/);
+        return m ? { label: m[1].trim(), items: m[2].trim() } : { label: '', items: l.replace(BULLET, '').trim() };
+      })
+      .filter((row) => row.items.length > 1);
+    if (rows.length > 1 && rows.every((row) => !row.label) && rows.every((row) => row.items.split(',').length < 3)) {
+      return [{ label: g.label || 'Skills', items: rows.map((row) => row.items).join(', ') }];
+    }
+    return rows.map((row) => (row.label ? row : { label: g.label, items: row.items }));
+  });
 
   r.experience = blockToRoles(sections.experience);
   r.projects = blockToRoles(sections.projects).map((e) => ({ name: e.title, meta: e.dates, subtitle: e.org, bullets: e.bullets, env: e.env }));
@@ -208,7 +296,7 @@ export function textToResume(text: string): Resume {
 
 /** The layout markers are internal, so nothing carrying them ever reaches a form field. */
 function stripMarkers<T>(value: T): T {
-  const MARKERS = new RegExp(`[${FULL_WIDTH}${GAP}]`, 'g');
+  const MARKERS = new RegExp(`[${FULL_WIDTH}${GAP}${NAME}]`, 'g');
   if (typeof value === 'string') return value.replace(MARKERS, ' ').replace(/\s+/g, ' ').trim() as unknown as T;
   if (Array.isArray(value)) return value.map(stripMarkers) as unknown as T;
   if (value && typeof value === 'object') {
@@ -265,5 +353,12 @@ function blockToRoles(block: string[]): Role[] {
     else cur.bullets.push(line);
   }
   if (cur) roles.push(cur);
+  for (const role of roles) {
+    role.dates = role.dates.replace(/\s*([-–—]|to|à)\s*/i, ' - ').replace(/\s+/g, ' ').trim();
+    if (!role.org) {
+      const m = role.title.match(/^(.{2,60}?)\s+(?:-|–|—|\||at|chez|@)\s+(.{2,60})$/i);
+      if (m) { role.title = m[1].trim(); role.org = m[2].trim(); }
+    }
+  }
   return roles.filter((r) => r.title || r.org || r.bullets.length);
 }
