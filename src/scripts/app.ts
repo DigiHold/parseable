@@ -240,12 +240,13 @@ function panelExport(): string {
   return `
     <div class="p-5">
       <p class="text-[13.5px] text-ink-2 mb-4">The PDF for this application, and the JSON so the next one takes a minute.</p>
-      <button class="btn btn-ghost mb-2.5 w-full" data-action="print">Download PDF</button>
+      <button class="btn btn-primary mb-2.5 w-full" data-action="pdf">Download PDF</button>
       <button class="btn btn-ghost mb-4 w-full" data-action="export-json">Export JSON</button>
+      <p class="mb-4 min-h-[18px] text-[13px] text-ink-3" data-role="pdf-out"></p>
       <div class="notice">
-        <strong>In the print dialog</strong>
-        Choose "Save as PDF", set margins to none and turn off headers and footers. That keeps a real
-        text layer in the file, which is the layer every parser reads.
+        <strong>A real text layer</strong>
+        The file is written here in your tab, with the text a parser reads rather than a picture of it.
+        <button class="ml-1 cursor-pointer border-0 bg-transparent p-0 text-[inherit] underline decoration-edge underline-offset-2" data-action="print">Use the browser print dialog instead</button>
       </div>
       <div class="notice">
         <strong>Name the file plainly</strong>
@@ -452,6 +453,18 @@ function bootstrap() {
     if (action === 'pick-photo') $<HTMLInputElement>('[data-file="photo"]')?.click();
     if (action === 'drop-photo') { data.basics.photo = null; render(); }
     if (action === 'print') print();
+    if (action === 'pdf') {
+      const out = $('[data-role="pdf-out"]');
+      if (out) out.textContent = 'Writing the file, one moment.';
+      import('./pdf')
+        .then((m) => m.downloadPdf(data))
+        .then(() => { if (out) out.textContent = ''; })
+        .catch((err) => {
+          if (out) out.textContent = 'The file could not be written here, so the print dialog opens instead.';
+          if (import.meta.env.DEV) console.error(err);
+          print();
+        });
+    }
     if (action === 'export-json') {
       const stem = (data.basics.name || 'resume').replace(/[^A-Za-z0-9]+/g, '') || 'resume';
       download(`${stem}_resume.json`, JSON.stringify(data, null, 2), 'application/json');

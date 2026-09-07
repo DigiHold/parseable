@@ -128,6 +128,17 @@ await fresh.close();
 await page.reload({ waitUntil: 'networkidle' });
 check('draft survives a reload', (await page.locator('#workspace').isVisible()) && (await page.locator('#sheet').innerText()).includes(name));
 
+// the PDF is written here, with a real text layer, and saves without the print dialog
+await page.click('[data-step="export"]'); await page.waitForTimeout(200);
+const [pdfDl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), page.click('[data-action="pdf"]')]);
+check('the PDF downloads without a dialog', /_Resume\.pdf$/.test(pdfDl.suggestedFilename()), pdfDl.suggestedFilename());
+const pdfPath = '/tmp/parseable-e2e.pdf';
+await pdfDl.saveAs(pdfPath);
+const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
+const pdfDoc = await getDocument({ data: new Uint8Array(readFileSync(pdfPath)) }).promise;
+const pdfText = (await (await pdfDoc.getPage(1)).getTextContent()).items.map((i) => i.str).join(' ');
+check('the PDF carries a real text layer', pdfText.includes(name) && pdfText.length > 300, `${pdfText.length} characters`);
+
 // print root is filled for the PDF
 await page.click('[data-action="print"]').catch(() => {});
 await page.waitForTimeout(200);
