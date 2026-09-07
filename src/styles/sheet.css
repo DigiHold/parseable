@@ -1,5 +1,5 @@
 /* ============================================================
-   The resume sheet. Three templates, one shared skeleton.
+   The resume sheet. Seven templates, one shared skeleton.
    Every template is a single column in DOM order, uses standard
    section headings and never applies letter-spacing to a heading,
    because letter-spacing survives into the PDF text layer and
@@ -85,6 +85,93 @@
 .sheet[data-tpl="open"] h2 { border-bottom: none; color: var(--s-accent); font-size: 9.4pt; margin: 19px 0 6px; }
 .sheet[data-tpl="open"] .s-item { margin-bottom: 13px; }
 .sheet[data-tpl="open"] .s-summary { text-align: left; }
+
+/* -- template: editorial. Plex Serif, an oxblood accent, the page of a printed book. -- */
+.sheet[data-tpl="editorial"] {
+  --s-accent: #7a2e2e;
+  --s-rule: #e6e0d8;
+  --s-mut: #6a6259;
+  --s-fs: 10pt;
+  --s-lh: 1.5;
+  font-family: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  padding: 16mm 17mm;
+}
+.sheet[data-tpl="editorial"] .s-head { border-bottom: 1px solid var(--s-ink); padding-bottom: 11px; margin-bottom: 16px; }
+.sheet[data-tpl="editorial"] .s-name { font-size: 27pt; font-weight: 500; letter-spacing: -.3px; }
+.sheet[data-tpl="editorial"] .s-role { font-size: 11.5pt; font-weight: 400; font-style: italic; color: var(--s-accent); }
+.sheet[data-tpl="editorial"] .s-contact { font-size: 9pt; }
+.sheet[data-tpl="editorial"] .s-contact .sep { color: var(--s-rule); }
+.sheet[data-tpl="editorial"] h2 { font-size: 9pt; font-weight: 500; color: var(--s-accent); border-bottom: none; margin: 18px 0 6px; padding-bottom: 0; }
+.sheet[data-tpl="editorial"] .s-summary { text-align: left; }
+.sheet[data-tpl="editorial"] .s-item { margin-bottom: 12px; }
+.sheet[data-tpl="editorial"] .s-item-title { font-size: 10.6pt; font-weight: 700; }
+.sheet[data-tpl="editorial"] .s-item-dates { font-weight: 400; }
+.sheet[data-tpl="editorial"] .s-item-org { font-style: italic; }
+
+/* -- template: mono. Plex Mono, a blue accent, plain and exact. -- */
+.sheet[data-tpl="mono"] {
+  --s-accent: #1f5fbf;
+  --s-rule: #d9dce3;
+  --s-mut: #5f6672;
+  --s-fs: 8.9pt;
+  --s-lh: 1.5;
+  font-family: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  padding: 14mm 15mm;
+}
+.sheet[data-tpl="mono"] .s-head { border-bottom: 1px dashed #b8bcc6; padding-bottom: 9px; margin-bottom: 14px; }
+.sheet[data-tpl="mono"] .s-name { font-size: 18pt; font-weight: 400; letter-spacing: 0; }
+.sheet[data-tpl="mono"] .s-role { font-weight: 400; color: var(--s-accent); font-size: 10.2pt; }
+.sheet[data-tpl="mono"] .s-contact { font-size: 8.4pt; }
+.sheet[data-tpl="mono"] h2 { font-size: 9pt; font-weight: 400; color: var(--s-accent); border-bottom: 1px solid var(--s-rule); margin: 16px 0 7px; }
+.sheet[data-tpl="mono"] .s-summary { text-align: left; }
+.sheet[data-tpl="mono"] .s-item-title { font-size: 9.6pt; font-weight: 400; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--s-rule); }
+.sheet[data-tpl="mono"] .s-item-org { font-style: normal; color: var(--s-mut); }
+.sheet[data-tpl="mono"] .s-item-dates { font-weight: 400; }
+.sheet[data-tpl="mono"] .s-skill b, .sheet[data-tpl="mono"] .s-env b { font-weight: 400; color: var(--s-accent); }
+.sheet[data-tpl="mono"] ul { padding-left: 14px; }
+
+/* -- template: signal. A big sans name, orange marks, a bar down the left edge. -- */
+.sheet[data-tpl="signal"] {
+  --s-accent: #d9480f;
+  --s-rule: #ececec;
+  --s-fs: 9.8pt;
+  --s-lh: 1.45;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 14mm 15mm 14mm 16mm;
+  border-left: 4mm solid var(--s-accent);
+}
+.sheet[data-tpl="signal"] .s-head { border-bottom: none; padding-bottom: 0; margin-bottom: 16px; }
+.sheet[data-tpl="signal"] .s-name { font-size: 30pt; font-weight: 600; letter-spacing: -.8px; line-height: 1; margin-bottom: 5px; }
+.sheet[data-tpl="signal"] .s-role { font-size: 11pt; font-weight: 500; color: var(--s-accent); }
+.sheet[data-tpl="signal"] .s-contact .sep { color: var(--s-accent); }
+.sheet[data-tpl="signal"] h2 { font-size: 9.6pt; font-weight: 600; border-bottom: none; position: relative; padding-bottom: 7px; margin: 17px 0 7px; }
+.sheet[data-tpl="signal"] h2::after { content: ''; position: absolute; left: 0; bottom: 0; width: 28px; height: 0; border-bottom: 3px solid var(--s-accent); }
+.sheet[data-tpl="signal"] .s-summary { text-align: left; }
+.sheet[data-tpl="signal"] .s-item-title { font-weight: 600; }
+.sheet[data-tpl="signal"] .s-item-dates { color: var(--s-accent); font-weight: 500; }
+.sheet[data-tpl="signal"] .s-item-org { font-style: normal; font-weight: 500; }
+
+/* -- template: portrait. Centred serif, gold hairlines, a round photo above the name. -- */
+.sheet[data-tpl="portrait"] {
+  --s-accent: #9a7b3c;
+  --s-rule: #e8e2d6;
+  --s-mut: #6a6259;
+  --s-fs: 9.8pt;
+  --s-lh: 1.5;
+  font-family: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  padding: 15mm 17mm;
+}
+.sheet[data-tpl="portrait"] .s-head { flex-direction: column; align-items: center; text-align: center; gap: 10px; border-bottom: 1px solid var(--s-accent); padding-bottom: 13px; margin-bottom: 16px; }
+.sheet[data-tpl="portrait"] .s-head-txt { width: 100%; }
+.sheet[data-tpl="portrait"] .s-photo { order: -1; width: 30mm; height: 30mm; border-radius: 50%; }
+.sheet[data-tpl="portrait"] .s-name { font-size: 24pt; font-weight: 500; }
+.sheet[data-tpl="portrait"] .s-role { font-style: italic; font-weight: 400; color: var(--s-accent); font-size: 11pt; }
+.sheet[data-tpl="portrait"] .s-contact .sep { color: var(--s-accent); }
+.sheet[data-tpl="portrait"] h2 { display: flex; align-items: center; gap: 12px; text-align: center; font-size: 9.2pt; font-weight: 500; border-bottom: none; padding-bottom: 0; margin: 18px 0 8px; }
+.sheet[data-tpl="portrait"] h2::before, .sheet[data-tpl="portrait"] h2::after { content: ''; flex: 1; border-top: 1px solid var(--s-rule); }
+.sheet[data-tpl="portrait"] .s-summary { text-align: center; }
+.sheet[data-tpl="portrait"] .s-item-title { font-weight: 700; }
+.sheet[data-tpl="portrait"] .s-item-dates { font-weight: 400; }
 
 /* ---------- print. Only the sheet reaches the paper. ---------- */
 @media print {

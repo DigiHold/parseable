@@ -134,25 +134,23 @@ function moveButtons(key: string, i: number, len: number): string {
 
 function panelTemplate(): string {
   const tpls: Array<{ id: TemplateId; name: string; desc: string }> = [
-    { id: 'classic', name: 'Classic', desc: 'Balanced. Works for most applications.' },
-    { id: 'compact', name: 'Compact', desc: 'Dense and achromatic. For a long career.' },
-    { id: 'open', name: 'Open', desc: 'More air, larger name. For a shorter one.' },
+    { id: 'classic', name: 'Classic', desc: 'Helvetica under a firm rule, the shape most recruiters expect.' },
+    { id: 'editorial', name: 'Editorial', desc: 'Plex Serif with an oxblood accent, it reads like a printed book.' },
+    { id: 'signal', name: 'Signal', desc: 'A big sans name with orange marks, made to be noticed.' },
+    { id: 'mono', name: 'Mono', desc: 'Plex Mono with a blue accent, plain and exact for engineers.' },
+    { id: 'portrait', name: 'Portrait', desc: 'Centred serif with gold hairlines, made for a photo.' },
+    { id: 'open', name: 'Open', desc: 'More air and a green accent, for a shorter career.' },
+    { id: 'compact', name: 'Compact', desc: 'Dense and achromatic, for a long career held on one page.' },
   ];
+  const mini = renderSheet(data);
   const b = data.basics;
   return `
     <div class="p-5">
-      <p class="text-[13.5px] text-ink-2 mb-4">Three one column layouts. They differ in density, not in structure.</p>
-      <div class="mb-5 grid grid-cols-3 gap-2.5">
+      <p class="text-[13.5px] text-ink-2 mb-4">Seven one column layouts that differ in voice, never in structure, so each one reads the same to the software.</p>
+      <div class="mb-5 grid grid-cols-2 gap-2.5">
         ${tpls.map((t) => `
           <button class="tpl" data-tpl="${t.id}" aria-pressed="${data.settings.template === t.id}">
-            <span class="tpl-thumb block">
-              <i style="height:7px;width:62%"></i><i style="height:3px;width:44%"></i>
-              <i style="height:2px;width:100%;margin-top:6px"></i><i style="height:2px;width:92%"></i><i style="height:2px;width:96%"></i>
-              <i style="height:4px;width:34%;margin-top:6px;background:#b98d3e"></i>
-              <i style="height:2px;width:88%"></i><i style="height:2px;width:80%"></i><i style="height:2px;width:90%"></i>
-              <i style="height:4px;width:34%;margin-top:6px;background:#b98d3e"></i>
-              <i style="height:2px;width:84%"></i><i style="height:2px;width:76%"></i>
-            </span>
+            <span class="tpl-thumb" aria-hidden="true"><article class="sheet" data-tpl="${t.id}">${mini}</article></span>
             <span class="block font-display text-[12.5px] font-semibold leading-tight">${t.name}</span>
             <span class="block text-[11.5px] leading-snug text-ink-3">${t.desc}</span>
           </button>`).join('')}

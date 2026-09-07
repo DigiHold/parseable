@@ -1,4 +1,5 @@
-export type TemplateId = 'classic' | 'compact' | 'open';
+export type TemplateId = 'classic' | 'compact' | 'open' | 'editorial' | 'mono' | 'signal' | 'portrait';
+export const TEMPLATE_IDS: readonly TemplateId[] = ['classic', 'compact', 'open', 'editorial', 'mono', 'signal', 'portrait'];
 
 export interface ResumeLink { label: string; url: string; }
 export interface SkillRow { label: string; items: string; }
@@ -57,7 +58,7 @@ export function normalise(raw: unknown): Resume {
     })),
     languages: str(r.languages),
     settings: {
-      template: (['classic', 'compact', 'open'] as const).includes(r?.settings?.template) ? r.settings.template : 'classic',
+      template: TEMPLATE_IDS.includes(r?.settings?.template) ? r.settings.template : 'classic',
       showPhoto: r?.settings?.showPhoto === true,
     },
   };
