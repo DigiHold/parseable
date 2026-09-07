@@ -149,18 +149,29 @@ async function loadFamily(pdfMake: any, family: FontName): Promise<void> {
   loaded.add(family);
 }
 
-/** Crops a square image to a circle, because a PDF has no border radius. */
-function circle(src: string, px = 320): Promise<string> {
+/**
+ * Fits the photo to the frame the template gives it, cropped from the centre rather
+ * than squashed, which is what object-fit: cover does on the sheet. A PDF has no
+ * border radius either, so the round frame is cut here with the same pass.
+ */
+function fit(src: string, ratio: number, round: boolean, px = 360): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
+      const w = px;
+      const h = Math.round(px / ratio);
       const c = document.createElement('canvas');
-      c.width = px; c.height = px;
+      c.width = w; c.height = h;
       const g = c.getContext('2d');
       if (!g) { resolve(src); return; }
-      g.beginPath(); g.arc(px / 2, px / 2, px / 2, 0, Math.PI * 2); g.closePath(); g.clip();
-      const side = Math.min(img.width, img.height);
-      g.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, px, px);
+      if (round) { g.beginPath(); g.arc(w / 2, h / 2, Math.min(w, h) / 2, 0, Math.PI * 2); g.closePath(); g.clip(); }
+      // the largest centred rectangle of the source that carries the frame's ratio
+      const srcRatio = img.width / img.height;
+      let sw = img.width;
+      let sh = img.height;
+      if (srcRatio > ratio) sw = img.height * ratio;
+      else sh = img.width / ratio;
+      g.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, w, h);
       resolve(c.toDataURL('image/png'));
     };
     img.onerror = () => resolve(src);
@@ -206,10 +217,12 @@ export async function downloadPdf(r: Resume): Promise<void> {
 
   const photo = r.settings.showPhoto && b.photo ? b.photo : '';
   if (photo && t.photo === 'circle') {
-    content.push({ image: await circle(photo), width: 30 * MM, height: 30 * MM, alignment: 'center', margin: [0, 0, 0, 8] });
+    content.push({ image: await fit(photo, 1, true), width: 30 * MM, height: 30 * MM, alignment: 'center', margin: [0, 0, 0, pt(10)] });
     content.push(...headStack);
   } else if (photo) {
-    content.push({ columns: [{ stack: headStack, width: '*' }, { image: photo, width: 26 * MM, height: 32 * MM, width2: 0 }], columnGap: 14 });
+    const w = 26 * MM;
+    const h = 32 * MM;
+    content.push({ columns: [{ stack: headStack, width: '*' }, { image: await fit(photo, w / h, false), width: w, height: h }], columnGap: pt(14) });
   } else {
     content.push(...headStack);
   }
