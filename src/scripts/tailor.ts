@@ -28,7 +28,7 @@ const PLACE_WORD = /\b(europe|emea|eu|uk|usa|us|france|switzerland|suisse|belgiu
  */
 export function cleanTitle(raw: string): string {
   let t = raw.replace(/^\s*(job\s+title|title|poste|intitul[ée])\s*:\s*/i, '').replace(/\s*[(\[{][^)\]}]*[)\]}]/g, ' ').trim();
-  const segments = t.split(/\s+(?:-|–|—|\||\/|@|at|chez|pour|for)\s+|\s*,\s*|\s*:\s*/i).map((x) => x.trim()).filter(Boolean);
+  const segments = t.split(/\s+(?:-|–|—|\||@|at|chez|pour|for)\s+|\s*,\s*|\s*:\s*/i).map((x) => x.trim()).filter(Boolean);
   t = segments.find((x) => ROLE_WORD.test(x)) ?? segments[0] ?? '';
   t = t.replace(TAG_WORD, ' ').replace(PLACE_WORD, ' ').replace(/\b\d+\s*(k|€|\$|£)\b|[€$£]\s*\d+k?/gi, ' ');
   t = t.replace(/\s+/g, ' ').replace(/^[\s,;:\-–—/|]+|[\s,;:\-–—/|]+$/g, '').trim();
