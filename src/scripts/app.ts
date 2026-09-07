@@ -15,6 +15,7 @@ let demo = true;
 let step: StepId = 'details';
 let started = false;
 let posting = '';
+let postingTitle = '';
 let lastAudit: Audit | null = null;
 let zoom = 0.66;
 
@@ -24,17 +25,18 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 /* The draft lives in sessionStorage, so it survives a reload and is gone when
    the tab closes. It never reaches a server, because there is no server. */
 function save() {
-  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, step, started, demo })); } catch { /* private mode */ }
+  try { sessionStorage.setItem(KEY, JSON.stringify({ data, posting, postingTitle, step, started, demo })); } catch { /* private mode */ }
 }
 function restore() {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return;
-    const p = JSON.parse(raw) as { data?: unknown; posting?: string; step?: StepId; started?: boolean; demo?: boolean };
+    const p = JSON.parse(raw) as { data?: unknown; posting?: string; postingTitle?: string; step?: StepId; started?: boolean; demo?: boolean };
     data = normalise(p.data);
     demo = p.demo === true;
     started = p.started === true;
     posting = typeof p.posting === 'string' ? p.posting : '';
+    postingTitle = typeof p.postingTitle === 'string' ? p.postingTitle : '';
     if (p.step && STEPS.includes(p.step)) step = p.step;
   } catch { /* corrupt draft, start clean */ }
 }
@@ -179,7 +181,11 @@ function panelPosting(): string {
   const a = lastAudit;
   return `
     <div class="p-5">
-      <p class="text-[13.5px] text-ink-2 mb-4">Paste the posting. The checker lists the terms it scores and marks the ones your resume already contains.</p>
+      <p class="text-[13.5px] text-ink-2 mb-4">Paste the posting and its title. The checker compares the two titles, lists the terms it scores and marks the ones your resume already contains.</p>
+      <div class="field">
+        <label for="f-post-title">Job title</label>
+        <input id="f-post-title" type="text" data-role="posting-title" value="${esc(postingTitle)}" placeholder="Senior Backend Engineer, as the posting writes it" autocomplete="off">
+      </div>
       <div class="field">
         <label for="f-post">Job description</label>
         <textarea id="f-post" rows="7" data-role="posting" placeholder="Paste the whole posting, requirements included.">${esc(posting)}</textarea>
@@ -199,8 +205,14 @@ function renderAudit(a: Audit): string {
           : `<button class="chip chip-miss" data-kw="${esc(k.term)}" title="Add to your skills, only if it is true of you">${esc(k.term)}</button>`).join('')}</div>`
       : '<p class="text-[13px] text-ink-3">Nothing in this group was detected in the posting.</p>';
 
+  const t = a.title;
+  const titleBlock = !t ? '' : t.exact
+    ? `<p class="mb-4 text-[13.5px] text-ink-2"><b class="text-ink">Title.</b> Your resume already carries "${esc(t.wanted)}", and the title is the first field the software scores.</p>`
+    : `<div class="notice"><strong>The title does not match</strong>The posting is for "${esc(t.wanted)}" and that phrase is not in your resume${t.wordsHit ? `, though ${t.wordsHit} of its ${t.words} words are` : ''}. If that is honestly the role you do, take it as your job title, because the title is the first field the software scores.<div class="mt-2"><button class="btn btn-ghost btn-sm" data-action="use-title">Use it as my job title</button></div></div>`;
+
   return `
     <div class="mt-5 border-t border-rule pt-4">
+      ${titleBlock}
       <div class="flex items-baseline gap-2.5">
         <b class="font-display text-[34px] font-bold leading-none tracking-[-0.03em]">${a.requiredPct}%</b>
         <span class="text-[13.5px] text-ink-2">of the ${a.requiredTotal} required terms, ${a.requiredHit} matched</span>
@@ -355,6 +367,7 @@ function bootstrap() {
   document.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement | HTMLTextAreaElement;
     if (el.dataset.role === 'posting') { posting = el.value; save(); return; }
+    if (el.dataset.role === 'posting-title') { postingTitle = el.value; save(); return; }
     const path = el.dataset.bind;
     if (!path) return;
 
@@ -428,7 +441,7 @@ function bootstrap() {
       const items = row.items.split(',').map((s) => s.trim()).filter(Boolean);
       if (!items.some((s) => s.toLowerCase() === kw.toLowerCase())) items.push(kw);
       row.items = items.join(', ');
-      lastAudit = audit(posting, renderParserText($('#sheet') as HTMLElement));
+      lastAudit = audit(posting, renderParserText($('#sheet') as HTMLElement), postingTitle);
       render();
       return;
     }
@@ -446,10 +459,19 @@ function bootstrap() {
       const stem = (data.basics.name || 'resume').replace(/[^A-Za-z0-9]+/g, '') || 'resume';
       download(`${stem}_resume.json`, JSON.stringify(data, null, 2), 'application/json');
     }
+    if (action === 'use-title') {
+      const wanted = lastAudit?.title?.wanted ?? postingTitle.trim();
+      if (!wanted) return;
+      data.basics.title = wanted;
+      renderPreview();
+      const sheet = $('#sheet');
+      if (sheet && posting.trim()) lastAudit = audit(posting, renderParserText(sheet), postingTitle);
+      save(); render(); return;
+    }
     if (action === 'run-audit') {
       const sheet = $('#sheet');
       if (!sheet || !posting.trim()) return;
-      lastAudit = audit(posting, renderParserText(sheet));
+      lastAudit = audit(posting, renderParserText(sheet), postingTitle);
       tailorSkillOrder(lastAudit);
       render();
     }

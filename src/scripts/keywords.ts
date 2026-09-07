@@ -8,10 +8,13 @@
  */
 
 export interface Keyword { term: string; required: boolean; found: boolean; }
+/** The posting's title against the resume: the exact phrase, and how many of its words appear at all. */
+export interface TitleMatch { wanted: string; exact: boolean; words: number; wordsHit: number; }
 export interface Audit {
   keywords: Keyword[];
   requiredTotal: number; requiredHit: number; requiredPct: number;
   preferredTotal: number; preferredHit: number;
+  title: TitleMatch | null;
 }
 
 /* Terms an ATS requisition actually scores. Precision beats coverage here:
@@ -140,8 +143,16 @@ function phrases(posting: string): string[] {
   return [...found.values()].slice(0, 10);
 }
 
-export function audit(posting: string, resumeText: string): Audit {
+export function audit(posting: string, resumeText: string, jobTitle = ''): Audit {
   const hay = norm(resumeText);
+
+  // The title is the first field a requisition scores, so it is compared on its own, never buried in the list.
+  const wanted = jobTitle.trim().replace(/\s+/g, ' ');
+  let title: TitleMatch | null = null;
+  if (wanted) {
+    const words = wanted.split(' ').filter((w) => w.length > 1 && !/^(and|or|of|the|a|an|in|at|for|to|with|de|des|du|et|le|la|les)$/i.test(w));
+    title = { wanted, exact: present(wanted, hay), words: words.length, wordsHit: words.filter((w) => present(w, hay)).length };
+  }
   const raw = classify(posting);
 
   // Collapse alias families onto one term. Required beats preferred on a collision.
@@ -167,5 +178,6 @@ export function audit(posting: string, resumeText: string): Audit {
     requiredPct: req.length ? Math.round((reqHit / req.length) * 100) : 0,
     preferredTotal: pref.length,
     preferredHit: pref.filter((k) => k.found).length,
+    title,
   };
 }

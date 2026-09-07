@@ -81,6 +81,11 @@ await page.fill('[data-role="posting"]', 'Requirements\n- Strong experience with
 await page.click('[data-action="run-audit"]'); await page.waitForTimeout(300);
 const score = await page.locator('.mt-5 b').first().innerText();
 check('audit produces a score', /\d+%/.test(score), score);
+await page.fill('[data-role="posting-title"]', 'Platform Engineer'); await page.click('[data-action="run-audit"]'); await page.waitForTimeout(300);
+check('a posting title that is missing is reported', (await page.locator('[data-action="use-title"]').count()) === 1);
+await page.click('[data-action="use-title"]'); await page.waitForTimeout(300);
+check('the posting title becomes the resume title', (await page.locator('#sheet').innerText()).includes('Platform Engineer'));
+check('the title then reads as matched', (await page.locator('[data-action="use-title"]').count()) === 0);
 const missing = page.locator('button.chip-miss').first();
 const missingTerm = await missing.innerText();
 await missing.click(); await page.waitForTimeout(200);
